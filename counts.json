@@ -1,31 +1,31 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T10:32:03.379849+00:00",
+  "generated_at": "2026-10-09T10:33:46.480266+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
   "status_counts": {
     "blocked": 0,
-    "candidate": 16,
+    "candidate": 15,
     "excluded": 278,
     "failed": 0,
     "in_progress": 3,
-    "successful": 36
+    "successful": 37
   },
-  "successful_datapoints": 36,
+  "successful_datapoints": 37,
   "failed_datapoints": 0,
   "blocked_cases": 0,
-  "pending_cases": 19,
+  "pending_cases": 18,
   "oracle_occurrences": {
     "authentication_bypass": 2,
     "other": 4,
     "remote_code_execution": 18,
     "unauthorized_database_read": 3,
-    "unauthorized_file_access": 10,
-    "unauthorized_file_creation": 2
+    "unauthorized_file_access": 11,
+    "unauthorized_file_creation": 3
   },
-  "oracle_occurrence_total": 39,
+  "oracle_occurrence_total": 41,
   "failure_categories": {},
   "blocker_categories": {},
   "excluded_by_target_language": {
@@ -66,7 +66,7 @@
     "pgAdmin 8.10": 1,
     "pgAdmin 9.2": 1,
     "react-rsc-19.0.0": 1,
-    "saltstack-2018.3.0": 1,
+    "saltstack-2018.3.0": 2,
     "vite-2.3.0": 1,
     "vite-4.4.0-beta.0": 1,
     "vite-6.1.0-beta.1": 1,
@@ -103,6 +103,7 @@
     "pgadmin-004",
     "react-001",
     "saltstack-001",
+    "saltstack-002",
     "vite-001",
     "vite-002",
     "vite-003",
@@ -230,6 +231,10 @@
     {
       "id": "saltstack-001",
       "commit": "0509226b74b0c276d8ebb52ec0d9a5ab22b0f9fa"
+    },
+    {
+      "id": "saltstack-002",
+      "commit": "2234e33b3e3fff328e317af4eaa63ed350d7c0c1"
     },
     {
       "id": "vite-001",

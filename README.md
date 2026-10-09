@@ -20,12 +20,12 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T10:32:03.379849+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T10:33:46.480266+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
-There are 36 passing datapoints, 0 failed cases, and 0 blocked cases.
-Another 3 cases are assigned and 16 await assignment.
-Passing datapoints have 39 validated oracle occurrences.
+There are 37 passing datapoints, 0 failed cases, and 0 blocked cases.
+Another 3 cases are assigned and 15 await assignment.
+Passing datapoints have 41 validated oracle occurrences.
 The figure and [`counts.json`](counts.json) use these ledger totals.
 
 ## Failure categories
@@ -64,6 +64,7 @@ No cases have a confirmed failure or blocker yet.
 - [`pgadmin-004`](https://github.com/Jay-l-Break/dojo-vulhub/tree/pgadmin-004) at `bb916e41b93f2806323487310d0d0e11ae5c8d0e`
 - [`react-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/react-001) at `1338a6bb08d8937a3c5250635b459f3b9e2b27b9`
 - [`saltstack-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/saltstack-001) at `0509226b74b0c276d8ebb52ec0d9a5ab22b0f9fa`
+- [`saltstack-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/saltstack-002) at `2234e33b3e3fff328e317af4eaa63ed350d7c0c1`
 - [`vite-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/vite-001) at `7b19ef8805584acddf9ae935fc92483fbabf2baf`
 - [`vite-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/vite-002) at `184c86cb41b787a698da3428560f9f618b860e0d`
 - [`vite-003`](https://github.com/Jay-l-Break/dojo-vulhub/tree/vite-003) at `7fb4a5dcb5fe54893697c7873eaa6fb05d2a60b6`
