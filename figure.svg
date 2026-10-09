@@ -3,24 +3,24 @@
 <rect width="100%" height="100%" fill="#fff"/>
 <path d="M325 210 C487.5 210 487.5 160 650 160 L650 278.9189189189189 C487.5 278.9189189189189 487.5 328.9189189189189 325 328.9189189189189 Z" fill="#3079d7" fill-opacity="0.28"/>
 <path d="M325 328.9189189189189 C487.5 328.9189189189189 487.5 400 650 400 L650 1001.081081081081 C487.5 1001.081081081081 487.5 930.0 325 930.0 Z" fill="#aaa9a6" fill-opacity="0.48"/>
-<path d="M675 160.0 C887.5 160.0 887.5 160 1100 160 L1100 235.67567567567568 C887.5 235.67567567567568 887.5 235.67567567567568 675 235.67567567567568 Z" fill="#2f7ed8" fill-opacity="0.3"/>
-<path d="M675 235.67567567567568 C887.5 235.67567567567568 887.5 850 1100 850 L1100 893.2432432432432 C887.5 893.2432432432432 887.5 278.9189189189189 675 278.9189189189189 Z" fill="#b9b9b5" fill-opacity="0.3"/>
-<path d="M1125 160.0 C1407.5 160.0 1407.5 120 1690 120 L1690 127 C1407.5 127 1407.5 163.98293029871977 1125 163.98293029871977 Z" fill="#2f7ed8" fill-opacity="0.32"/>
+<path d="M675 160.0 C887.5 160.0 887.5 160 1100 160 L1100 237.83783783783784 C887.5 237.83783783783784 887.5 237.83783783783784 675 237.83783783783784 Z" fill="#2f7ed8" fill-opacity="0.3"/>
+<path d="M675 237.83783783783784 C887.5 237.83783783783784 887.5 850 1100 850 L1100 891.081081081081 C887.5 891.081081081081 887.5 278.9189189189189 675 278.9189189189189 Z" fill="#b9b9b5" fill-opacity="0.3"/>
+<path d="M1125 160.0 C1407.5 160.0 1407.5 120 1690 120 L1690 127 C1407.5 127 1407.5 163.991683991684 1125 163.991683991684 Z" fill="#2f7ed8" fill-opacity="0.32"/>
 <rect x="1690" y="120" width="25" height="7" rx="3" fill="#2f7ed8"/>
 <text x="1735" y="147" text-anchor="start" class="count">2</text><text x="1735" y="176" text-anchor="start" class="detail">Authentication bypass</text>
-<path d="M1125 163.98293029871977 C1407.5 163.98293029871977 1407.5 210 1690 210 L1690 217.96586059743956 C1407.5 217.96586059743956 1407.5 171.94879089615932 1125 171.94879089615932 Z" fill="#2f7ed8" fill-opacity="0.32"/>
-<rect x="1690" y="210" width="25" height="7.965860597439545" rx="3" fill="#2f7ed8"/>
+<path d="M1125 163.991683991684 C1407.5 163.991683991684 1407.5 210 1690 210 L1690 217.983367983368 C1407.5 217.983367983368 1407.5 171.975051975052 1125 171.975051975052 Z" fill="#2f7ed8" fill-opacity="0.32"/>
+<rect x="1690" y="210" width="25" height="7.983367983367984" rx="3" fill="#2f7ed8"/>
 <text x="1735" y="237" text-anchor="start" class="count">4</text><text x="1735" y="266" text-anchor="start" class="detail">Application flag</text>
-<path d="M1125 171.94879089615932 C1407.5 171.94879089615932 1407.5 300 1690 300 L1690 333.8549075391181 C1407.5 333.8549075391181 1407.5 205.8036984352774 1125 205.8036984352774 Z" fill="#2f7ed8" fill-opacity="0.32"/>
-<rect x="1690" y="300" width="25" height="33.85490753911807" rx="3" fill="#2f7ed8"/>
-<text x="1735" y="327" text-anchor="start" class="count">17</text><text x="1735" y="356" text-anchor="start" class="detail">Code execution</text>
-<path d="M1125 205.8036984352774 C1407.5 205.8036984352774 1407.5 390 1690 390 L1690 397 C1407.5 397 1407.5 211.77809388335706 1125 211.77809388335706 Z" fill="#2f7ed8" fill-opacity="0.32"/>
+<path d="M1125 171.97505197505197 C1407.5 171.97505197505197 1407.5 300 1690 300 L1690 335.92515592515593 C1407.5 335.92515592515593 1407.5 207.9002079002079 1125 207.9002079002079 Z" fill="#2f7ed8" fill-opacity="0.32"/>
+<rect x="1690" y="300" width="25" height="35.92515592515593" rx="3" fill="#2f7ed8"/>
+<text x="1735" y="327" text-anchor="start" class="count">18</text><text x="1735" y="356" text-anchor="start" class="detail">Code execution</text>
+<path d="M1125 207.9002079002079 C1407.5 207.9002079002079 1407.5 390 1690 390 L1690 397 C1407.5 397 1407.5 213.8877338877339 1125 213.8877338877339 Z" fill="#2f7ed8" fill-opacity="0.32"/>
 <rect x="1690" y="390" width="25" height="7" rx="3" fill="#2f7ed8"/>
 <text x="1735" y="417" text-anchor="start" class="count">3</text><text x="1735" y="446" text-anchor="start" class="detail">Database read</text>
-<path d="M1125 211.77809388335703 C1407.5 211.77809388335703 1407.5 480 1690 480 L1690 499.91465149359885 C1407.5 499.91465149359885 1407.5 231.69274537695588 1125 231.69274537695588 Z" fill="#2f7ed8" fill-opacity="0.32"/>
-<rect x="1690" y="480" width="25" height="19.914651493598864" rx="3" fill="#2f7ed8"/>
+<path d="M1125 213.88773388773387 C1407.5 213.88773388773387 1407.5 480 1690 480 L1690 499.95841995841994 C1407.5 499.95841995841994 1407.5 233.84615384615384 1125 233.84615384615384 Z" fill="#2f7ed8" fill-opacity="0.32"/>
+<rect x="1690" y="480" width="25" height="19.958419958419956" rx="3" fill="#2f7ed8"/>
 <text x="1735" y="507" text-anchor="start" class="count">10</text><text x="1735" y="536" text-anchor="start" class="detail">Private file access</text>
-<path d="M1125 231.6927453769559 C1407.5 231.6927453769559 1407.5 570 1690 570 L1690 577 C1407.5 577 1407.5 235.67567567567568 1125 235.67567567567568 Z" fill="#2f7ed8" fill-opacity="0.32"/>
+<path d="M1125 233.84615384615384 C1407.5 233.84615384615384 1407.5 570 1690 570 L1690 577 C1407.5 577 1407.5 237.83783783783784 1125 237.83783783783784 Z" fill="#2f7ed8" fill-opacity="0.32"/>
 <rect x="1690" y="570" width="25" height="7" rx="3" fill="#2f7ed8"/>
 <text x="1735" y="597" text-anchor="start" class="count">2</text><text x="1735" y="626" text-anchor="start" class="detail">File creation</text>
 <rect x="300" y="210" width="25" height="720" rx="3" fill="#777775"/>
@@ -29,12 +29,12 @@
 <text x="280" y="125" text-anchor="end" class="count">333</text><text x="280" y="154" text-anchor="end" class="detail">Vulhub cases</text>
 <text x="640" y="75" text-anchor="end" class="count">55</text><text x="640" y="104" text-anchor="end" class="detail">JavaScript and Python</text>
 <text x="680" y="1040" text-anchor="start" class="count">278</text><text x="680" y="1069" text-anchor="start" class="detail">Other target languages</text>
-<rect x="1100" y="160" width="25" height="75.67567567567568" rx="3" fill="#2f7ed8"/>
-<text x="1140" y="105" text-anchor="start" class="count">35</text><text x="1140" y="134" text-anchor="start" class="detail">Successful datapoints</text>
+<rect x="1100" y="160" width="25" height="77.83783783783784" rx="3" fill="#2f7ed8"/>
+<text x="1140" y="105" text-anchor="start" class="count">36</text><text x="1140" y="134" text-anchor="start" class="detail">Successful datapoints</text>
 <rect x="1100" y="390" width="25" height="5" rx="3" fill="#ed6434"/>
 <text x="1140" y="335" text-anchor="start" class="count">0</text><text x="1140" y="364" text-anchor="start" class="detail">Failed datapoints</text>
 <rect x="1100" y="620" width="25" height="5" rx="3" fill="#f49a5b"/>
 <text x="1140" y="565" text-anchor="start" class="count">0</text><text x="1140" y="594" text-anchor="start" class="detail">Blocked cases</text>
-<rect x="1100" y="850" width="25" height="43.24324324324324" rx="3" fill="#b9b9b5"/>
-<text x="1140" y="795" text-anchor="start" class="count">20</text><text x="1140" y="824" text-anchor="start" class="detail">Work pending</text>
+<rect x="1100" y="850" width="25" height="41.08108108108108" rx="3" fill="#b9b9b5"/>
+<text x="1140" y="795" text-anchor="start" class="count">19</text><text x="1140" y="824" text-anchor="start" class="detail">Work pending</text>
 </svg>

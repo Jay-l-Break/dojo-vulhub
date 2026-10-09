@@ -1,7 +1,7 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T10:28:39.505522+00:00",
+  "generated_at": "2026-10-09T10:32:03.379849+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
@@ -10,22 +10,22 @@
     "candidate": 16,
     "excluded": 278,
     "failed": 0,
-    "in_progress": 4,
-    "successful": 35
+    "in_progress": 3,
+    "successful": 36
   },
-  "successful_datapoints": 35,
+  "successful_datapoints": 36,
   "failed_datapoints": 0,
   "blocked_cases": 0,
-  "pending_cases": 20,
+  "pending_cases": 19,
   "oracle_occurrences": {
     "authentication_bypass": 2,
     "other": 4,
-    "remote_code_execution": 17,
+    "remote_code_execution": 18,
     "unauthorized_database_read": 3,
     "unauthorized_file_access": 10,
     "unauthorized_file_creation": 2
   },
-  "oracle_occurrence_total": 38,
+  "oracle_occurrence_total": 39,
   "failure_categories": {},
   "blocker_categories": {},
   "excluded_by_target_language": {
@@ -56,6 +56,7 @@
     "comfyui-manager-3.3": 2,
     "django-1.10": 5,
     "django-3.1.0": 1,
+    "kibana-5.0.0-alpha2": 1,
     "langflow-1.0.0": 1,
     "langflow-1.3.0": 1,
     "mongo-express 0.15.0": 1,
@@ -87,6 +88,7 @@
     "flask-001",
     "gradio-001",
     "gradio-002",
+    "kibana-001",
     "langflow-001",
     "langflow-002",
     "mongo-express-001",
@@ -164,6 +166,10 @@
     {
       "id": "gradio-002",
       "commit": "feaf27cbb35995412b3294d2aedd35cff05d8ef3"
+    },
+    {
+      "id": "kibana-001",
+      "commit": "3968f240d86ca5e931457037374bc49c27db0e4f"
     },
     {
       "id": "langflow-001",
