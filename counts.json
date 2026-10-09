@@ -1,30 +1,30 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T09:47:43.053094+00:00",
+  "generated_at": "2026-10-09T09:56:55.504269+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
   "status_counts": {
     "blocked": 0,
-    "candidate": 26,
+    "candidate": 25,
     "excluded": 278,
     "failed": 0,
     "in_progress": 4,
-    "successful": 25
+    "successful": 26
   },
-  "successful_datapoints": 25,
+  "successful_datapoints": 26,
   "failed_datapoints": 0,
   "blocked_cases": 0,
-  "pending_cases": 30,
+  "pending_cases": 29,
   "oracle_occurrences": {
     "other": 4,
-    "remote_code_execution": 12,
+    "remote_code_execution": 13,
     "unauthorized_database_read": 3,
     "unauthorized_file_access": 7,
     "unauthorized_file_creation": 1
   },
-  "oracle_occurrence_total": 27,
+  "oracle_occurrence_total": 28,
   "failure_categories": {},
   "blocker_categories": {},
   "excluded_by_target_language": {
@@ -57,6 +57,7 @@
     "django-3.1.0": 1,
     "langflow-1.0.0": 1,
     "mongo-express 0.15.0": 1,
+    "n8n-1.65.0": 1,
     "pgAdmin 5.4": 2,
     "pgAdmin 8.10": 1,
     "pgAdmin 9.2": 1,
@@ -79,6 +80,7 @@
     "gradio-002",
     "langflow-001",
     "mongo-express-001",
+    "n8n-001",
     "node-001",
     "node-002",
     "pgadmin-001",
@@ -146,6 +148,10 @@
     {
       "id": "mongo-express-001",
       "commit": "3a72f3f343e1725fb5bce524fbacf03b8d7d9c76"
+    },
+    {
+      "id": "n8n-001",
+      "commit": "c4e860a574a59352b199ef595f1d34bb5e1a7d92"
     },
     {
       "id": "node-001",
