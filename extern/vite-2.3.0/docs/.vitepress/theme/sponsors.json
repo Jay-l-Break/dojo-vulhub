@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Tailwind Labs",
+    "href": "https://tailwindcss.com",
+    "src": "/tailwind-labs.svg"
+  },
+  {
+    "name": "Vue Jobs",
+    "href": "https://vuejobs.com/?ref=vuejs",
+    "src": "/vuejobs.png"
+  }
+]
