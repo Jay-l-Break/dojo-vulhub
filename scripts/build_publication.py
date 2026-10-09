@@ -21,6 +21,7 @@ ORACLE_LABELS = {
     "other": "Application flag",
 }
 VALID_STATUSES = {"excluded", "candidate", "in_progress", "successful", "failed", "blocked"}
+LOCAL_AUDIT_STATUSES = {"passed", "failed", "blocked", "pending"}
 
 
 def read_ledger(path: Path) -> dict:
@@ -81,6 +82,54 @@ def build_counts(ledger: dict) -> dict:
                        if entry.get("version_group"))
     repins = sorted(entry["vulnerability_id"] for entry in successful
                     if entry.get("version_repin_required"))
+    local_audits = []
+    for entry in successful:
+        audit = entry.get("local_runtime_audit") or {}
+        status = audit.get("status", "pending")
+        if status not in LOCAL_AUDIT_STATUSES:
+            raise ValueError(f"Unknown local runtime status: {entry['vulnerability_id']}")
+        if status == "passed" and not (
+            audit.get("root_dockerfile") is True
+            and audit.get("docker_build") is True
+            and audit.get("docker_run") is True
+            and audit.get("container_port") == 80
+            and type(audit.get("http_status")) is int
+            and 100 <= audit["http_status"] < 500
+            and audit.get("tested_source_commit") == entry.get("source_branch_commit")
+            and (audit.get("root_compose_present") is True
+                 or audit.get("direct_http_ready") is True)
+            and (audit.get("root_compose_present") is not True or (
+                audit.get("root_compose_config_valid") is True
+                and audit.get("root_compose_zero_env_config_valid") is True
+                and audit.get("root_compose_uses_root_dockerfile") is True
+                and audit.get("root_compose_ready") is True
+                and audit.get("root_compose_host_port_80") is True
+                and audit.get("root_compose_public_bind") is True
+            ))
+        ):
+            raise ValueError(f"Incomplete local runtime evidence: {entry['vulnerability_id']}")
+        local_audits.append({
+            "id": entry["vulnerability_id"],
+            "commit": entry.get("source_branch_commit"),
+            "status": status,
+            "root_dockerfile": bool(audit.get("root_dockerfile")),
+            "docker_build": bool(audit.get("docker_build")),
+            "docker_run": bool(audit.get("docker_run")),
+            "container_port": audit.get("container_port"),
+            "http_status": audit.get("http_status"),
+            "direct_http_ready": bool(audit.get("direct_http_ready")),
+            "support_services_required": bool(audit.get("support_services")),
+            "root_compose_present": bool(audit.get("root_compose_present")),
+            "root_compose_zero_env_config_valid": bool(
+                audit.get("root_compose_zero_env_config_valid")
+            ),
+            "root_compose_uses_root_dockerfile": bool(
+                audit.get("root_compose_uses_root_dockerfile")
+            ),
+            "root_compose_ready": bool(audit.get("root_compose_ready")),
+            "reason": audit.get("reason"),
+        })
+    local_statuses = Counter(audit["status"] for audit in local_audits)
     counts = {
         "benchmark": ledger["benchmark"],
         "vulhub_revision": ledger["vulhub_revision"],
@@ -105,6 +154,21 @@ def build_counts(ledger: dict) -> dict:
             {"id": entry["vulnerability_id"], "commit": entry["source_branch_commit"]}
             for entry in successful if entry.get("source_branch_commit")
         ],
+        "local_source_audit": {
+            "total": len(local_audits),
+            "root_dockerfiles": sum(audit["root_dockerfile"] for audit in local_audits),
+            "root_compose_stacks": sum(audit["root_compose_present"]
+                                       for audit in local_audits if audit["status"] == "passed"),
+            "direct_images_ready": sum(audit["direct_http_ready"]
+                                       for audit in local_audits if audit["status"] == "passed"),
+            "images_needing_public_companions": sum(
+                not audit["direct_http_ready"] and audit["support_services_required"]
+                for audit in local_audits if audit["status"] == "passed"
+            ),
+            "status_counts": {status: local_statuses[status]
+                              for status in sorted(LOCAL_AUDIT_STATUSES)},
+            "cases": sorted(local_audits, key=lambda audit: audit["id"]),
+        },
     }
     if counts["excluded_cases"] + counts["language_candidates"] != counts["source_cases"]:
         raise ValueError("Language selection counts do not reconcile")
@@ -218,6 +282,7 @@ def render_svg(counts: dict) -> str:
 def render_readme(counts: dict) -> str:
     status = counts["status_counts"]
     branches = counts["published_source_branches"]
+    local_audit = counts["local_source_audit"]
     lines = [
         "# Vulhub benchmark",
         "",
@@ -253,6 +318,25 @@ def render_readme(counts: dict) -> str:
         f"Passing datapoints have {counts['oracle_occurrence_total']} validated oracle occurrences.",
         f"Earlier version repins are pending for {len(counts['version_repins_pending'])} passing datapoints.",
         "The figure and [`counts.json`](counts.json) use these ledger totals.",
+        "",
+        "## Local source deployment",
+        "",
+        "Every published vulnerability branch needs a root Dockerfile that starts its application server on container port 80.",
+        "The local check builds that image, starts it, and requests the application through port 80.",
+        "Public support services can start alongside the image when the application requires them.",
+        "A root Compose file must start without private environment variables and publish host port 80 on all interfaces by default.",
+        "The local check also starts each root Compose stack and requests the application through port 80.",
+        f"Root Dockerfiles present: {local_audit['root_dockerfiles']} of {local_audit['total']}.",
+        f"Root Compose stacks tested: {local_audit['root_compose_stacks']}.",
+        f"Images that reach HTTP readiness on their own: {local_audit['direct_images_ready']}.",
+        f"Images that need public Compose companions for HTTP readiness: {local_audit['images_needing_public_companions']}.",
+        f"Local checks: {local_audit['status_counts']['passed']} passed, "
+        f"{local_audit['status_counts']['failed']} failed, "
+        f"{local_audit['status_counts']['blocked']} blocked, "
+        f"{local_audit['status_counts']['pending']} pending.",
+        "These local startup checks do not repeat the oracle tests against rebuilt source images.",
+        "Rocket.Chat and Vite use pinned published runtime artifacts alongside checked-in upstream source snapshots.",
+        "Per-branch results and source commits are in [`counts.json`](counts.json).",
         "",
         "## Failure categories",
         "",

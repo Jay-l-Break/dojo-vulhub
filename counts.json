@@ -1,7 +1,7 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T13:00:51.414955+00:00",
+  "generated_at": "2026-10-09T16:17:48.593203+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
@@ -150,219 +150,1152 @@
   "published_source_branches": [
     {
       "id": "airflow-001",
-      "commit": "e622fecd25edd57c6f94dbbeda0cd67f3ea247cb"
+      "commit": "b6fec8af1746b2dbde389baceca13517d16e250d"
     },
     {
       "id": "airflow-002",
-      "commit": "b99690ae297308c75a6a92a70d21de1c97208193"
+      "commit": "c9cc6d696853a7cf621ab2f286121d1166fe1954"
     },
     {
       "id": "airflow-003",
-      "commit": "50e6ed8c4889f3cb56ab100bf483ba5b53039664"
+      "commit": "cd00dbfaeb02787f08420243d610314d9059509a"
     },
     {
       "id": "budibase-001",
-      "commit": "3aefdfa6c4f8803e49455945bcb348d8e70f61a7"
+      "commit": "34146b641ad79087975eb4ef9aad0644f0007821"
     },
     {
       "id": "celery-001",
-      "commit": "ca33ca6d3868ab058995f508d7759867abd98881"
+      "commit": "48b0843fa1959fef84c6ffc61d86286e64c0b6a2"
     },
     {
       "id": "chartbrew-001",
-      "commit": "8eaea933f2e1df76ac0fab121e75761e1aaaed8a"
+      "commit": "ac251bfbf7ddb17b7752aa419aee72ab9f2dbe84"
     },
     {
       "id": "comfyui-001",
-      "commit": "c17383118477fefea9b675e97920027b56b2e3d6"
+      "commit": "47583a37764375bb9b5851e5ac46a1d838f954cb"
     },
     {
       "id": "comfyui-002",
-      "commit": "aeaabf5c816082de61dacc5509d66dc0dab7be46"
+      "commit": "400d76691c0911930f8ed17ea3d7cdf20a3020cd"
     },
     {
       "id": "django-001",
-      "commit": "a73b108f3cc5fbb60e746979eeff076c1f061019"
+      "commit": "7783c150e0c3a447c8aafe59096a697ce7e0d227"
     },
     {
       "id": "django-002",
-      "commit": "c49e3fce80761fa8f9dda289946f0e397563eb82"
+      "commit": "4548e9ddf7cec911afff42df58943ee83345aec2"
     },
     {
       "id": "django-003",
-      "commit": "758859083b3f3d18d280d25c98a1515dd978b920"
+      "commit": "fb845e626c877a5ef344d03a2c12a934073eba80"
     },
     {
       "id": "django-004",
-      "commit": "13c2c51377065a30e8a7f89f1b3e4b1c60383ba2"
+      "commit": "999341bb316479d832be298fcd41b53602addc5e"
     },
     {
       "id": "django-005",
-      "commit": "d2e9c84e7907ba048ddef39f31387825d2c800d4"
+      "commit": "e54832e5e24ac118d988a47e12776894b2ac4e59"
     },
     {
       "id": "django-006",
-      "commit": "45facb0cd2d5c3bf7bec88a2fb02bdeb878f620a"
+      "commit": "80c137c2feff99e66f7a03adf27688d8d19aa2e4"
     },
     {
       "id": "electron-002",
-      "commit": "0de0f9f0b762eda44afbcd9b56c78d3ddebe2d0d"
+      "commit": "47b47565c0579395296151f0152709585f74909c"
     },
     {
       "id": "flask-001",
-      "commit": "80302968d7aa25e2b051af1cbde1669ac0af64dd"
+      "commit": "e0ceb3478f58ef78b6f03d5582a2c3ba6bfaf1f4"
     },
     {
       "id": "gradio-001",
-      "commit": "8f689400725fbe6470c05d2e2ccd9a5b2398797d"
+      "commit": "9cba549d3ae8ddcd114b4ccafd4677e979e5716e"
     },
     {
       "id": "gradio-002",
-      "commit": "feaf27cbb35995412b3294d2aedd35cff05d8ef3"
+      "commit": "1590df3c5b7228bb397c49b4dcd7e39fa732e875"
     },
     {
       "id": "jumpserver-001",
-      "commit": "15f8461d13dae96e3ab6b729a75082bfa78332c8"
+      "commit": "023014f02d28845def03c642157062e6af319280"
     },
     {
       "id": "jupyter-001",
-      "commit": "7b3a7c52f3da79859f7375ff32d5a10b54b16afc"
+      "commit": "d9a964619e38dfeb18631b4be0c222c8303b8d47"
     },
     {
       "id": "kibana-001",
-      "commit": "3968f240d86ca5e931457037374bc49c27db0e4f"
+      "commit": "7cd539769d56be013d7c79785016df613a247536"
     },
     {
       "id": "kibana-002",
-      "commit": "0bc0423d4a70747a14a4ab4efc285e0e5fde2a9e"
+      "commit": "22f3d633a7ac19b4d7927abafdc45352f3744367"
     },
     {
       "id": "kibana-003",
-      "commit": "e88d10dd46fb857f47f7603184862bf4e100d27d"
+      "commit": "162dbeae721117f4d70fd4f2057744941c242c95"
     },
     {
       "id": "langflow-001",
-      "commit": "66be9dd9cd9a93d26aaec19f0bd3d2d2e6d7c06a"
+      "commit": "84e809571be617fb73957f455cc3ad2c28a87f79"
     },
     {
       "id": "langflow-002",
-      "commit": "3fd5e2791ca54f078ef220ab465093e35ba7cfbe"
+      "commit": "3aa8578a462d5730e3f9f28923452a282d4159c8"
     },
     {
       "id": "mongo-express-001",
-      "commit": "3a72f3f343e1725fb5bce524fbacf03b8d7d9c76"
+      "commit": "f6c794e9dcd52cf13694a948e586f1628ce52c82"
     },
     {
       "id": "n8n-001",
-      "commit": "e008711653bffcebbcaa5d82e3bd95bc44d69f46"
+      "commit": "82990738a51e41b4cfe0fca3253b62b8c2ebe120"
     },
     {
       "id": "n8n-002",
-      "commit": "40de2bc596b21a2b19c4f2f3b9ad1c469a65c517"
+      "commit": "e0b17b240f948e89bc763aa2618512ba0bef0221"
     },
     {
       "id": "next-js-001",
-      "commit": "8e8bc97d61a5f1ad71022a9cc2afe185ec807f7e"
+      "commit": "b32ab19d4038205af7fd197c4a0c8fc16a278d0f"
     },
     {
       "id": "node-001",
-      "commit": "5d086b74e3f7b1b56823dbadc729fb0a852e6191"
+      "commit": "94cf10e8056d3b8fca2ca3ec02b62cb2e74ecd3b"
     },
     {
       "id": "node-002",
-      "commit": "0128e84df40cf7fb22b329b1f605834a49d852bc"
+      "commit": "8776b75f3900d8d8e4ba6caf79fcf8e0c80487c4"
     },
     {
       "id": "openclaw-001",
-      "commit": "8f11033873b4b93ce6157aadb4e09271bc748fc2"
+      "commit": "afe31a9eb82fdc1b9c7a5fe6c0ac76cbcd5981c6"
     },
     {
       "id": "pdfjs-001",
-      "commit": "040756f5f3a980149b4597d86707b465bc0db808"
+      "commit": "5f9866da22d4d54a61749f3af195e30bc9a6c667"
     },
     {
       "id": "pgadmin-001",
-      "commit": "1c4944d9e8fbb9f1f3ba6f9e6fc116c1a7195168"
+      "commit": "17ba5abc9d676b98881881d5711e4c865a0a4cc9"
     },
     {
       "id": "pgadmin-002",
-      "commit": "aca8c5f899cfa944a3810dd6ee4c71c391724d8e"
+      "commit": "6cf1e04144b7e1cce3350015eb28b2c044df4a27"
     },
     {
       "id": "pgadmin-003",
-      "commit": "e02b428f9dcd23f81bcca5cd26f5353beb456732"
+      "commit": "e54411038963845a2221e85d3609ac14a9b31101"
     },
     {
       "id": "pgadmin-004",
-      "commit": "bb916e41b93f2806323487310d0d0e11ae5c8d0e"
+      "commit": "a4a4dc33ddb474c2b9a7594645abdcae42121c20"
     },
     {
       "id": "aiohttp-001",
-      "commit": "21d7c493968e544088d61341dda072dc40932b31"
+      "commit": "dcd372081cd73407b4a073861629f3be8368e1a9"
     },
     {
       "id": "pickle-001",
-      "commit": "54276f46377aa6fa7a30d76f1fc69d8b3769911e"
+      "commit": "33dc04c61746339cfa42c9251e41607ff664a783"
     },
     {
       "id": "react-001",
-      "commit": "1338a6bb08d8937a3c5250635b459f3b9e2b27b9"
+      "commit": "589d15dcf7b882828a0c34890874eabd249da8e2"
     },
     {
       "id": "rocketchat-001",
-      "commit": "e6ad104052c0454c0ba8fb81d5f52ff26869fb8c"
+      "commit": "be75bc5f59fe2617313bedd2980c8cc904253a73"
     },
     {
       "id": "saltstack-001",
-      "commit": "1d445b27c4ed1f13ce34105ad90e93badd6d874f"
+      "commit": "42e9560f7c85bfdf70f116f6b9c73c48e5596323"
     },
     {
       "id": "saltstack-002",
-      "commit": "3848d645844f3758fb7c190c8e75e33c934b31d6"
+      "commit": "33b3327c30553b63419c44941fc4f1d7a83ab080"
     },
     {
       "id": "saltstack-003",
-      "commit": "3213b760d7264dafa73727f72d12a8cda3a1488e"
+      "commit": "31d2d5b1eb55242bb79739f1234097c69e5e2002"
     },
     {
       "id": "scrapyd-001",
-      "commit": "8503eef27a13f43c44cf67f48f61a132474082a8"
+      "commit": "460e5840d4d43f4ab28acd29bec51b538ecad3a1"
     },
     {
       "id": "superset-001",
-      "commit": "1fd021ec49cb0baa76eefe4d3c41596d186fa1a6"
+      "commit": "a36ed960e98d116ad4ce843768d8edf12bb3c77c"
     },
     {
       "id": "superset-002",
-      "commit": "b241f1ac962e17d677cebfb9669529e232c005d8"
+      "commit": "9c970b50a0a2d0eb8bd5a61cdf1c12131d4e3bbb"
     },
     {
       "id": "supervisor-001",
-      "commit": "0931971bf055091819483d7848a023075b8020ad"
+      "commit": "f578c933315c55034b900a78a4550e3def694d0c"
     },
     {
       "id": "vite-001",
-      "commit": "7b19ef8805584acddf9ae935fc92483fbabf2baf"
+      "commit": "f9e4e44b37e2dbd909b97840c9be928af0282970"
     },
     {
       "id": "vite-002",
-      "commit": "184c86cb41b787a698da3428560f9f618b860e0d"
+      "commit": "40aa0cf10fe8afc5ee68a5c1031c8aa67cc11acf"
     },
     {
       "id": "vite-003",
-      "commit": "7fb4a5dcb5fe54893697c7873eaa6fb05d2a60b6"
+      "commit": "4ccc4cc77e48e61d9479971fb39a71d744b9a17d"
     },
     {
       "id": "vite-004",
-      "commit": "19f82efcdb68448f78d974aea100423bf1a538a2"
+      "commit": "12cc2c16cdc601c4af543a8b2fff46a5f2678b2b"
     },
     {
       "id": "yapi-001",
-      "commit": "e40ae35c2b89267b571a612e46f43705d0b6e0ab"
+      "commit": "59864738899596a592e755a109650628b1b20578"
     },
     {
       "id": "yapi-002",
-      "commit": "77d51007d05ee99c041f2c2b038cbda195b2c98b"
+      "commit": "4431652d402ff5f6e837ab8c923aebb129b69b68"
     }
-  ]
+  ],
+  "local_source_audit": {
+    "total": 54,
+    "root_dockerfiles": 54,
+    "root_compose_stacks": 20,
+    "direct_images_ready": 49,
+    "images_needing_public_companions": 5,
+    "status_counts": {
+      "blocked": 0,
+      "failed": 0,
+      "passed": 54,
+      "pending": 0
+    },
+    "cases": [
+      {
+        "id": "aiohttp-001",
+        "commit": "dcd372081cd73407b4a073861629f3be8368e1a9",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "airflow-001",
+        "commit": "b6fec8af1746b2dbde389baceca13517d16e250d",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 302,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "airflow-002",
+        "commit": "c9cc6d696853a7cf621ab2f286121d1166fe1954",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 302,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "airflow-003",
+        "commit": "cd00dbfaeb02787f08420243d610314d9059509a",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 302,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "budibase-001",
+        "commit": "34146b641ad79087975eb4ef9aad0644f0007821",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "celery-001",
+        "commit": "48b0843fa1959fef84c6ffc61d86286e64c0b6a2",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "chartbrew-001",
+        "commit": "ac251bfbf7ddb17b7752aa419aee72ab9f2dbe84",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "comfyui-001",
+        "commit": "47583a37764375bb9b5851e5ac46a1d838f954cb",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "comfyui-002",
+        "commit": "400d76691c0911930f8ed17ea3d7cdf20a3020cd",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "django-001",
+        "commit": "7783c150e0c3a447c8aafe59096a697ce7e0d227",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": true,
+        "root_compose_zero_env_config_valid": true,
+        "root_compose_uses_root_dockerfile": true,
+        "root_compose_ready": true,
+        "reason": null
+      },
+      {
+        "id": "django-002",
+        "commit": "4548e9ddf7cec911afff42df58943ee83345aec2",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 404,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": true,
+        "root_compose_zero_env_config_valid": true,
+        "root_compose_uses_root_dockerfile": true,
+        "root_compose_ready": true,
+        "reason": null
+      },
+      {
+        "id": "django-003",
+        "commit": "fb845e626c877a5ef344d03a2c12a934073eba80",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 404,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": true,
+        "root_compose_zero_env_config_valid": true,
+        "root_compose_uses_root_dockerfile": true,
+        "root_compose_ready": true,
+        "reason": null
+      },
+      {
+        "id": "django-004",
+        "commit": "999341bb316479d832be298fcd41b53602addc5e",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": true,
+        "root_compose_zero_env_config_valid": true,
+        "root_compose_uses_root_dockerfile": true,
+        "root_compose_ready": true,
+        "reason": null
+      },
+      {
+        "id": "django-005",
+        "commit": "e54832e5e24ac118d988a47e12776894b2ac4e59",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 404,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": true,
+        "root_compose_zero_env_config_valid": true,
+        "root_compose_uses_root_dockerfile": true,
+        "root_compose_ready": true,
+        "reason": null
+      },
+      {
+        "id": "django-006",
+        "commit": "80c137c2feff99e66f7a03adf27688d8d19aa2e4",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": true,
+        "root_compose_zero_env_config_valid": true,
+        "root_compose_uses_root_dockerfile": true,
+        "root_compose_ready": true,
+        "reason": null
+      },
+      {
+        "id": "electron-002",
+        "commit": "47b47565c0579395296151f0152709585f74909c",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "flask-001",
+        "commit": "e0ceb3478f58ef78b6f03d5582a2c3ba6bfaf1f4",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "gradio-001",
+        "commit": "9cba549d3ae8ddcd114b4ccafd4677e979e5716e",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "gradio-002",
+        "commit": "1590df3c5b7228bb397c49b4dcd7e39fa732e875",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "jumpserver-001",
+        "commit": "023014f02d28845def03c642157062e6af319280",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": false,
+        "support_services_required": true,
+        "root_compose_present": true,
+        "root_compose_zero_env_config_valid": true,
+        "root_compose_uses_root_dockerfile": true,
+        "root_compose_ready": true,
+        "reason": null
+      },
+      {
+        "id": "jupyter-001",
+        "commit": "d9a964619e38dfeb18631b4be0c222c8303b8d47",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 302,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "kibana-001",
+        "commit": "7cd539769d56be013d7c79785016df613a247536",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "kibana-002",
+        "commit": "22f3d633a7ac19b4d7927abafdc45352f3744367",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 302,
+        "direct_http_ready": false,
+        "support_services_required": true,
+        "root_compose_present": true,
+        "root_compose_zero_env_config_valid": true,
+        "root_compose_uses_root_dockerfile": true,
+        "root_compose_ready": true,
+        "reason": null
+      },
+      {
+        "id": "kibana-003",
+        "commit": "162dbeae721117f4d70fd4f2057744941c242c95",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 302,
+        "direct_http_ready": false,
+        "support_services_required": true,
+        "root_compose_present": true,
+        "root_compose_zero_env_config_valid": true,
+        "root_compose_uses_root_dockerfile": true,
+        "root_compose_ready": true,
+        "reason": null
+      },
+      {
+        "id": "langflow-001",
+        "commit": "84e809571be617fb73957f455cc3ad2c28a87f79",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "langflow-002",
+        "commit": "3aa8578a462d5730e3f9f28923452a282d4159c8",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "mongo-express-001",
+        "commit": "f6c794e9dcd52cf13694a948e586f1628ce52c82",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": false,
+        "support_services_required": true,
+        "root_compose_present": true,
+        "root_compose_zero_env_config_valid": true,
+        "root_compose_uses_root_dockerfile": true,
+        "root_compose_ready": true,
+        "reason": null
+      },
+      {
+        "id": "n8n-001",
+        "commit": "82990738a51e41b4cfe0fca3253b62b8c2ebe120",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 404,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "n8n-002",
+        "commit": "e0b17b240f948e89bc763aa2618512ba0bef0221",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 404,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "next-js-001",
+        "commit": "b32ab19d4038205af7fd197c4a0c8fc16a278d0f",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 302,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "node-001",
+        "commit": "94cf10e8056d3b8fca2ca3ec02b62cb2e74ecd3b",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": true,
+        "root_compose_zero_env_config_valid": true,
+        "root_compose_uses_root_dockerfile": true,
+        "root_compose_ready": true,
+        "reason": null
+      },
+      {
+        "id": "node-002",
+        "commit": "8776b75f3900d8d8e4ba6caf79fcf8e0c80487c4",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": false,
+        "support_services_required": true,
+        "root_compose_present": true,
+        "root_compose_zero_env_config_valid": true,
+        "root_compose_uses_root_dockerfile": true,
+        "root_compose_ready": true,
+        "reason": null
+      },
+      {
+        "id": "openclaw-001",
+        "commit": "afe31a9eb82fdc1b9c7a5fe6c0ac76cbcd5981c6",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "pdfjs-001",
+        "commit": "5f9866da22d4d54a61749f3af195e30bc9a6c667",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": true,
+        "root_compose_zero_env_config_valid": true,
+        "root_compose_uses_root_dockerfile": true,
+        "root_compose_ready": true,
+        "reason": null
+      },
+      {
+        "id": "pgadmin-001",
+        "commit": "17ba5abc9d676b98881881d5711e4c865a0a4cc9",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 302,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "pgadmin-002",
+        "commit": "6cf1e04144b7e1cce3350015eb28b2c044df4a27",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 302,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "pgadmin-003",
+        "commit": "e54411038963845a2221e85d3609ac14a9b31101",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "pgadmin-004",
+        "commit": "a4a4dc33ddb474c2b9a7594645abdcae42121c20",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "pickle-001",
+        "commit": "33dc04c61746339cfa42c9251e41607ff664a783",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "react-001",
+        "commit": "589d15dcf7b882828a0c34890874eabd249da8e2",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": true,
+        "root_compose_zero_env_config_valid": true,
+        "root_compose_uses_root_dockerfile": true,
+        "root_compose_ready": true,
+        "reason": null
+      },
+      {
+        "id": "rocketchat-001",
+        "commit": "be75bc5f59fe2617313bedd2980c8cc904253a73",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "saltstack-001",
+        "commit": "42e9560f7c85bfdf70f116f6b9c73c48e5596323",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "saltstack-002",
+        "commit": "33b3327c30553b63419c44941fc4f1d7a83ab080",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "saltstack-003",
+        "commit": "31d2d5b1eb55242bb79739f1234097c69e5e2002",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "scrapyd-001",
+        "commit": "460e5840d4d43f4ab28acd29bec51b538ecad3a1",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 404,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "superset-001",
+        "commit": "a36ed960e98d116ad4ce843768d8edf12bb3c77c",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": true,
+        "root_compose_zero_env_config_valid": true,
+        "root_compose_uses_root_dockerfile": true,
+        "root_compose_ready": true,
+        "reason": null
+      },
+      {
+        "id": "superset-002",
+        "commit": "9c970b50a0a2d0eb8bd5a61cdf1c12131d4e3bbb",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": true,
+        "root_compose_zero_env_config_valid": true,
+        "root_compose_uses_root_dockerfile": true,
+        "root_compose_ready": true,
+        "reason": null
+      },
+      {
+        "id": "supervisor-001",
+        "commit": "f578c933315c55034b900a78a4550e3def694d0c",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "vite-001",
+        "commit": "f9e4e44b37e2dbd909b97840c9be928af0282970",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 404,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": true,
+        "root_compose_zero_env_config_valid": true,
+        "root_compose_uses_root_dockerfile": true,
+        "root_compose_ready": true,
+        "reason": null
+      },
+      {
+        "id": "vite-002",
+        "commit": "40aa0cf10fe8afc5ee68a5c1031c8aa67cc11acf",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 404,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": true,
+        "root_compose_zero_env_config_valid": true,
+        "root_compose_uses_root_dockerfile": true,
+        "root_compose_ready": true,
+        "reason": null
+      },
+      {
+        "id": "vite-003",
+        "commit": "4ccc4cc77e48e61d9479971fb39a71d744b9a17d",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 404,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": true,
+        "root_compose_zero_env_config_valid": true,
+        "root_compose_uses_root_dockerfile": true,
+        "root_compose_ready": true,
+        "reason": null
+      },
+      {
+        "id": "vite-004",
+        "commit": "12cc2c16cdc601c4af543a8b2fff46a5f2678b2b",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": true,
+        "root_compose_zero_env_config_valid": true,
+        "root_compose_uses_root_dockerfile": true,
+        "root_compose_ready": true,
+        "reason": null
+      },
+      {
+        "id": "yapi-001",
+        "commit": "59864738899596a592e755a109650628b1b20578",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      },
+      {
+        "id": "yapi-002",
+        "commit": "4431652d402ff5f6e837ab8c923aebb129b69b68",
+        "status": "passed",
+        "root_dockerfile": true,
+        "docker_build": true,
+        "docker_run": true,
+        "container_port": 80,
+        "http_status": 200,
+        "direct_http_ready": true,
+        "support_services_required": false,
+        "root_compose_present": false,
+        "root_compose_zero_env_config_valid": false,
+        "root_compose_uses_root_dockerfile": false,
+        "root_compose_ready": false,
+        "reason": null
+      }
+    ]
+  }
 }
