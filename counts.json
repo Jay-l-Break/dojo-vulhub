@@ -1,29 +1,29 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T08:52:15.148656+00:00",
+  "generated_at": "2026-10-09T08:56:46.703298+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
   "status_counts": {
     "blocked": 0,
-    "candidate": 38,
+    "candidate": 36,
     "excluded": 278,
     "failed": 0,
     "in_progress": 4,
-    "successful": 13
+    "successful": 15
   },
-  "successful_datapoints": 13,
+  "successful_datapoints": 15,
   "failed_datapoints": 0,
   "blocked_cases": 0,
-  "pending_cases": 42,
+  "pending_cases": 40,
   "oracle_occurrences": {
     "other": 1,
-    "remote_code_execution": 5,
+    "remote_code_execution": 6,
     "unauthorized_database_read": 3,
-    "unauthorized_file_access": 4
+    "unauthorized_file_access": 6
   },
-  "oracle_occurrence_total": 13,
+  "oracle_occurrence_total": 16,
   "failure_categories": {},
   "blocker_categories": {},
   "excluded_by_target_language": {
@@ -46,9 +46,11 @@
   "verified_version_groups": {
     "Django 1.10.0": 3,
     "Django 3.1.0": 1,
+    "Flask 0.1": 1,
     "Gradio 4.0.0": 2,
     "Node pg 2.4.0": 1,
     "Node.js 8.5.0": 1,
+    "Vite 2.0.0-alpha.1": 1,
     "aiohttp 1.1.0": 1,
     "mongo-express 0.15.0": 1,
     "pgAdmin 5.4": 2,
@@ -60,6 +62,7 @@
     "django-003",
     "django-005",
     "django-006",
+    "flask-001",
     "gradio-001",
     "gradio-002",
     "mongo-express-001",
@@ -67,7 +70,8 @@
     "node-002",
     "pgadmin-001",
     "pgadmin-002",
-    "pgadmin-003"
+    "pgadmin-003",
+    "vite-001"
   ],
   "published_source_branches": [
     {
@@ -77,6 +81,10 @@
     {
       "id": "django-003",
       "commit": "758859083b3f3d18d280d25c98a1515dd978b920"
+    },
+    {
+      "id": "django-004",
+      "commit": "13c2c51377065a30e8a7f89f1b3e4b1c60383ba2"
     },
     {
       "id": "django-005",

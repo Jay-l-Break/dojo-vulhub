@@ -9,6 +9,7 @@ This benchmark ports vulnerable JavaScript and Python applications from a pinned
 The source revision is [`8fd63916f7a8711e2e01dda0d27237e4d6175d38`](https://github.com/vulhub/vulhub/commit/8fd63916f7a8711e2e01dda0d27237e4d6175d38).
 A case is one directory with a Docker Compose file at that revision.
 The language decision uses the vulnerable application runtime and source code.
+TypeScript source compiled to JavaScript counts when the deployed vulnerable runtime is JavaScript.
 PoC scripts and container configuration do not determine the language.
 
 ## Version grouping
@@ -19,12 +20,12 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T08:52:15.148656+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T08:56:46.703298+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
-There are 13 passing datapoints, 0 failed cases, and 0 blocked cases.
-Another 4 cases are assigned and 38 await assignment.
-Passing datapoints have 13 validated oracle occurrences.
+There are 15 passing datapoints, 0 failed cases, and 0 blocked cases.
+Another 4 cases are assigned and 36 await assignment.
+Passing datapoints have 16 validated oracle occurrences.
 The figure and [`counts.json`](counts.json) use these ledger totals.
 
 ## Failure categories
@@ -36,6 +37,7 @@ No cases have a confirmed failure or blocker yet.
 - [`aiohttp-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/aiohttp-001) at `21d7c493968e544088d61341dda072dc40932b31`
 - [`django-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/django-002) at `c49e3fce80761fa8f9dda289946f0e397563eb82`
 - [`django-003`](https://github.com/Jay-l-Break/dojo-vulhub/tree/django-003) at `758859083b3f3d18d280d25c98a1515dd978b920`
+- [`django-004`](https://github.com/Jay-l-Break/dojo-vulhub/tree/django-004) at `13c2c51377065a30e8a7f89f1b3e4b1c60383ba2`
 - [`django-005`](https://github.com/Jay-l-Break/dojo-vulhub/tree/django-005) at `d2e9c84e7907ba048ddef39f31387825d2c800d4`
 - [`django-006`](https://github.com/Jay-l-Break/dojo-vulhub/tree/django-006) at `45facb0cd2d5c3bf7bec88a2fb02bdeb878f620a`
 - [`flask-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/flask-001) at `80302968d7aa25e2b051af1cbde1669ac0af64dd`

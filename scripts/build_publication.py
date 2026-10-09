@@ -227,6 +227,7 @@ def render_readme(counts: dict) -> str:
         f"The source revision is [`{counts['vulhub_revision']}`](https://github.com/vulhub/vulhub/commit/{counts['vulhub_revision']}).",
         "A case is one directory with a Docker Compose file at that revision.",
         "The language decision uses the vulnerable application runtime and source code.",
+        "TypeScript source compiled to JavaScript counts when the deployed vulnerable runtime is JavaScript.",
         "PoC scripts and container configuration do not determine the language.",
         "",
         "## Version grouping",
