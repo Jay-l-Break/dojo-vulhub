@@ -1,0 +1,73 @@
+============================================================================
+ghettoq - Ghetto Queue using Redis or Django Models.
+============================================================================
+
+:Version: 0.1.2
+
+Introduction
+============
+
+ghettoq is a ghetto queue framework, used to implement Redis and Django
+database support for
+`carrot`_
+
+.. _`carrot`: http://pypi.python.org/pypi/carrot
+
+Installation
+============
+
+You can install ``ghettoq`` either via the Python Package Index (PyPI)
+or from source.
+
+To install using ``pip``,::
+
+    $ pip install ghettoq
+
+
+To install using ``easy_install``,::
+
+    $ easy_install ghettoq
+
+
+If you have downloaded a source tarball you can install it
+by doing the following,::
+
+    $ python setup.py build
+    # python setup.py install # as root
+
+Examples
+========
+
+    >>> from ghettoq.simple import Connection
+    >>> import simplejson
+
+    >>> conn = Connection("redis", host="localhost", database="myqueue")
+
+    >>> # Publishing messages
+    >>> q = conn.Queue("tasks")
+    >>> payload = {"name": "George Constanza"}
+    >>> q.put(simplejson.dumps(payload))
+
+    >>> # Consuming messages
+    >>> message = q.get()
+    >>> simplejson.loads(message)
+    {"name": "George Constanza"}
+
+    # Empty raises ghettoq.messaging.Empty
+    >>> q.get()
+    Empty
+
+
+Using Django database support
+-----------------------------
+
+If settings is already configured you don't have to specify any
+connection options.
+
+    >>> from ghettoq.simple import Connection
+
+    >>> conn = Connection("database")
+    >>> queue = conn.Queue(name="tasks")
+    >>> queue.put("To whom it may concern")
+    >>> queue.get()
+    "To whom it may concern"
