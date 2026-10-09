@@ -1,0 +1,17 @@
+services:
+  mongodb:
+    image: mongo:3.4@sha256:d314f7eca9d3f825d091b77c40d2f3c9d6fff4de88dde2962527353476f107ba
+    healthcheck:
+      test: ["CMD-SHELL", "mongo --quiet --eval 'db.adminCommand({ping: 1}).ok' | grep 1"]
+      interval: 2s
+      retries: 30
+
+  backend:
+    build: .
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
+    ports:
+      - "${DOJO_HOST_PORT:-80}:80"
