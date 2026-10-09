@@ -1,31 +1,31 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T10:52:26.556746+00:00",
+  "generated_at": "2026-10-09T10:58:20.388811+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
   "status_counts": {
     "blocked": 0,
-    "candidate": 11,
+    "candidate": 10,
     "excluded": 278,
     "failed": 0,
     "in_progress": 4,
-    "successful": 40
+    "successful": 41
   },
-  "successful_datapoints": 40,
+  "successful_datapoints": 41,
   "failed_datapoints": 0,
   "blocked_cases": 0,
-  "pending_cases": 15,
+  "pending_cases": 14,
   "oracle_occurrences": {
     "authentication_bypass": 2,
     "other": 4,
-    "remote_code_execution": 21,
+    "remote_code_execution": 22,
     "unauthorized_database_read": 3,
     "unauthorized_file_access": 11,
     "unauthorized_file_creation": 3
   },
-  "oracle_occurrence_total": 44,
+  "oracle_occurrence_total": 45,
   "failure_categories": {},
   "blocker_categories": {},
   "excluded_by_target_language": {
@@ -63,6 +63,7 @@
     "mongo-express 0.15.0": 1,
     "n8n-1.53.0": 2,
     "next-js-12.0.0": 1,
+    "openclaw-2026.1.21-1": 1,
     "pdfjs-1.0.1011": 1,
     "pgAdmin 5.4": 2,
     "pgAdmin 8.10": 1,
@@ -100,6 +101,7 @@
     "next-js-001",
     "node-001",
     "node-002",
+    "openclaw-001",
     "pdfjs-001",
     "pgadmin-001",
     "pgadmin-002",
@@ -212,6 +214,10 @@
     {
       "id": "node-002",
       "commit": "0128e84df40cf7fb22b329b1f605834a49d852bc"
+    },
+    {
+      "id": "openclaw-001",
+      "commit": "8f11033873b4b93ce6157aadb4e09271bc748fc2"
     },
     {
       "id": "pdfjs-001",
