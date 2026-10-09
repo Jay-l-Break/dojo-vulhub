@@ -1,0 +1,4 @@
+.git
+compose.yaml
+__pycache__
+*.pyc
