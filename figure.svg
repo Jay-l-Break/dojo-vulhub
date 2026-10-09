@@ -1,10 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="2048" height="1170" viewBox="0 0 2048 1170">
+<svg xmlns="http://www.w3.org/2000/svg" width="2048" height="1295" viewBox="0 0 2048 1295">
 <style>.count{font:700 34px Arial,sans-serif;fill:#151515}.detail{font:22px Arial,sans-serif;fill:#575757}</style>
 <rect width="100%" height="100%" fill="#fff"/>
 <path d="M325 210 C487.5 210 487.5 160 650 160 L650 278.9189189189189 C487.5 278.9189189189189 487.5 328.9189189189189 325 328.9189189189189 Z" fill="#3079d7" fill-opacity="0.28"/>
 <path d="M325 328.9189189189189 C487.5 328.9189189189189 487.5 400 650 400 L650 1001.081081081081 C487.5 1001.081081081081 487.5 930.0 325 930.0 Z" fill="#aaa9a6" fill-opacity="0.48"/>
 <path d="M675 160.0 C887.5 160.0 887.5 160 1100 160 L1100 257.2972972972973 C887.5 257.2972972972973 887.5 257.2972972972973 675 257.2972972972973 Z" fill="#2f7ed8" fill-opacity="0.3"/>
-<path d="M675 257.2972972972973 C887.5 257.2972972972973 887.5 850 1100 850 L1100 871.6216216216217 C887.5 871.6216216216217 887.5 278.9189189189189 675 278.9189189189189 Z" fill="#b9b9b5" fill-opacity="0.3"/>
+<path d="M675 257.2972972972973 C887.5 257.2972972972973 887.5 620 1100 620 L1100 625 C887.5 625 887.5 259.4594594594595 675 259.4594594594595 Z" fill="#f49a5b" fill-opacity="0.3"/>
+<path d="M675 259.4594594594595 C887.5 259.4594594594595 887.5 850 1100 850 L1100 869.4594594594595 C887.5 869.4594594594595 887.5 278.91891891891896 675 278.91891891891896 Z" fill="#b9b9b5" fill-opacity="0.3"/>
 <path d="M1125 160.0 C1407.5 160.0 1407.5 120 1690 120 L1690 127 C1407.5 127 1407.5 165.9569773855488 1125 165.9569773855488 Z" fill="#2f7ed8" fill-opacity="0.32"/>
 <rect x="1690" y="120" width="25" height="7" rx="3" fill="#2f7ed8"/>
 <text x="1735" y="147" text-anchor="start" class="count">3</text><text x="1735" y="176" text-anchor="start" class="detail">Authentication bypass</text>
@@ -23,6 +24,9 @@
 <path d="M1125 251.34031991174848 C1407.5 251.34031991174848 1407.5 574.6414782129068 1690 574.6414782129068 L1690 581.6414782129068 C1407.5 581.6414782129068 1407.5 257.2972972972973 1125 257.2972972972973 Z" fill="#2f7ed8" fill-opacity="0.32"/>
 <rect x="1690" y="574.6414782129068" width="25" height="7" rx="3" fill="#2f7ed8"/>
 <text x="1735" y="601.6414782129068" text-anchor="start" class="count">3</text><text x="1735" y="630.6414782129068" text-anchor="start" class="detail">File creation</text>
+<path d="M1125 620.0 C1407.5 620.0 1407.5 664.6414782129068 1690 664.6414782129068 L1690 671.6414782129068 C1407.5 671.6414782129068 1407.5 625.0 1125 625.0 Z" fill="#f49a5b" fill-opacity="0.32"/>
+<rect x="1690" y="664.6414782129068" width="25" height="7" rx="3" fill="#f49a5b"/>
+<text x="1735" y="691.6414782129068" text-anchor="start" class="count">1</text><text x="1735" y="720.6414782129068" text-anchor="start" class="detail">Windows protocol handler</text><text x="1735" y="745.6414782129068" text-anchor="start" class="detail">unavailable on Linux</text>
 <rect x="300" y="210" width="25" height="720" rx="3" fill="#777775"/>
 <rect x="650" y="160" width="25" height="118.91891891891892" rx="3" fill="#2f7ed8"/>
 <rect x="650" y="400" width="25" height="601.081081081081" rx="3" fill="#777775"/>
@@ -34,7 +38,7 @@
 <rect x="1100" y="390" width="25" height="5" rx="3" fill="#ed6434"/>
 <text x="1140" y="335" text-anchor="start" class="count">0</text><text x="1140" y="364" text-anchor="start" class="detail">Failed datapoints</text>
 <rect x="1100" y="620" width="25" height="5" rx="3" fill="#f49a5b"/>
-<text x="1140" y="565" text-anchor="start" class="count">0</text><text x="1140" y="594" text-anchor="start" class="detail">Blocked cases</text>
-<rect x="1100" y="850" width="25" height="21.62162162162162" rx="3" fill="#b9b9b5"/>
-<text x="1140" y="795" text-anchor="start" class="count">10</text><text x="1140" y="824" text-anchor="start" class="detail">Work pending</text>
+<text x="1140" y="565" text-anchor="start" class="count">1</text><text x="1140" y="594" text-anchor="start" class="detail">Blocked cases</text>
+<rect x="1100" y="850" width="25" height="19.45945945945946" rx="3" fill="#b9b9b5"/>
+<text x="1140" y="795" text-anchor="start" class="count">9</text><text x="1140" y="824" text-anchor="start" class="detail">Work pending</text>
 </svg>
