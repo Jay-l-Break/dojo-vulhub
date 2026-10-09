@@ -20,7 +20,7 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T11:57:24.603348+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T12:20:03.987885+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
 Passing datapoints: 53.
@@ -59,7 +59,7 @@ The figure and [`counts.json`](counts.json) use these ledger totals.
 - [`jupyter-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/jupyter-001) at `7b3a7c52f3da79859f7375ff32d5a10b54b16afc`
 - [`kibana-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/kibana-001) at `3968f240d86ca5e931457037374bc49c27db0e4f`
 - [`kibana-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/kibana-002) at `0bc0423d4a70747a14a4ab4efc285e0e5fde2a9e`
-- [`kibana-003`](https://github.com/Jay-l-Break/dojo-vulhub/tree/kibana-003) at `86ad0ec3b8a8001c3cff0372d36416276a36521e`
+- [`kibana-003`](https://github.com/Jay-l-Break/dojo-vulhub/tree/kibana-003) at `e88d10dd46fb857f47f7603184862bf4e100d27d`
 - [`langflow-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/langflow-001) at `66be9dd9cd9a93d26aaec19f0bd3d2d2e6d7c06a`
 - [`langflow-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/langflow-002) at `3fd5e2791ca54f078ef220ab465093e35ba7cfbe`
 - [`mongo-express-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/mongo-express-001) at `3a72f3f343e1725fb5bce524fbacf03b8d7d9c76`
