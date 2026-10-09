@@ -1,31 +1,31 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T10:25:57.804025+00:00",
+  "generated_at": "2026-10-09T10:28:39.505522+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
   "status_counts": {
     "blocked": 0,
-    "candidate": 17,
+    "candidate": 16,
     "excluded": 278,
     "failed": 0,
     "in_progress": 4,
-    "successful": 34
+    "successful": 35
   },
-  "successful_datapoints": 34,
+  "successful_datapoints": 35,
   "failed_datapoints": 0,
   "blocked_cases": 0,
-  "pending_cases": 21,
+  "pending_cases": 20,
   "oracle_occurrences": {
-    "authentication_bypass": 1,
+    "authentication_bypass": 2,
     "other": 4,
     "remote_code_execution": 17,
     "unauthorized_database_read": 3,
     "unauthorized_file_access": 10,
     "unauthorized_file_creation": 2
   },
-  "oracle_occurrence_total": 37,
+  "oracle_occurrence_total": 38,
   "failure_categories": {},
   "blocker_categories": {},
   "excluded_by_target_language": {
@@ -60,6 +60,7 @@
     "langflow-1.3.0": 1,
     "mongo-express 0.15.0": 1,
     "n8n-1.53.0": 2,
+    "next-js-12.0.0": 1,
     "pgAdmin 5.4": 2,
     "pgAdmin 8.10": 1,
     "pgAdmin 9.2": 1,
@@ -91,6 +92,7 @@
     "mongo-express-001",
     "n8n-001",
     "n8n-002",
+    "next-js-001",
     "node-001",
     "node-002",
     "pgadmin-001",
@@ -182,6 +184,10 @@
     {
       "id": "n8n-002",
       "commit": "40de2bc596b21a2b19c4f2f3b9ad1c469a65c517"
+    },
+    {
+      "id": "next-js-001",
+      "commit": "8e8bc97d61a5f1ad71022a9cc2afe185ec807f7e"
     },
     {
       "id": "node-001",
