@@ -1,0 +1,106 @@
+{
+  "name": "@budibase/server",
+  "version": "0.3.0",
+  "description": "Budibase Web Server",
+  "main": "src/electron.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Budibase/budibase.git"
+  },
+  "build": {
+    "appId": "com.budibase.builder",
+    "productName": "Budibase Builder",
+    "afterSign": "electron-builder-notarize",
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "hardenedRuntime": true
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Development"
+    }
+  },
+  "scripts": {
+    "test": "jest --testPathIgnorePatterns=routes && npm run test:integration",
+    "test:integration": "jest routes --runInBand",
+    "test:watch": "jest --watch",
+    "run:docker": "node src/index",
+    "dev:builder": "nodemon src/index.js",
+    "electron": "electron src/electron.js",
+    "build:electron": "electron-builder --dir",
+    "publish:electron": "electron-builder -mwl --publish always",
+    "postinstall": "electron-builder install-app-deps",
+    "lint": "eslint --fix src/"
+  },
+  "keywords": [
+    "budibase"
+  ],
+  "author": "Michael Shanks",
+  "license": "AGPL-3.0-or-later",
+  "dependencies": {
+    "@budibase/client": "^0.3.0",
+    "@koa/router": "^8.0.0",
+    "@sendgrid/mail": "^7.1.1",
+    "@sentry/node": "^5.19.2",
+    "aws-sdk": "^2.767.0",
+    "bcryptjs": "^2.4.3",
+    "chmodr": "^1.2.0",
+    "csvtojson": "^2.0.10",
+    "dotenv": "^8.2.0",
+    "download": "^8.0.0",
+    "electron-is-dev": "^1.2.0",
+    "electron-unhandled": "^3.0.2",
+    "electron-updater": "^4.3.1",
+    "fix-path": "^3.0.0",
+    "fs-extra": "^8.1.0",
+    "handlebars": "^4.7.6",
+    "jimp": "^0.16.1",
+    "joi": "^17.2.1",
+    "jsonschema": "^1.4.0",
+    "jsonwebtoken": "^8.5.1",
+    "koa": "^2.7.0",
+    "koa-body": "^4.2.0",
+    "koa-compress": "^4.0.1",
+    "koa-pino-logger": "^3.0.0",
+    "koa-send": "^5.0.0",
+    "koa-session": "^5.12.0",
+    "koa-static": "^5.0.0",
+    "lodash": "^4.17.13",
+    "mustache": "^4.0.1",
+    "node-fetch": "^2.6.0",
+    "pino-pretty": "^4.0.0",
+    "pouchdb": "^7.2.1",
+    "pouchdb-all-dbs": "^1.0.2",
+    "pouchdb-replication-stream": "^1.2.9",
+    "sanitize-s3-objectkey": "^0.0.1",
+    "squirrelly": "^7.5.0",
+    "tar-fs": "^2.1.0",
+    "to-json-schema": "^0.2.5",
+    "uuid": "^3.3.2",
+    "validate.js": "^0.13.1",
+    "worker-farm": "^1.7.0",
+    "yargs": "^13.2.4",
+    "zlib": "^1.0.5"
+  },
+  "devDependencies": {
+    "@jest/test-sequencer": "^24.8.0",
+    "electron": "10.1.3",
+    "electron-builder": "^22.7.0",
+    "electron-builder-notarize": "^1.1.2",
+    "eslint": "^6.8.0",
+    "jest": "^24.8.0",
+    "nodemon": "^2.0.4",
+    "pouchdb-adapter-memory": "^7.2.1",
+    "server-destroy": "^1.0.1",
+    "supertest": "^4.0.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFiles": [
+      "./scripts/jestSetup.js"
+    ]
+  },
+  "gitHead": "284cceb9b703c38566c6e6363c022f79a08d5691"
+}

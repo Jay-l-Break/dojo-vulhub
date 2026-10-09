@@ -1,0 +1,820 @@
+{
+	"_lib": "./dist/index.js",
+	"_templates": {
+		"saveRowButton": {
+			"description": "Save row button",
+			"component": "button"
+		}
+	},
+	"embed": {
+		"name": "Embed",
+		"description": "Embed stuff",
+		"props": {
+			"embed": "string"
+		}
+	},
+	"Navigation": {
+		"name": "Navigation",
+		"description": "A basic header navigation component",
+		"children": true,
+		"props": {
+			"logoUrl": "string",
+			"title": "string",
+			"backgroundColor": "string",
+			"color": "string",
+			"borderWidth": "string",
+			"borderColor": "string",
+			"borderStyle": "string"
+		}
+	},
+	"button": {
+		"name": "Button",
+		"description": "an html <button />",
+		"props": {
+			"text": "string",
+			"className": "string",
+			"disabled": "bool",
+			"onClick": "event"
+		},
+		"tags": [
+			"layout"
+		],
+		"presets": {
+			"primary": {
+				"contentText": "Primary Button Preset",
+				"color": "papayawhip",
+				"padding": "20px",
+				"background": "blue"
+			},
+			"secondary": {
+				"contentText": "Secondary Button Preset",
+				"color": "rebeccapurple",
+				"padding": "10px",
+				"background": "#fff",
+				"border": "1px solid red"
+			},
+			"error": {
+				"contentText": "ERROR",
+				"color": "red",
+				"padding": "10px",
+				"border": "1px solid red"
+			}
+		}
+	},
+	"login": {
+		"name": "Login Control",
+		"description": "A control that accepts username, password an also handles password resets",
+		"props": {
+			"logo": "asset",
+			"loginRedirect": "string",
+			"title": "string",
+			"usernameLabel": {
+				"type": "string",
+				"default": "Username"
+			},
+			"passwordLabel": {
+				"type": "string",
+				"default": "Password"
+			},
+			"loginButtonLabel": {
+				"type": "string",
+				"default": "Login"
+			},
+			"buttonClass": "string",
+			"inputClass": "string",
+			"buttonText": "string"
+		},
+		"tags": [
+			"login",
+			"credentials",
+			"password",
+			"logon"
+		]
+	},
+	"input": {
+		"name": "Textfield",
+		"bindable": "value",
+		"description": "An HTML input",
+		"props": {
+			"value": "string",
+			"type": {
+				"type": "options",
+				"options": [
+					"text",
+					"password",
+					"checkbox",
+					"color",
+					"date",
+					"datetime-local",
+					"email",
+					"file",
+					"hidden",
+					"image",
+					"month",
+					"number",
+					"radio",
+					"range",
+					"reset",
+					"search",
+					"submit",
+					"tel",
+					"time",
+					"week"
+				],
+				"default": "text"
+			},
+			"onChange": "event",
+			"className": "string"
+		},
+		"tags": [
+			"form"
+		]
+	},
+	"select": {
+		"name": "Select",
+		"bindable": "value",
+		"description": "An HTML <select> (dropdown)",
+		"props": {
+			"value": "string",
+			"className": "string"
+		}
+	},
+	"option": {
+		"name": "Option",
+		"description": "An HTML <option>, to be used with <select>",
+		"children": false,
+		"props": {
+			"value": "string",
+			"text": "string"
+		}
+	},
+	"text": {
+		"name": "Text",
+		"description": "stylable block of text",
+		"children": false,
+		"props": {
+			"text": "string",
+			"type": {
+				"type": "string",
+				"default": "none"
+			}
+		},
+		"tags": [
+			"div",
+			"container"
+		]
+	},
+	"textfield": {
+		"name": "Textfield",
+		"description": "A component that allows the user to input text.",
+		"props": {
+			"label": "string",
+			"type": "string",
+			"value": "string",
+			"onchange": "event"
+		}
+	},
+	"checkbox": {
+		"name": "Checkbox",
+		"bindable": "value",
+		"description": "A selectable checkbox component",
+		"props": {
+			"label": "string",
+			"checked": "bool",
+			"value": "string",
+			"onchange": "event"
+		}
+	},
+	"radiobutton": {
+		"name": "Radiobutton",
+		"bindable": "value",
+		"description": "A selectable radiobutton component",
+		"props": {
+			"label": "string",
+			"checked": "bool",
+			"value": "string",
+			"onchange": "event"
+		}
+	},
+	"icon": {
+		"description": "A HTML icon tag",
+		"props": {
+			"icon": "string",
+			"size": {
+				"type": "string",
+				"default": "fa-lg"
+			},
+			"color": {
+				"type": "string",
+				"default": "#000"
+			}
+		}
+	},
+	"datatable": {
+		"description": "an HTML table that fetches data from a table or view and displays it.",
+		"data": true,
+		"props": {
+			"datasource": "tables",
+			"stripeColor": "string",
+			"borderColor": "string",
+			"backgroundColor": "string",
+			"color": "string"
+		}
+	},
+	"datagrid": {
+		"name": "Grid",
+		"description": "a datagrid component with functionality to add, remove and edit rows.",
+		"data": true,
+		"props": {
+			"datasource": "tables",
+			"editable": "bool",
+			"theme": {
+				"type": "options",
+				"default": "alpine",
+				"options": [
+					"alpine",
+					"alpine-dark",
+					"balham",
+					"balham-dark",
+					"material"
+				]
+			},
+			"height": {
+				"type": "number",
+				"default": "540"
+			},
+			"pagination": {
+				"type": "bool",
+				"default": true
+			},
+			"detailUrl": "string"
+		}
+	},
+	"dataform": {
+		"name": "Form",
+		"description": "an HTML table that fetches data from a table or view and displays it.",
+		"data": true,
+		"props": {}
+	},
+	"dataformwide": {
+		"name": "Form Wide",
+		"description": "an HTML table that fetches data from a table or view and displays it.",
+		"data": true,
+		"props": {}
+	},
+	"datalist": {
+		"description": "A configurable data list that attaches to your backend tables.",
+		"data": true,
+		"props": {
+			"table": "tables",
+			"layout": {
+				"type": "options",
+				"default": "list",
+				"options": [
+					"list",
+					"grid"
+				]
+			}
+		}
+	},
+	"list": {
+		"name": "Repeater",
+		"description": "A configurable data list that attaches to your backend tables.",
+		"context": "datasource",
+		"children": true,
+		"data": true,
+		"props": {
+			"datasource": "tables"
+		}
+	},
+	"stackedlist": {
+		"name": "Stacked List",
+		"description": "A stacked list component for displaying information",
+		"props": {
+			"imageUrl": "string",
+			"heading": "string",
+			"text1": "string",
+			"text2": "string",
+			"text3": "string",
+			"destinationUrl": "string"
+		}
+	},
+	"rowdetail": {
+		"name": "Row Detail",
+		"description": "Loads a row, using an ID in the url",
+		"context": "table",
+		"children": true,
+		"data": true,
+		"baseComponent": true,
+		"props": {
+			"table": "tables"
+		}
+	},
+	"newrow": {
+		"name": "New Row",
+		"description": "Prepares a new row for creation",
+		"context": "table",
+		"children": true,
+		"data": true,
+		"baseComponent": true,
+		"props": {
+			"table": "tables"
+		}
+	},
+	"card": {
+		"name": "Card",
+		"props": {
+			"imageUrl": "string",
+			"heading": "string",
+			"description": "string",
+			"linkText": "string",
+			"linkUrl": "string",
+			"color": "string",
+			"linkHoverColor": "string",
+			"imageHeight": {
+				"type": "options",
+				"default": "20rem",
+				"options": [
+					"12rem",
+					"16rem",
+					"20rem",
+					"24rem"
+				]
+			},
+			"cardWidth": {
+				"type": "options",
+				"default": "20rem",
+				"options": [
+					"16rem",
+					"20rem",
+					"24rem"
+				]
+			}
+		}
+	},
+	"cardhorizontal": {
+		"name": "Horizontal Card",
+		"props": {
+			"imageUrl": "string",
+			"heading": "string",
+			"description": "string",
+			"subtext": "string",
+			"linkText": "string",
+			"linkUrl": "string",
+			"color": "string",
+			"linkHoverColor": "string",
+			"imageWidth": {
+				"type": "options",
+				"default": "8rem",
+				"options": [
+					"8rem",
+					"12rem",
+					"16rem"
+				]
+			},
+			"cardWidth": {
+				"type": "options",
+				"default": "32rem",
+				"options": [
+					"24rem",
+					"28rem",
+					"32rem",
+					"40rem",
+					"48rem",
+					"60rem",
+					"100%"
+				]
+			},
+			"imageHeight": {
+				"type": "options",
+				"default": "8rem",
+				"options": [
+					"8rem",
+					"12rem",
+					"16rem"
+				]
+			}
+		}
+	},
+	"datamap": {
+		"description": "shiny chart",
+		"data": true,
+		"props": {
+			"table": "tables"
+		}
+	},
+	"donut": {
+		"description": "Donut Chart",
+		"data": true,
+		"props": {
+			"datasource": "string",
+			"data": "string",
+			"color": "string",
+			"height": "number",
+			"width": "number",
+			"hasFixedHighlightedSlice": "bool",
+			"hasLastHoverSliceHighlighted": "bool",
+			"hasHoverAnimation": "bool",
+			"numberFormat": "string",
+			"nameKey": "string",
+			"valueKey": "string",
+			"isAnimated": "bool",
+			"externalRadius": "number",
+			"internalRadius": "number",
+			"radiusHoverOffset": "number",
+			"percentageFormat": "string",
+			"useLegend": "bool",
+			"legendWidth": "number",
+			"legendHeight": "number"
+		}
+	},
+	"sparkline": {
+		"description": "Sparkline Chart",
+		"data": true,
+		"props": {
+			"table": "string",
+			"areaGradient": "string",
+			"height": "number",
+			"width": "number",
+			"dateLabel": "string",
+			"duration": "string",
+			"isAnimated": "bool",
+			"lineGradient": "string",
+			"titleText": "string",
+			"valueLabel": "string"
+		}
+	},
+	"stackedbar": {
+		"description": "Stacked Bar Chart",
+		"data": true,
+		"props": {
+			"datasource": "tables",
+			"color": "string",
+			"height": "number",
+			"width": "number",
+			"margin": "string",
+			"aspectRatio": "string",
+			"betweenBarsPadding": "number",
+			"grid": "string",
+			"hasPercentage": "bool",
+			"hasReversedStacks": "bool",
+			"isAnimated": "bool",
+			"isHorizontal": "bool",
+			"locale": "string",
+			"nameLabel": "string",
+			"percentageAxisToMaxRatio": "number",
+			"stackLabel": "string",
+			"valueLabel": "string",
+			"valueLabelFormat": "string",
+			"xTicks": "number",
+			"yTicks": "number",
+			"yAxisLabel": "string",
+			"yAxisLabelOffset": "number",
+			"useLegend": "bool"
+		}
+	},
+	"stackarea": {
+		"description": "Step Chart",
+		"data": true,
+		"props": {
+			"table": "string",
+			"color": "string",
+			"height": "number",
+			"width": "number",
+			"margin": "string",
+			"xAxisLabel": "string",
+			"xAxisLabelOffset": "string",
+			"yAxisLabel": "string",
+			"yAxisLabelOffset": "string",
+			"areaCurve": "number",
+			"areaOpacity": "number",
+			"aspectRatio": "number",
+			"dateLabel": "string",
+			"grid": "string",
+			"isAnimated": "bool",
+			"keyLabel": "string",
+			"locale": "string",
+			"tooltipThreshold": "number",
+			"topicsOrder": "string",
+			"valueLabel": "string",
+			"xAxisCustomFormat": "string",
+			"xAxisFormat": "string",
+			"xAxisScale": "string",
+			"xAxisValueType": "string",
+			"yTicks": "number",
+			"xTicks": "number",
+			"yAxisBaseline": "string",
+			"useLegend": "bool"
+		}
+	},
+	"step": {
+		"description": "Step Chart",
+		"data": true,
+		"props": {
+			"table": "string",
+			"height": "number",
+			"width": "number",
+			"margin": "string",
+			"xAxisLabel": "string",
+			"xAxisLabelOffset": "string",
+			"yAxisLabel": "string",
+			"yAxisLabelOffset": "string",
+			"yTicks": "string"
+		}
+	},
+	"scatterplot": {
+		"description": "Scatterplot Chart",
+		"data": true,
+		"props": {
+			"table": "string",
+			"color": "string",
+			"height": "number",
+			"width": "number",
+			"aspectRatio": "string",
+			"circleOpacity": "string",
+			"grid": "string",
+			"hasCrossHairs": "bool",
+			"isAnimated": "bool",
+			"maxCircleArea": "number",
+			"xAxisLabel": "string",
+			"xAxisLabelOffset": "string",
+			"xTicks": "string",
+			"yAxisFormat": "string",
+			"yAxisLabel": "string",
+			"yAxisLabelOffset": "string",
+			"yTicks": "string"
+		}
+	},
+	"bar": {
+		"description": "Bar Chart",
+		"data": true,
+		"props": {
+			"datasource": "tables",
+			"nameLabel": "string",
+			"valueLabel": "string",
+			"betweenBarsPadding": "number",
+			"gradient": "string",
+			"color": "string",
+			"hasSingleBarHighlight": "bool",
+			"height": "number",
+			"width": "number",
+			"isAnimated": "bool",
+			"isHorizontal": "bool",
+			"labelNumberFormat": "number",
+			"locale": "string",
+			"xAxisLabel": "string",
+			"yAxisLabel": "string",
+			"useLegend": "bool",
+			"xTicks": "number",
+			"yTicks": "number"
+		}
+	},
+	"line": {
+		"description": "Line Chart",
+		"data": true,
+		"props": {
+			"datasource": "tables",
+			"width": "number",
+			"height": "number",
+			"axisTimeCombinations": "string",
+			"color": "string",
+			"grid": {
+				"type": "string",
+				"default": "horizontal"
+			},
+			"aspectRatio": "number",
+			"dateLabel": "string",
+			"isAnimated": {
+				"type": "bool",
+				"default": true
+			},
+			"lineCurve": "string",
+			"locale": "string",
+			"numberFormat": "string",
+			"shouldShowAllDataPoints": {
+				"type": "bool",
+				"default": true
+			},
+			"topicLabel": "string",
+			"valueLabel": "string",
+			"xAxisValueType": {
+				"type": "string",
+				"default": "date"
+			},
+			"xAxisScale": "string",
+			"xAxisFormat": {
+				"type": "string",
+				"default": "custom"
+			},
+			"xAxisCustomFormat": "string",
+			"xAxisLabel": "string",
+			"yAxisLabel": "string",
+			"tooltipTitle": "string",
+			"xTicks": "number",
+			"yTicks": "number"
+		}
+	},
+	"brush": {
+		"description": "brush chart",
+		"data": true,
+		"props": {
+			"table": "string",
+			"gradient": "string",
+			"height": "number",
+			"width": "number",
+			"margin": "string",
+			"dateRange": "string",
+			"locale": "string",
+			"roundingTimeInterval": "string",
+			"xAxisFormat": "string",
+			"xTicks": "number",
+			"xAxisCustomFormat": "string"
+		}
+	},
+	"heatmap": {
+		"description": "Heatmap chart",
+		"data": true,
+		"props": {
+			"table": "string",
+			"color": "string",
+			"height": "number",
+			"width": "number",
+			"useLegend": "bool",
+			"yAxisLabel": "string",
+			"boxSize": "number"
+		}
+	},
+	"groupedbar": {
+		"description": "Groupedbar chart",
+		"data": true,
+		"props": {
+			"datasource": "tables",
+			"nameLabel": "string",
+			"valueLabel": "string",
+			"color": "string",
+			"height": "string",
+			"width": "string",
+			"margin": "string",
+			"grid": "string",
+			"groupLabel": "string",
+			"isAnimated": "bool",
+			"isHorizontal": "bool",
+			"yTicks": "string",
+			"useLegend": "bool",
+			"tooltipTitle": "string"
+		}
+	},
+	"bullet": {
+		"description": "Bullet chart",
+		"data": true,
+		"props": {
+			"table": "string",
+			"color": "string",
+			"customSubtitle": "string",
+			"customTitle": "string",
+			"numberFormat": "string",
+			"paddingBetweenAxisAndChart": "number",
+			"height": "number",
+			"width": "number"
+		}
+	},
+	"datepicker": {
+		"name": "Date Picker",
+		"description": "Date Picker",
+		"bindable": "value",
+		"props": {
+			"placeholder": "string"
+		}
+	},
+	"datachart": {
+		"description": "shiny chart",
+		"data": true,
+		"props": {
+			"table": "tables",
+			"type": {
+				"type": "options",
+				"default": "column2d",
+				"options": [
+					"column3d",
+					"line",
+					"area2d",
+					"bar2d",
+					"bar3d",
+					"pie2d",
+					"pie3d",
+					"doughnut2d",
+					"doughnut3d",
+					"pareto2d",
+					"pareto3d"
+				]
+			}
+		}
+	},
+	"link": {
+		"name": "Link",
+		"description": "an HTML anchor <a> tag",
+		"props": {
+			"url": "string",
+			"openInNewTab": "bool",
+			"text": "string",
+			"color": "string",
+			"hoverColor": "string",
+			"underline": "bool",
+			"fontSize": "string",
+			"fontFamily": {
+				"type": "options",
+				"default": "initial",
+				"styleBindingProperty": "font-family",
+				"options": [
+					"initial",
+					"Times New Roman",
+					"Georgia",
+					"Arial",
+					"Arial Black",
+					"Comic Sans MS",
+					"Impact",
+					"Lucida Sans Unicode"
+				]
+			}
+		}
+	},
+	"image": {
+		"description": "an HTML <img> tag",
+		"props": {
+			"url": "string",
+			"className": "string",
+			"description": "string",
+			"height": "string",
+			"width": "string"
+		}
+	},
+	"container": {
+		"name": "Container",
+		"children": true,
+		"description": "An element that contains and lays out other elements. e.g. <div>, <header> etc",
+		"props": {
+			"className": "string",
+			"onLoad": "event",
+			"type": {
+				"type": "options",
+				"options": [
+					"article",
+					"aside",
+					"details",
+					"div",
+					"firgure",
+					"figcaption",
+					"footer",
+					"header",
+					"main",
+					"mark",
+					"nav",
+					"paragraph",
+					"summary"
+				],
+				"default": "div"
+			}
+		},
+		"baseComponent": true,
+		"tags": [
+			"div",
+			"container",
+			"layout"
+		]
+	},
+	"heading": {
+		"name": "Heading",
+		"description": "An HTML H1 - H6 tag",
+		"props": {
+			"className": "string",
+			"text": "string",
+			"type": {
+				"type": "options",
+				"default": "h1",
+				"options": [
+					"h1",
+					"h2",
+					"h3",
+					"h4",
+					"h5",
+					"h6"
+				]
+			}
+		},
+		"tags": []
+	},
+	"thead": {
+		"name": "Table Head",
+		"description": "an HTML <thead> tab",
+		"props": {
+			"className": "string"
+		}
+	},
+	"tbody": {
+		"name": "Table Body",
+		"description": "an HTML <tbody> tab",
+		"props": {
+			"className": "string"
+		}
+	}
+}
