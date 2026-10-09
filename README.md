@@ -20,12 +20,12 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T11:17:16.563028+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T11:21:05.747545+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
-There are 45 passing datapoints, 0 failed cases, and 1 blocked cases.
-Another 4 cases are assigned and 5 await assignment.
-Passing datapoints have 49 validated oracle occurrences.
+There are 46 passing datapoints, 0 failed cases, and 1 blocked cases.
+Another 4 cases are assigned and 4 await assignment.
+Passing datapoints have 50 validated oracle occurrences.
 The figure and [`counts.json`](counts.json) use these ledger totals.
 
 ## Failure categories
@@ -53,6 +53,7 @@ The figure and [`counts.json`](counts.json) use these ledger totals.
 - [`gradio-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/gradio-002) at `feaf27cbb35995412b3294d2aedd35cff05d8ef3`
 - [`kibana-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/kibana-001) at `3968f240d86ca5e931457037374bc49c27db0e4f`
 - [`kibana-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/kibana-002) at `0bc0423d4a70747a14a4ab4efc285e0e5fde2a9e`
+- [`kibana-003`](https://github.com/Jay-l-Break/dojo-vulhub/tree/kibana-003) at `86ad0ec3b8a8001c3cff0372d36416276a36521e`
 - [`langflow-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/langflow-001) at `66be9dd9cd9a93d26aaec19f0bd3d2d2e6d7c06a`
 - [`langflow-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/langflow-002) at `3fd5e2791ca54f078ef220ab465093e35ba7cfbe`
 - [`mongo-express-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/mongo-express-001) at `3a72f3f343e1725fb5bce524fbacf03b8d7d9c76`

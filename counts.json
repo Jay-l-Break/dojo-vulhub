@@ -1,31 +1,31 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T11:17:16.563028+00:00",
+  "generated_at": "2026-10-09T11:21:05.747545+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
   "status_counts": {
     "blocked": 1,
-    "candidate": 5,
+    "candidate": 4,
     "excluded": 278,
     "failed": 0,
     "in_progress": 4,
-    "successful": 45
+    "successful": 46
   },
-  "successful_datapoints": 45,
+  "successful_datapoints": 46,
   "failed_datapoints": 0,
   "blocked_cases": 1,
-  "pending_cases": 9,
+  "pending_cases": 8,
   "oracle_occurrences": {
     "authentication_bypass": 3,
     "other": 4,
-    "remote_code_execution": 25,
+    "remote_code_execution": 26,
     "unauthorized_database_read": 3,
     "unauthorized_file_access": 11,
     "unauthorized_file_creation": 3
   },
-  "oracle_occurrence_total": 49,
+  "oracle_occurrence_total": 50,
   "failure_categories": {},
   "blocker_categories": {
     "Windows protocol handler unavailable on Linux": 1
@@ -62,6 +62,7 @@
     "electron-1.7.13": 1,
     "kibana-5.0.0-alpha2": 1,
     "kibana-6.5.0": 1,
+    "kibana-7.0.0": 1,
     "langflow-1.0.0": 1,
     "langflow-1.3.0": 1,
     "mongo-express 0.15.0": 1,
@@ -100,6 +101,7 @@
     "gradio-002",
     "kibana-001",
     "kibana-002",
+    "kibana-003",
     "langflow-001",
     "langflow-002",
     "mongo-express-001",
@@ -199,6 +201,10 @@
     {
       "id": "kibana-002",
       "commit": "0bc0423d4a70747a14a4ab4efc285e0e5fde2a9e"
+    },
+    {
+      "id": "kibana-003",
+      "commit": "86ad0ec3b8a8001c3cff0372d36416276a36521e"
     },
     {
       "id": "langflow-001",
