@@ -1,29 +1,29 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T08:56:46.703298+00:00",
+  "generated_at": "2026-10-09T09:03:33.242078+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
   "status_counts": {
     "blocked": 0,
-    "candidate": 36,
+    "candidate": 34,
     "excluded": 278,
     "failed": 0,
     "in_progress": 4,
-    "successful": 15
+    "successful": 17
   },
-  "successful_datapoints": 15,
+  "successful_datapoints": 17,
   "failed_datapoints": 0,
   "blocked_cases": 0,
-  "pending_cases": 40,
+  "pending_cases": 38,
   "oracle_occurrences": {
-    "other": 1,
-    "remote_code_execution": 6,
+    "other": 2,
+    "remote_code_execution": 7,
     "unauthorized_database_read": 3,
     "unauthorized_file_access": 6
   },
-  "oracle_occurrence_total": 16,
+  "oracle_occurrence_total": 18,
   "failure_categories": {},
   "blocker_categories": {},
   "excluded_by_target_language": {
@@ -44,6 +44,7 @@
     "Shell and C": 1
   },
   "verified_version_groups": {
+    "Django 1.10": 1,
     "Django 1.10.0": 3,
     "Django 3.1.0": 1,
     "Flask 0.1": 1,
@@ -54,12 +55,14 @@
     "aiohttp 1.1.0": 1,
     "mongo-express 0.15.0": 1,
     "pgAdmin 5.4": 2,
+    "pgAdmin 8.10": 1,
     "pgAdmin 9.2": 1
   },
   "passing_vulnerability_ids": [
     "aiohttp-001",
     "django-002",
     "django-003",
+    "django-004",
     "django-005",
     "django-006",
     "flask-001",
@@ -71,6 +74,7 @@
     "pgadmin-001",
     "pgadmin-002",
     "pgadmin-003",
+    "pgadmin-004",
     "vite-001"
   ],
   "published_source_branches": [
@@ -129,6 +133,10 @@
     {
       "id": "pgadmin-003",
       "commit": "e02b428f9dcd23f81bcca5cd26f5353beb456732"
+    },
+    {
+      "id": "pgadmin-004",
+      "commit": "bb916e41b93f2806323487310d0d0e11ae5c8d0e"
     },
     {
       "id": "aiohttp-001",
