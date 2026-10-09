@@ -1,7 +1,7 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T11:51:01.466725+00:00",
+  "generated_at": "2026-10-09T11:54:58.121727+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
@@ -10,22 +10,22 @@
     "candidate": 0,
     "excluded": 278,
     "failed": 0,
-    "in_progress": 3,
-    "successful": 51
+    "in_progress": 2,
+    "successful": 52
   },
-  "successful_datapoints": 51,
+  "successful_datapoints": 52,
   "failed_datapoints": 0,
   "blocked_cases": 1,
-  "pending_cases": 3,
+  "pending_cases": 2,
   "oracle_occurrences": {
     "authentication_bypass": 4,
     "other": 5,
-    "remote_code_execution": 29,
+    "remote_code_execution": 30,
     "unauthorized_database_read": 3,
     "unauthorized_file_access": 11,
     "unauthorized_file_creation": 3
   },
-  "oracle_occurrence_total": 55,
+  "oracle_occurrence_total": 56,
   "failure_categories": {},
   "blocker_categories": {
     "Windows protocol handler unavailable on Linux": 1
@@ -79,6 +79,7 @@
     "react-rsc-19.0.0": 1,
     "rocketchat-3.8.0-rc.0": 1,
     "saltstack-2018.3.0": 3,
+    "scrapyd-0.10": 1,
     "superset-1.5.0": 2,
     "supervisor-3.0b1": 1,
     "vite-2.3.0": 1,
@@ -129,6 +130,7 @@
     "saltstack-001",
     "saltstack-002",
     "saltstack-003",
+    "scrapyd-001",
     "superset-001",
     "superset-002",
     "supervisor-001",
@@ -307,6 +309,10 @@
     {
       "id": "saltstack-003",
       "commit": "85994dee5bf9b5f4421aaf16af4009675c3e45c8"
+    },
+    {
+      "id": "scrapyd-001",
+      "commit": "8503eef27a13f43c44cf67f48f61a132474082a8"
     },
     {
       "id": "superset-001",
