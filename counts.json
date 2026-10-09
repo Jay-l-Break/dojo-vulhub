@@ -1,16 +1,16 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T08:00:48.313491+00:00",
+  "generated_at": "2026-10-09T08:03:04.445010+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
   "status_counts": {
     "blocked": 0,
-    "candidate": 50,
+    "candidate": 49,
     "excluded": 278,
     "failed": 0,
-    "in_progress": 3,
+    "in_progress": 4,
     "successful": 2
   },
   "successful_datapoints": 2,
