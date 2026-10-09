@@ -20,12 +20,12 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T09:40:52.449667+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T09:43:27.343967+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
-There are 22 passing datapoints, 0 failed cases, and 0 blocked cases.
-Another 4 cases are assigned and 29 await assignment.
-Passing datapoints have 23 validated oracle occurrences.
+There are 23 passing datapoints, 0 failed cases, and 0 blocked cases.
+Another 4 cases are assigned and 28 await assignment.
+Passing datapoints have 25 validated oracle occurrences.
 The figure and [`counts.json`](counts.json) use these ledger totals.
 
 ## Failure categories
@@ -35,6 +35,7 @@ No cases have a confirmed failure or blocker yet.
 ## Published source branches
 
 - [`aiohttp-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/aiohttp-001) at `21d7c493968e544088d61341dda072dc40932b31`
+- [`airflow-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/airflow-001) at `e622fecd25edd57c6f94dbbeda0cd67f3ea247cb`
 - [`comfyui-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/comfyui-001) at `c17383118477fefea9b675e97920027b56b2e3d6`
 - [`comfyui-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/comfyui-002) at `aeaabf5c816082de61dacc5509d66dc0dab7be46`
 - [`django-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/django-001) at `a73b108f3cc5fbb60e746979eeff076c1f061019`
