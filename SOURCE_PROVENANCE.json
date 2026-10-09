@@ -1,0 +1,9 @@
+{
+  "upstream_repository": "https://github.com/YMFE/yapi",
+  "upstream_tag": "v1.3.13",
+  "upstream_commit": "53eb9054685bf0ec3733e2543510b120bdea2172",
+  "upstream_source_archive": "vendor/yapi-v1.3.13-source.tar.gz",
+  "upstream_source_archive_sha256": "5194b635590939a8ed192231673945a0f467833a404df6f761d86c0dffa776ae",
+  "vulhub_source_id": "yapi/mongodb-inj",
+  "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38"
+}
