@@ -1,0 +1,56 @@
+{
+  "name": "Document Submission Portal",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Document Submission",
+        "path": "vulnerable-form",
+        "responseMode": "responseNode",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "document",
+              "fieldType": "file",
+              "requiredField": true,
+              "multipleFiles": false
+            }
+          ]
+        }
+      },
+      "id": "n8n-002-form-trigger",
+      "name": "Form Trigger",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.1,
+      "position": [100, 100],
+      "webhookId": "vulnerable-form"
+    },
+    {
+      "parameters": {
+        "respondWith": "binary",
+        "inputDataFieldName": "document"
+      },
+      "id": "n8n-002-binary-response",
+      "name": "Return Document",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [300, 100]
+    }
+  ],
+  "connections": {
+    "Form Trigger": {
+      "main": [
+        [
+          {
+            "node": "Return Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

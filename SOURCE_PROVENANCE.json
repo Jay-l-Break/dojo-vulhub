@@ -1,0 +1,10 @@
+{
+  "upstream_repository": "https://github.com/n8n-io/n8n",
+  "selected_upstream_tag": "n8n@1.53.0",
+  "selected_upstream_commit": "7ffaec03eaa77c0c812adee1a71f5e9aeb3724b3",
+  "selected_source_archive": "vendor/n8n-1.53.0-source.tar.gz",
+  "selected_source_archive_sha256": "3eaf1fef00cf29f23723be720b14254fce852572c0fcb54426703f358eb73c13",
+  "runtime_image": "n8nio/n8n:1.53.0@sha256:260d13f316cdba6ef043d9e473d082705bba5c3ab235b633808b563c59196148",
+  "vulhub_source_id": "n8n/CVE-2026-21858",
+  "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38"
+}
