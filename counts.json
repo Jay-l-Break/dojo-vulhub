@@ -1,7 +1,7 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T08:20:16.863787+00:00",
+  "generated_at": "2026-10-09T08:22:57.608351+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
@@ -46,9 +46,9 @@
     "Django 1.10.0": 2,
     "Django 3.1.0": 1,
     "Gradio 4.0.0": 2,
-    "Node pg 7.1.0": 1,
+    "Node pg 2.4.0": 1,
     "Node.js 8.5.0": 1,
-    "pgAdmin 5.4": 1
+    "pgAdmin 5.4": 2
   },
   "passing_vulnerability_ids": [
     "django-003",
@@ -86,7 +86,7 @@
     },
     {
       "id": "node-002",
-      "commit": "66c1fdc9851460cad635c3af10dac0f27ef09df0"
+      "commit": "0128e84df40cf7fb22b329b1f605834a49d852bc"
     },
     {
       "id": "pgadmin-001",

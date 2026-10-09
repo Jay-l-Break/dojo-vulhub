@@ -19,7 +19,7 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T08:20:16.863787+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T08:22:57.608351+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
 There are 7 passing datapoints, 0 failed cases, and 0 blocked cases.
@@ -40,7 +40,7 @@ No cases have a confirmed failure or blocker yet.
 - [`gradio-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/gradio-001) at `8f689400725fbe6470c05d2e2ccd9a5b2398797d`
 - [`gradio-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/gradio-002) at `feaf27cbb35995412b3294d2aedd35cff05d8ef3`
 - [`node-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/node-001) at `5d086b74e3f7b1b56823dbadc729fb0a852e6191`
-- [`node-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/node-002) at `66c1fdc9851460cad635c3af10dac0f27ef09df0`
+- [`node-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/node-002) at `0128e84df40cf7fb22b329b1f605834a49d852bc`
 - [`pgadmin-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/pgadmin-001) at `1c4944d9e8fbb9f1f3ba6f9e6fc116c1a7195168`
 
 ## Validation
