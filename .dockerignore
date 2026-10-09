@@ -1,0 +1,12 @@
+.git
+**/.git
+**/__pycache__
+**/*.pyc
+user
+models
+output
+input
+temp
+docs
+tests
+**/tests
