@@ -1,27 +1,28 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T08:05:18.215504+00:00",
+  "generated_at": "2026-10-09T08:08:18.036999+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
   "status_counts": {
     "blocked": 0,
-    "candidate": 48,
+    "candidate": 46,
     "excluded": 278,
     "failed": 0,
     "in_progress": 4,
-    "successful": 3
+    "successful": 5
   },
-  "successful_datapoints": 3,
+  "successful_datapoints": 5,
   "failed_datapoints": 0,
   "blocked_cases": 0,
-  "pending_cases": 52,
+  "pending_cases": 50,
   "oracle_occurrences": {
-    "unauthorized_database_read": 1,
+    "remote_code_execution": 1,
+    "unauthorized_database_read": 2,
     "unauthorized_file_access": 2
   },
-  "oracle_occurrence_total": 3,
+  "oracle_occurrence_total": 5,
   "failure_categories": {},
   "blocker_categories": {},
   "excluded_by_target_language": {
@@ -47,9 +48,11 @@
     "Node pg 7.1.0": 1
   },
   "passing_vulnerability_ids": [
+    "django-003",
     "django-006",
     "gradio-001",
-    "gradio-002"
+    "gradio-002",
+    "node-002"
   ],
   "published_source_branches": [
     {
