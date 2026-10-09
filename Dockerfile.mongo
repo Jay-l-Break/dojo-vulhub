@@ -1,0 +1,5 @@
+FROM mongo@sha256:4ca81c89ad08f4cfa9906005126112bffe8fb363800466ef5e50f6238f6f6af1
+
+COPY mongo-start.sh /usr/local/bin/mongo-start.sh
+RUN chmod 755 /usr/local/bin/mongo-start.sh
+CMD ["mongo-start.sh"]
