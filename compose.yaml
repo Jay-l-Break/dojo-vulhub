@@ -1,0 +1,16 @@
+services:
+  backend:
+    build: .
+    environment:
+      DB_HOST: db
+      DB_PASSWORD: ${DB_PASSWORD:-local-compose-django-006-db}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-}
+    ports:
+      - "${DOJO_HOST_PORT:-80}:80"
+    depends_on:
+      - db
+  db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-local-compose-django-006-db}
+      POSTGRES_DB: CVE_2022_34265
