@@ -1,31 +1,31 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T11:21:05.747545+00:00",
+  "generated_at": "2026-10-09T11:22:48.454461+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
   "status_counts": {
     "blocked": 1,
-    "candidate": 4,
+    "candidate": 3,
     "excluded": 278,
     "failed": 0,
     "in_progress": 4,
-    "successful": 46
+    "successful": 47
   },
-  "successful_datapoints": 46,
+  "successful_datapoints": 47,
   "failed_datapoints": 0,
   "blocked_cases": 1,
-  "pending_cases": 8,
+  "pending_cases": 7,
   "oracle_occurrences": {
     "authentication_bypass": 3,
     "other": 4,
-    "remote_code_execution": 26,
+    "remote_code_execution": 27,
     "unauthorized_database_read": 3,
     "unauthorized_file_access": 11,
     "unauthorized_file_creation": 3
   },
-  "oracle_occurrence_total": 50,
+  "oracle_occurrence_total": 51,
   "failure_categories": {},
   "blocker_categories": {
     "Windows protocol handler unavailable on Linux": 1
@@ -76,6 +76,7 @@
     "react-rsc-19.0.0": 1,
     "saltstack-2018.3.0": 3,
     "superset-1.5.0": 2,
+    "supervisor-3.0b1": 1,
     "vite-2.3.0": 1,
     "vite-4.4.0-beta.0": 1,
     "vite-6.1.0-beta.1": 1,
@@ -122,6 +123,7 @@
     "saltstack-003",
     "superset-001",
     "superset-002",
+    "supervisor-001",
     "vite-001",
     "vite-002",
     "vite-003",
@@ -289,6 +291,10 @@
     {
       "id": "superset-002",
       "commit": "b241f1ac962e17d677cebfb9669529e232c005d8"
+    },
+    {
+      "id": "supervisor-001",
+      "commit": "0931971bf055091819483d7848a023075b8020ad"
     },
     {
       "id": "vite-001",
