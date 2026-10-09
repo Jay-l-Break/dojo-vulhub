@@ -1,0 +1,12 @@
+{
+  "upstream_repository": "https://github.com/YMFE/yapi",
+  "selected_upstream_tag": "v1.3.13",
+  "selected_upstream_commit": "53eb9054685bf0ec3733e2543510b120bdea2172",
+  "selected_source_archive": "vendor/yapi-v1.3.13-source.tar.gz",
+  "selected_source_archive_sha256": "5194b635590939a8ed192231673945a0f467833a404df6f761d86c0dffa776ae",
+  "earliest_individual_tag": "v1.1.0",
+  "earliest_individual_commit": "801aba3966df88de313d55d5e008af2e6d5a3bbb",
+  "version_group": "yapi-1.3.13",
+  "vulhub_source_id": "yapi/unacc",
+  "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38"
+}
