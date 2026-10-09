@@ -1,31 +1,31 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T11:07:11.049086+00:00",
+  "generated_at": "2026-10-09T11:13:28.738509+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
   "status_counts": {
     "blocked": 0,
-    "candidate": 9,
+    "candidate": 7,
     "excluded": 278,
     "failed": 0,
     "in_progress": 4,
-    "successful": 42
+    "successful": 44
   },
-  "successful_datapoints": 42,
+  "successful_datapoints": 44,
   "failed_datapoints": 0,
   "blocked_cases": 0,
-  "pending_cases": 13,
+  "pending_cases": 11,
   "oracle_occurrences": {
     "authentication_bypass": 3,
     "other": 4,
-    "remote_code_execution": 22,
+    "remote_code_execution": 24,
     "unauthorized_database_read": 3,
     "unauthorized_file_access": 11,
     "unauthorized_file_creation": 3
   },
-  "oracle_occurrence_total": 46,
+  "oracle_occurrence_total": 48,
   "failure_categories": {},
   "blocker_categories": {},
   "excluded_by_target_language": {
@@ -53,6 +53,7 @@
     "Vite 2.0.0-alpha.1": 1,
     "aiohttp 1.1.0": 1,
     "airflow-1.8.0": 3,
+    "chartbrew-v1.0.0-beta.9": 1,
     "comfyui-manager-3.3": 2,
     "django-1.10": 5,
     "django-3.1.0": 1,
@@ -70,7 +71,7 @@
     "pgAdmin 9.2": 1,
     "react-rsc-19.0.0": 1,
     "saltstack-2018.3.0": 3,
-    "superset-1.5.0": 1,
+    "superset-1.5.0": 2,
     "vite-2.3.0": 1,
     "vite-4.4.0-beta.0": 1,
     "vite-6.1.0-beta.1": 1,
@@ -81,6 +82,7 @@
     "airflow-001",
     "airflow-002",
     "airflow-003",
+    "chartbrew-001",
     "comfyui-001",
     "comfyui-002",
     "django-001",
@@ -113,6 +115,7 @@
     "saltstack-002",
     "saltstack-003",
     "superset-001",
+    "superset-002",
     "vite-001",
     "vite-002",
     "vite-003",
@@ -132,6 +135,10 @@
     {
       "id": "airflow-003",
       "commit": "50e6ed8c4889f3cb56ab100bf483ba5b53039664"
+    },
+    {
+      "id": "chartbrew-001",
+      "commit": "8eaea933f2e1df76ac0fab121e75761e1aaaed8a"
     },
     {
       "id": "comfyui-001",
@@ -264,6 +271,10 @@
     {
       "id": "superset-001",
       "commit": "1fd021ec49cb0baa76eefe4d3c41596d186fa1a6"
+    },
+    {
+      "id": "superset-002",
+      "commit": "b241f1ac962e17d677cebfb9669529e232c005d8"
     },
     {
       "id": "vite-001",
