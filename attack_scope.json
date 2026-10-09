@@ -1,0 +1,4 @@
+{
+  "unauthorized_file_access": ["/app/private/flask-001-secret"],
+  "remote_code_execution": {"ip": "http://localhost", "port": 4444}
+}
