@@ -1,0 +1,606 @@
+const mongoose = require("mongoose");
+const moment = require("moment");
+const Sequelize = require("sequelize");
+
+const externalDbConnection = require("../modules/externalDbConnection");
+
+const db = require("../models/models");
+const DatasetController = require("./DatasetController");
+const ConnectionController = require("./ConnectionController");
+const DataRequestController = require("./DataRequestController");
+const ChartCacheController = require("./ChartCacheController");
+
+// charts
+const LineChart = require("../charts/LineChart");
+const BarChart = require("../charts/BarChart");
+const PieChart = require("../charts/PieChart");
+
+class ChartController {
+  constructor() {
+    this.connectionController = new ConnectionController();
+    this.datasetController = new DatasetController();
+    this.dataRequestController = new DataRequestController();
+    this.chartCache = new ChartCacheController();
+  }
+
+  create(data, user) {
+    let chartId;
+    return db.Chart.create(data)
+      .then((chart) => {
+        chartId = chart.id;
+        if (data.Datasets || data.dataRequest) {
+          const createPromises = [];
+
+          // add the datasets creation
+          if (data.Datasets) {
+            for (const dataset of data.Datasets) {
+              if (!dataset.deleted) {
+                dataset.chart_id = chartId;
+                createPromises.push(this.datasetController.create(dataset));
+              }
+            }
+          }
+
+          // add the dataRequest creation
+          if (data.dataRequest) {
+            const { dataRequest } = data;
+            dataRequest.chart_id = chart.id;
+            createPromises.push(this.dataRequestController.create(dataRequest));
+          }
+
+          // add the update promise as well
+          createPromises.push(this.update(chart.id, { dashboardOrder: chart.id }));
+          return Promise.all(createPromises);
+        } else {
+          return this.update(chart.id, { dashboardOrder: chart.id });
+        }
+      })
+      .then(() => {
+        // delete chart cache
+        if (user) {
+          this.chartCache.deleteAll(user.id);
+        }
+
+        return this.findById(chartId);
+      })
+      .catch((error) => {
+        return new Promise((resolve, reject) => reject(error));
+      });
+  }
+
+  findAll(conditions = {}) {
+    return db.Chart.findAll(conditions)
+      .then((charts) => {
+        return new Promise((resolve) => resolve(charts));
+      })
+      .catch((error) => {
+        return new Promise((resolve, reject) => reject(error));
+      });
+  }
+
+  findByProject(projectId) {
+    return db.Chart.findAll({
+      where: { project_id: projectId },
+      order: [["dashboardOrder", "ASC"]],
+      include: [{ model: db.Dataset }],
+    })
+      .then((charts) => {
+        return charts;
+      })
+      .catch((error) => {
+        return new Promise((resolve, reject) => reject(error));
+      });
+  }
+
+  findById(id) {
+    return db.Chart.findOne({
+      where: { id },
+      include: [{ model: db.Dataset }],
+    })
+      .then((chart) => {
+        return chart;
+      })
+      .catch((error) => {
+        return new Promise((resolve, reject) => reject(error));
+      });
+  }
+
+  update(id, data, user) {
+    if (data.autoUpdate) {
+      return db.Chart.update(data, { where: { id } })
+        .then(() => {
+          const updatePromises = [];
+
+          if (data.Datasets || data.dataRequest) {
+            if (data.Datasets) {
+              updatePromises
+                .push(this.updateDatasets(id, data.Datasets));
+            }
+            if (data.dataRequest) {
+              updatePromises
+                .push(this.dataRequestController.update(data.dataRequest.id, data.dataRequest));
+            }
+
+            return Promise.all(updatePromises).then(() => this.findById(id));
+          } else {
+            return this.findById(id);
+          }
+        })
+        .catch((error) => {
+          return new Promise((resolve, reject) => reject(error));
+        });
+    }
+
+    return db.Chart.update(data, {
+      where: { id },
+    })
+      .then(() => {
+        // clear chart cache
+        if (user) {
+          this.chartCache.deleteAll(user.id);
+        }
+
+        const updatePromises = [];
+        if (data.Datasets || data.dataRequest) {
+          if (data.Datasets) {
+            const datasetsToUpdate = [];
+            for (const dataset of data.Datasets) {
+              if (!dataset.deleted && !dataset.id) {
+                dataset.chart_id = id;
+                updatePromises.push(this.datasetController.create(dataset));
+              } else if (!dataset.deleted && dataset.id) {
+                datasetsToUpdate.push(dataset);
+              }
+            }
+
+            if (datasetsToUpdate.length > 0) {
+              updatePromises
+                .push(this.updateDatasets(id, data.Datasets));
+            }
+          }
+          if (data.dataRequest && data.dataRequest.id) {
+            updatePromises
+              .push(this.dataRequestController.update(data.dataRequest.id, data.dataRequest));
+          }
+
+          if (data.dataRequest && !data.dataRequest.id) {
+            const newDataRequest = { ...data.dataRequest, chart_id: id };
+            updatePromises.push(this.dataRequestController.create(newDataRequest));
+          }
+
+          return Promise.all(updatePromises).then(() => this.findById(id));
+        } else {
+          return this.findById(id);
+        }
+      })
+      .catch((error) => {
+        return new Promise((resolve, reject) => reject(error));
+      });
+  }
+
+  addConnection(chartId, connection) {
+    return db.Chart.findByPk(chartId)
+      .then((chart) => {
+        return chart.addConnections([connection]);
+      })
+      .then((chart) => {
+        return this.findById(chart.id);
+      })
+      .catch((error) => {
+        return new Promise((resolve, reject) => reject(error));
+      });
+  }
+
+  updateDatasets(chartId, datasets) {
+    const updatePromises = [];
+    for (const dataset of datasets) {
+      if (dataset.id && !dataset.deleted) {
+        if (parseInt(dataset.chart_id, 10) === parseInt(chartId, 10)) {
+          updatePromises.push(this.datasetController.update(dataset.id, dataset));
+        }
+      } else if (dataset.id && dataset.deleted) {
+        updatePromises.push(this.datasetController.remove(dataset.id));
+      } else if (!dataset.id && !dataset.deleted) {
+        dataset.chart_id = chartId;
+        updatePromises.push(this.datasetController.create(dataset));
+      }
+    }
+
+    return Promise.all(updatePromises)
+      .then(() => {
+        return this.findById(chartId);
+      })
+      .catch((error) => {
+        return new Promise((resolve, reject) => reject(error));
+      });
+  }
+
+  changeDashboardOrder(selectedId, otherId) {
+    let selectedChart;
+    return this.findById(selectedId)
+      .then((chart) => {
+        selectedChart = chart;
+
+        return this.findById(otherId);
+      })
+      .then((otherChart) => {
+        const updateSelected = this.update(selectedId, {
+          dashboardOrder: otherChart.dashboardOrder,
+        });
+        const updateNeighbour = this.update(otherChart.id, {
+          dashboardOrder: selectedChart.dashboardOrder,
+        });
+
+        return Promise.all([updateSelected, updateNeighbour]);
+      })
+      .then((values) => {
+        return values;
+      })
+      .catch((error) => {
+        return new Promise((resolve, reject) => reject(error));
+      });
+  }
+
+  remove(id) {
+    return db.Chart.destroy({ where: { id } })
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        return new Promise((resolve, reject) => reject(error));
+      });
+  }
+
+  updateChartData(id, user, noSource) {
+    let gChart;
+    let gCache;
+    let skipCache = false;
+    return this.findById(id)
+      .then((chart) => {
+        gChart = chart;
+        if (!chart.Datasets || chart.Datasets.length === 0) {
+          throw new Error("The chart doesn't have any datasets");
+        }
+
+        if (!user) {
+          skipCache = true;
+          return new Promise((resolve) => resolve(false));
+        }
+
+        return this.chartCache.findLast(user.id, chart.id);
+      })
+      .then((cache) => {
+        if (!skipCache) {
+          gCache = cache;
+        }
+
+        const requestPromises = [];
+        gChart.Datasets.map((dataset) => {
+          if (noSource && gCache && gCache.data) {
+            requestPromises.push(this.datasetController.runRequest(dataset.id, true));
+          } else {
+            requestPromises.push(this.datasetController.runRequest(dataset.id));
+          }
+          return dataset;
+        });
+
+        return Promise.all(requestPromises);
+      })
+      .then((datasets) => {
+        const resolvingData = {
+          chart: gChart,
+          datasets,
+        };
+
+        // change the datasets data if the cache is called
+        if (!skipCache && noSource === true && gCache && gCache.data && gCache.data.datasets) {
+          resolvingData.datasets = gCache.data.datasets.map((item) => {
+            const tempItem = item;
+            for (let i = 0; i < datasets.length; i++) {
+              if (item.options.id === datasets[i].options.id) {
+                tempItem.options = datasets[i].options;
+                break;
+              }
+            }
+            return tempItem;
+          });
+        } else if (!skipCache) {
+          // create a new cache for the data that was fetched
+          this.chartCache.create(user.id, gChart.id, resolvingData);
+        }
+
+        return Promise.resolve(resolvingData);
+      })
+      .then((chartData) => {
+        // LINE CHART
+        if (gChart.type === "line") {
+          const lineChart = new LineChart(chartData);
+          return lineChart.aggregateOverTime();
+
+          // BAR CHART
+        } else if (gChart.type === "bar") {
+          const barChart = new BarChart(chartData);
+
+          if (gChart.subType.toLowerCase().indexOf("timeseries") > -1) {
+            return barChart.aggregateOverTime();
+          } else if (gChart.subType === "pattern") {
+            return barChart.createPatterns();
+          } else {
+            return new Promise((resolve, reject) => reject(new Error("Could not find the chart type")));
+          }
+
+          // PIE CHART
+        } else if (gChart.type === "pie" || gChart.type === "doughnut"
+          || gChart.type === "radar" || gChart.type === "polar") {
+          const pieChart = new PieChart(chartData);
+          if (gChart.subType === "pattern") {
+            return pieChart.createPatterns();
+          } else {
+            return new Promise((resolve, reject) => reject(new Error("Could not find the chart type")));
+          }
+        } else {
+          return new Promise((resolve, reject) => reject(new Error("Could not find the chart type")));
+        }
+      })
+      .then((chartData) => {
+        return this.update(id, { chartData, chartDataUpdated: moment() });
+      })
+      .then(() => {
+        return this.findById(id);
+      })
+      .catch((err) => {
+        return err;
+      });
+  }
+
+  runPostgresQuery(chart) {
+    return this.connectionController.findById(chart.connection_id)
+      .then((connection) => {
+        return externalDbConnection(connection);
+      })
+      .then((db) => {
+        return db.query(chart.query, { type: Sequelize.QueryTypes.SELECT });
+      })
+      .then((results) => {
+        return this.getChartData(chart.id, results);
+      })
+      .then(() => {
+        return this.findById(chart.id);
+      })
+      .catch((error) => {
+        return new Promise((resolve, reject) => reject(error));
+      });
+  }
+
+  runRequest(chart) {
+    return this.dataRequestController.sendRequest(chart.id, chart.connection_id)
+      .then((data) => {
+        return this.getChartData(chart.id, data);
+      })
+      .then(() => {
+        return this.findById(chart.id);
+      })
+      .catch((error) => {
+        return new Promise((resolve, reject) => reject(error));
+      });
+  }
+
+  runQuery(id) {
+    let gChart;
+    return this.findById(id)
+      .then((chart) => {
+        gChart = chart;
+        return this.connectionController.getConnectionUrl(chart.connection_id);
+      })
+      .then((url) => {
+        const options = {
+          keepAlive: 1,
+          connectTimeoutMS: 30000,
+        };
+        return mongoose.connect(url, options);
+      })
+      .then(() => {
+        return Function(`'use strict';return (mongoose) => mongoose.${gChart.query}.toArray()`)()(mongoose); // eslint-disable-line
+      })
+      // if array fails, check if it works with object (for example .findOne() return object)
+      .catch(() => {
+        return Function(`'use strict';return (mongoose) => mongoose.${gChart.query}`)()(mongoose); // eslint-disable-line
+      })
+      .then((data) => {
+        return this.getChartData(gChart.getDataValue("id"), data);
+      })
+      .then(() => {
+        return this.findById(gChart.getDataValue("id"));
+      })
+      .catch((error) => {
+        return new Promise((resolve, reject) => reject(error));
+      });
+  }
+
+  testMongoQuery({ connection_id, query }) {
+    return this.connectionController.getConnectionUrl(connection_id)
+      .then((url) => {
+        const options = {
+          keepAlive: 1,
+          connectTimeoutMS: 30000,
+        };
+        return mongoose.connect(url, options);
+      })
+      .then(() => {
+        return Function(`'use strict';return (mongoose) => mongoose.${query}.toArray()`)()(mongoose); // eslint-disable-line
+      })
+      .then((data) => {
+        return new Promise((resolve) => resolve(data));
+      })
+      .catch(() => {
+        return Function(`'use strict';return (mongoose) => mongoose.${query}`)()(mongoose); // eslint-disable-line
+      })
+      .then((data) => {
+        return new Promise((resolve) => resolve(data));
+      })
+      .catch((error) => {
+        return new Promise((resolve, reject) => reject(error));
+      });
+  }
+
+  testQuery(chart, projectId) {
+    return this.connectionController.findById(chart.connection_id)
+      .then((connection) => {
+        if (connection.type === "mongodb") {
+          return this.testMongoQuery(chart, projectId);
+        } else if (connection.type === "postgres" || connection.type === "mysql") {
+          return this.getPostgresData(chart, projectId, connection);
+        } else {
+          throw new Error("The connection type is not supported");
+        }
+      })
+      .catch((error) => {
+        return new Promise((resolve, reject) => reject(error));
+      });
+  }
+
+  getApiChartData(chart) {
+    return this.connectionController.testDataRequest(chart)
+      .then((data) => {
+        return new Promise((resolve) => resolve(data));
+      })
+      .catch((error) => {
+        return new Promise((resolve, reject) => reject(error));
+      });
+  }
+
+  getPostgresData(chart, projectId, connection) {
+    return externalDbConnection(connection)
+      .then((db) => {
+        return db.query(chart.query, { type: Sequelize.QueryTypes.SELECT });
+      })
+      .then((results) => {
+        return new Promise((resolve) => resolve(results));
+      })
+      .catch((error) => {
+        return new Promise((resolve, reject) => reject(error));
+      });
+  }
+
+  getPreviewData(chart, projectId, user, noSource) {
+    return this.chartCache.findLast(user.id, chart.id)
+      .then((cache) => {
+        if (noSource === "true") {
+          return new Promise((resolve) => resolve(cache));
+        }
+
+        return this.connectionController.findById(chart.connection_id);
+      })
+      .then((connection) => {
+        if (noSource === "true") {
+          return new Promise((resolve) => resolve(connection.data));
+        }
+
+        if (connection.type === "mongodb") {
+          return this.testQuery(chart, projectId);
+        } else if (connection.type === "api") {
+          return this.getApiChartData(chart, projectId);
+        } else if (connection.type === "postgres" || connection.type === "mysql") {
+          return this.getPostgresData(chart, projectId, connection);
+        } else {
+          throw new Error("The connection type is not supported");
+        }
+      })
+      .then((data) => {
+        if (noSource !== "true") {
+          // cache, but do it async
+          this.chartCache.create(user.id, chart.id, data);
+        }
+
+        return new Promise((resolve) => resolve(data));
+      })
+      .catch((error) => {
+        return new Promise((resolve, reject) => reject(error));
+      });
+  }
+
+  previewChart(chart, projectId, user, noSource) {
+    return this.getPreviewData(chart, projectId, user, noSource)
+      .then((data) => {
+        // LINE CHART
+        if (chart.type === "line") {
+          const lineChart = new LineChart(chart, data);
+          return lineChart.aggregateOverTime();
+
+        // BAR CHART
+        } else if (chart.type === "bar") {
+          const barChart = new BarChart(chart, data);
+
+          if (chart.subType.toLowerCase().indexOf("timeseries") > -1) {
+            return barChart.aggregateOverTime();
+          } else if (chart.subType === "pattern") {
+            return barChart.createPatterns();
+          } else {
+            return new Promise((resolve, reject) => reject(new Error("Could not find the chart type")));
+          }
+
+        // PIE CHART
+        } else if (chart.type === "pie" || chart.type === "doughnut"
+          || chart.type === "radar" || chart.type === "polar") {
+          const pieChart = new PieChart(chart, data);
+          if (chart.subType === "pattern") {
+            return pieChart.createPatterns();
+          } else {
+            return new Promise((resolve, reject) => reject(new Error("Could not find the chart type")));
+          }
+        } else {
+          return new Promise((resolve, reject) => reject(new Error("Could not find the chart type")));
+        }
+      })
+      .then((chartData) => {
+        return new Promise((resolve) => resolve(chartData));
+      })
+      .catch((error) => {
+        return new Promise((resolve, reject) => reject(error));
+      });
+  }
+
+  getChartData(id, data) {
+    let gChartData;
+    return this.findById(id)
+      .then((chart) => {
+        // LINE CHART
+        if (chart.type === "line") {
+          const lineChart = new LineChart(chart, data);
+          return lineChart.aggregateOverTime();
+
+        // BAR CHART
+        } else if (chart.type === "bar") {
+          const barChart = new BarChart(chart, data);
+          if (chart.subType.toLowerCase().indexOf("timeseries") > -1) {
+            return barChart.aggregateOverTime();
+          } else if (chart.subType === "pattern") {
+            return barChart.createPatterns();
+          } else {
+            return new Promise((resolve, reject) => reject(new Error("Could not find the chart type")));
+          }
+
+        // PIE CHART
+        } else if (chart.type === "pie" || chart.type === "doughnut"
+          || chart.type === "radar" || chart.type === "polar") {
+          const pieChart = new PieChart(chart, data);
+          if (chart.subType === "pattern") {
+            return pieChart.createPatterns();
+          } else {
+            return new Promise((resolve, reject) => reject(new Error("Could not find the chart type")));
+          }
+        } else {
+          return new Promise((resolve, reject) => reject(new Error("Could not find the chart type")));
+        }
+      })
+      .then((chartData) => {
+        gChartData = chartData;
+        return this.update(id, { chartData: gChartData, chartDataUpdated: moment() });
+      })
+      .then(() => {
+        return new Promise((resolve) => resolve(gChartData));
+      });
+  }
+}
+
+module.exports = ChartController;

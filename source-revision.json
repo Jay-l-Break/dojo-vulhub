@@ -1,0 +1,8 @@
+{
+  "application": "Chartbrew",
+  "version": "v1.0.0-beta.9",
+  "upstream_repository": "https://github.com/chartbrew/chartbrew",
+  "upstream_revision": "5ea23f72a1123e81fcb25121b3827199572a3942",
+  "upstream_archive_sha256": "7e83241359f596642e823c03e23e5e0ea88758c5b3b045aa41c2d943962c1daf",
+  "runtime_change": "The server port accepts PORT so the benchmark target serves its original API on port 80."
+}
