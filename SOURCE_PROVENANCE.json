@@ -1,0 +1,13 @@
+{
+  "upstream_repository": "https://github.com/vercel/next.js",
+  "selected_upstream_tag": "v12.0.0",
+  "selected_upstream_commit": "8a450db14a1b29d506ec86df1a002bc525ab0da7",
+  "selected_source_archive": "vendor/nextjs-v12.0.0-source.tar.gz",
+  "selected_source_archive_sha256": "8c72484479a63f21ec950ae5a0c1dc1dc5af1746f847a080355e9212eea8925c",
+  "npm_package": "next@12.0.0",
+  "npm_integrity": "sha512-FCV4ODfm+7g8TWi9FjwjH+z5Rt1UHIVnFFO7GfCg+LLYC2LF89gCjjXEIeK8loaiDEkxafPqjyCWWfUU7xJ8DA==",
+  "node_base_image": "node:16-bullseye-slim@sha256:503446c15c6236291222f8192513c2eb56a02a8949cbadf4fe78cce19815c734",
+  "vulhub_source_id": "next.js/CVE-2025-29927",
+  "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
+  "original_vulhub_version": "15.2.2"
+}
