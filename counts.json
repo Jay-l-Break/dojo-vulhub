@@ -1,29 +1,29 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T09:23:28.627987+00:00",
+  "generated_at": "2026-10-09T09:32:59.785364+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
   "status_counts": {
     "blocked": 0,
-    "candidate": 31,
+    "candidate": 29,
     "excluded": 278,
     "failed": 0,
     "in_progress": 4,
-    "successful": 20
+    "successful": 22
   },
-  "successful_datapoints": 20,
+  "successful_datapoints": 22,
   "failed_datapoints": 0,
   "blocked_cases": 0,
-  "pending_cases": 35,
+  "pending_cases": 33,
   "oracle_occurrences": {
     "other": 4,
-    "remote_code_execution": 8,
+    "remote_code_execution": 10,
     "unauthorized_database_read": 3,
     "unauthorized_file_access": 6
   },
-  "oracle_occurrence_total": 21,
+  "oracle_occurrence_total": 23,
   "failure_categories": {},
   "blocker_categories": {},
   "excluded_by_target_language": {
@@ -50,18 +50,19 @@
     "Node.js 8.5.0": 1,
     "Vite 2.0.0-alpha.1": 1,
     "aiohttp 1.1.0": 1,
-    "comfyui-manager-3.3": 1,
+    "comfyui-manager-3.3": 2,
     "django-1.10": 5,
     "django-3.1.0": 1,
     "mongo-express 0.15.0": 1,
     "pgAdmin 5.4": 2,
     "pgAdmin 8.10": 1,
     "pgAdmin 9.2": 1,
-    "yapi-1.3.13": 1
+    "yapi-1.3.13": 2
   },
   "passing_vulnerability_ids": [
     "aiohttp-001",
     "comfyui-001",
+    "comfyui-002",
     "django-001",
     "django-002",
     "django-003",
@@ -79,12 +80,17 @@
     "pgadmin-003",
     "pgadmin-004",
     "vite-001",
-    "yapi-001"
+    "yapi-001",
+    "yapi-002"
   ],
   "published_source_branches": [
     {
       "id": "comfyui-001",
       "commit": "c17383118477fefea9b675e97920027b56b2e3d6"
+    },
+    {
+      "id": "comfyui-002",
+      "commit": "aeaabf5c816082de61dacc5509d66dc0dab7be46"
     },
     {
       "id": "django-001",
@@ -161,6 +167,10 @@
     {
       "id": "yapi-001",
       "commit": "e40ae35c2b89267b571a612e46f43705d0b6e0ab"
+    },
+    {
+      "id": "yapi-002",
+      "commit": "77d51007d05ee99c041f2c2b038cbda195b2c98b"
     }
   ]
 }
