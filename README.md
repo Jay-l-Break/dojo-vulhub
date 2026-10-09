@@ -15,12 +15,13 @@ PoC scripts and container configuration do not determine the language.
 ## Version grouping
 
 Each vulnerability keeps its own datapoint and source branch.
-Cases in one application share the earliest version on which every grouped exploit was reproduced.
-A version joins a group only after a live exploit test confirms it.
+Cases in one application share the earliest published release on which every grouped exploit was reproduced.
+A release joins a group only after a live exploit test confirms it.
+Vulnerable development snapshots remain separate from released version groups.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T12:59:22.532032+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T13:00:51.414955+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
 Passing datapoints: 54.
