@@ -1,0 +1,12 @@
+{
+  "comfyui": {
+    "repository": "https://github.com/Comfy-Org/ComfyUI",
+    "revision": "8f40b43e0204d5b9780f3e9618e140e929e80594",
+    "version": "0.9.2"
+  },
+  "comfyui_manager": {
+    "repository": "https://github.com/Comfy-Org/ComfyUI-Manager",
+    "revision": "de2b8fbd88cf245a1ba7dcc62455e2136d51f0c9",
+    "version": "3.3"
+  }
+}
