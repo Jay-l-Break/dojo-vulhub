@@ -1,0 +1,5 @@
+.git
+src/frontend
+src/backend/tests
+__pycache__
+*.pyc
