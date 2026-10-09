@@ -1,0 +1,9 @@
+{
+  "application": "Kibana",
+  "version": "6.5.0",
+  "upstream_repository": "https://github.com/elastic/kibana",
+  "upstream_tag": "v6.5.0",
+  "upstream_commit": "467f35fbf730033dd5c3d1035512c16023551e87",
+  "vulhub_source_id": "kibana/CVE-2019-7609",
+  "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38"
+}
