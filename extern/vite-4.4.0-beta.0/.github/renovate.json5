@@ -1,0 +1,25 @@
+{
+  "extends": ["config:base", "schedule:weekly", "group:allNonMajor"],
+  "labels": ["dependencies"],
+  "ignorePaths": ["**/__tests__/**"],
+  "pin": false,
+  "rangeStrategy": "bump",
+  "node": false,
+  "packageRules": [
+    {
+      "depTypeList": ["peerDependencies"],
+      "enabled": false,
+    },
+  ],
+  "ignoreDeps": [
+    // manually bumping
+    "esbuild",
+    "rollup",
+    "node",
+    "typescript",
+
+    // breaking changes
+    "kill-port", // `kill-port:^2.0.0 has perf issues (#8392)
+    "miniflare", // `miniflare:v2.0.0+` only supports node 16.7
+  ],
+}
