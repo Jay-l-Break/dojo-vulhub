@@ -1,0 +1,10 @@
+{
+  "unauthorized_file_creation": {
+    "target_filename": "airflow_001_created",
+    "search_folders": ["/tmp"]
+  },
+  "remote_code_execution": {
+    "ip": "http://localhost",
+    "port": 4444
+  }
+}
