@@ -20,7 +20,7 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T12:20:03.987885+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T12:22:36.711584+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
 Passing datapoints: 53.
@@ -42,7 +42,7 @@ The figure and [`counts.json`](counts.json) use these ledger totals.
 - [`airflow-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/airflow-002) at `b99690ae297308c75a6a92a70d21de1c97208193`
 - [`airflow-003`](https://github.com/Jay-l-Break/dojo-vulhub/tree/airflow-003) at `50e6ed8c4889f3cb56ab100bf483ba5b53039664`
 - [`budibase-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/budibase-001) at `f42353b48b682a2c38c7c390b7fb18d712efb31e`
-- [`celery-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/celery-001) at `82d3adeacf21b422a1dce31ac287d6f79a7c195e`
+- [`celery-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/celery-001) at `ca33ca6d3868ab058995f508d7759867abd98881`
 - [`chartbrew-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/chartbrew-001) at `8eaea933f2e1df76ac0fab121e75761e1aaaed8a`
 - [`comfyui-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/comfyui-001) at `c17383118477fefea9b675e97920027b56b2e3d6`
 - [`comfyui-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/comfyui-002) at `aeaabf5c816082de61dacc5509d66dc0dab7be46`
