@@ -20,12 +20,12 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T09:43:27.343967+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T09:47:43.053094+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
-There are 23 passing datapoints, 0 failed cases, and 0 blocked cases.
-Another 4 cases are assigned and 28 await assignment.
-Passing datapoints have 25 validated oracle occurrences.
+There are 25 passing datapoints, 0 failed cases, and 0 blocked cases.
+Another 4 cases are assigned and 26 await assignment.
+Passing datapoints have 27 validated oracle occurrences.
 The figure and [`counts.json`](counts.json) use these ledger totals.
 
 ## Failure categories
@@ -47,6 +47,7 @@ No cases have a confirmed failure or blocker yet.
 - [`flask-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/flask-001) at `80302968d7aa25e2b051af1cbde1669ac0af64dd`
 - [`gradio-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/gradio-001) at `8f689400725fbe6470c05d2e2ccd9a5b2398797d`
 - [`gradio-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/gradio-002) at `feaf27cbb35995412b3294d2aedd35cff05d8ef3`
+- [`langflow-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/langflow-001) at `66be9dd9cd9a93d26aaec19f0bd3d2d2e6d7c06a`
 - [`mongo-express-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/mongo-express-001) at `3a72f3f343e1725fb5bce524fbacf03b8d7d9c76`
 - [`node-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/node-001) at `5d086b74e3f7b1b56823dbadc729fb0a852e6191`
 - [`node-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/node-002) at `0128e84df40cf7fb22b329b1f605834a49d852bc`
@@ -55,6 +56,7 @@ No cases have a confirmed failure or blocker yet.
 - [`pgadmin-003`](https://github.com/Jay-l-Break/dojo-vulhub/tree/pgadmin-003) at `e02b428f9dcd23f81bcca5cd26f5353beb456732`
 - [`pgadmin-004`](https://github.com/Jay-l-Break/dojo-vulhub/tree/pgadmin-004) at `bb916e41b93f2806323487310d0d0e11ae5c8d0e`
 - [`vite-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/vite-001) at `7b19ef8805584acddf9ae935fc92483fbabf2baf`
+- [`vite-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/vite-002) at `184c86cb41b787a698da3428560f9f618b860e0d`
 - [`yapi-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/yapi-001) at `e40ae35c2b89267b571a612e46f43705d0b6e0ab`
 - [`yapi-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/yapi-002) at `77d51007d05ee99c041f2c2b038cbda195b2c98b`
 

@@ -1,30 +1,30 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T09:43:27.343967+00:00",
+  "generated_at": "2026-10-09T09:47:43.053094+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
   "status_counts": {
     "blocked": 0,
-    "candidate": 28,
+    "candidate": 26,
     "excluded": 278,
     "failed": 0,
     "in_progress": 4,
-    "successful": 23
+    "successful": 25
   },
-  "successful_datapoints": 23,
+  "successful_datapoints": 25,
   "failed_datapoints": 0,
   "blocked_cases": 0,
-  "pending_cases": 32,
+  "pending_cases": 30,
   "oracle_occurrences": {
     "other": 4,
-    "remote_code_execution": 11,
+    "remote_code_execution": 12,
     "unauthorized_database_read": 3,
-    "unauthorized_file_access": 6,
+    "unauthorized_file_access": 7,
     "unauthorized_file_creation": 1
   },
-  "oracle_occurrence_total": 25,
+  "oracle_occurrence_total": 27,
   "failure_categories": {},
   "blocker_categories": {},
   "excluded_by_target_language": {
@@ -55,10 +55,12 @@
     "comfyui-manager-3.3": 2,
     "django-1.10": 5,
     "django-3.1.0": 1,
+    "langflow-1.0.0": 1,
     "mongo-express 0.15.0": 1,
     "pgAdmin 5.4": 2,
     "pgAdmin 8.10": 1,
     "pgAdmin 9.2": 1,
+    "vite-2.3.0": 1,
     "yapi-1.3.13": 2
   },
   "passing_vulnerability_ids": [
@@ -75,6 +77,7 @@
     "flask-001",
     "gradio-001",
     "gradio-002",
+    "langflow-001",
     "mongo-express-001",
     "node-001",
     "node-002",
@@ -83,6 +86,7 @@
     "pgadmin-003",
     "pgadmin-004",
     "vite-001",
+    "vite-002",
     "yapi-001",
     "yapi-002"
   ],
@@ -136,6 +140,10 @@
       "commit": "feaf27cbb35995412b3294d2aedd35cff05d8ef3"
     },
     {
+      "id": "langflow-001",
+      "commit": "66be9dd9cd9a93d26aaec19f0bd3d2d2e6d7c06a"
+    },
+    {
       "id": "mongo-express-001",
       "commit": "3a72f3f343e1725fb5bce524fbacf03b8d7d9c76"
     },
@@ -170,6 +178,10 @@
     {
       "id": "vite-001",
       "commit": "7b19ef8805584acddf9ae935fc92483fbabf2baf"
+    },
+    {
+      "id": "vite-002",
+      "commit": "184c86cb41b787a698da3428560f9f618b860e0d"
     },
     {
       "id": "yapi-001",
