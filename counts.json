@@ -1,7 +1,7 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T12:57:54.524368+00:00",
+  "generated_at": "2026-10-09T12:59:22.532032+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
@@ -81,8 +81,7 @@
     "pickle-source-16e8fa9": 1,
     "react-rsc-19.0.0": 1,
     "rocketchat-3.8.0-rc.0": 1,
-    "saltstack-2018.3.0": 1,
-    "saltstack-2018.3.0rc1": 2,
+    "saltstack-2018.3.0rc1": 3,
     "scrapyd-0.10": 1,
     "superset-1.5.0": 2,
     "supervisor-3.0b1": 1,
@@ -91,9 +90,7 @@
     "vite-6.1.0-beta.1": 1,
     "yapi-1.3.13": 2
   },
-  "version_repins_pending": [
-    "saltstack-002"
-  ],
+  "version_repins_pending": [],
   "passing_vulnerability_ids": [
     "aiohttp-001",
     "airflow-001",
@@ -321,7 +318,7 @@
     },
     {
       "id": "saltstack-002",
-      "commit": "2234e33b3e3fff328e317af4eaa63ed350d7c0c1"
+      "commit": "3848d645844f3758fb7c190c8e75e33c934b31d6"
     },
     {
       "id": "saltstack-003",
