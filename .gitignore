@@ -1,0 +1,15 @@
+*~
+*.egg
+*.egg-info
+*.pyc
+*.pyo
+*.swp
+.DS_Store
+.coverage
+build/
+docs/.build/
+dist/
+.tox/
+nosetests.xml
+supervisor/coverage.xml
+tmp/
