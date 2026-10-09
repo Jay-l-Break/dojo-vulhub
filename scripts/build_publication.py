@@ -36,6 +36,8 @@ def read_ledger(path: Path) -> dict:
         eligible = entry["language_decision"] in {"JavaScript", "Python"}
         if eligible == (entry["final_status"] == "excluded"):
             raise ValueError(f"Language decision disagrees with status: {entry['source_id']}")
+        if entry["final_status"] == "successful" and not entry["claimed_oracles"]:
+            raise ValueError(f"Successful case has no claimed oracle: {entry['source_id']}")
     selected_ids = [entry["vulnerability_id"] for entry in entries
                     if entry["final_status"] != "excluded"]
     if len(selected_ids) != len(set(selected_ids)) or None in selected_ids:

@@ -1,28 +1,29 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T08:22:57.608351+00:00",
+  "generated_at": "2026-10-09T08:32:05.772276+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
   "status_counts": {
     "blocked": 0,
-    "candidate": 44,
+    "candidate": 40,
     "excluded": 278,
     "failed": 0,
     "in_progress": 4,
-    "successful": 7
+    "successful": 11
   },
-  "successful_datapoints": 7,
+  "successful_datapoints": 11,
   "failed_datapoints": 0,
   "blocked_cases": 0,
-  "pending_cases": 48,
+  "pending_cases": 44,
   "oracle_occurrences": {
-    "remote_code_execution": 1,
+    "other": 1,
+    "remote_code_execution": 3,
     "unauthorized_database_read": 3,
-    "unauthorized_file_access": 3
+    "unauthorized_file_access": 4
   },
-  "oracle_occurrence_total": 7,
+  "oracle_occurrence_total": 11,
   "failure_categories": {},
   "blocker_categories": {},
   "excluded_by_target_language": {
@@ -43,23 +44,32 @@
     "Shell and C": 1
   },
   "verified_version_groups": {
-    "Django 1.10.0": 2,
+    "Django 1.10.0": 3,
     "Django 3.1.0": 1,
     "Gradio 4.0.0": 2,
     "Node pg 2.4.0": 1,
     "Node.js 8.5.0": 1,
+    "aiohttp 1.1.0": 1,
     "pgAdmin 5.4": 2
   },
   "passing_vulnerability_ids": [
+    "aiohttp-001",
+    "django-002",
     "django-003",
     "django-005",
     "django-006",
     "gradio-001",
     "gradio-002",
     "node-001",
-    "pgadmin-001"
+    "node-002",
+    "pgadmin-001",
+    "pgadmin-002"
   ],
   "published_source_branches": [
+    {
+      "id": "django-002",
+      "commit": "c49e3fce80761fa8f9dda289946f0e397563eb82"
+    },
     {
       "id": "django-003",
       "commit": "758859083b3f3d18d280d25c98a1515dd978b920"
@@ -93,8 +103,12 @@
       "commit": "1c4944d9e8fbb9f1f3ba6f9e6fc116c1a7195168"
     },
     {
+      "id": "pgadmin-002",
+      "commit": "aca8c5f899cfa944a3810dd6ee4c71c391724d8e"
+    },
+    {
       "id": "aiohttp-001",
-      "commit": "f6055e3f76f2f5f95865a45ffea6cff8648ed21a"
+      "commit": "21d7c493968e544088d61341dda072dc40932b31"
     }
   ]
 }
