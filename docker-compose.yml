@@ -1,0 +1,25 @@
+services:
+  mariadb:
+    image: mariadb:10.11.5@sha256:d98220e8513201e1a0a720724b8599024854b7bf33afea81ac1dd3c54dd47420
+    environment:
+      MARIADB_ROOT_PASSWORD: ${JUMPSERVER_DB_PASSWORD:-jumpserver-local-test}
+      MARIADB_DATABASE: jumpserver
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -uroot -p\"$$MARIADB_ROOT_PASSWORD\" --silent"]
+      interval: 2s
+      retries: 40
+
+  backend:
+    build: .
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    environment:
+      DB_HOST: mariadb
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_PASSWORD: ${JUMPSERVER_DB_PASSWORD:-jumpserver-local-test}
+      DB_NAME: jumpserver
+      CORE_WORKER: "1"
+    ports:
+      - "${DOJO_HOST_PORT:-80}:80"
