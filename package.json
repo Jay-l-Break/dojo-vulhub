@@ -1,0 +1,12 @@
+{
+  "name": "pdfjs-001",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node server.cjs"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "1.0.10",
+    "pdfjs-dist": "1.0.1011"
+  }
+}
