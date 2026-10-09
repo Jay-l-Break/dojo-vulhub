@@ -1,0 +1,138 @@
+[[breaking-changes-6.0]]
+== Breaking changes in 6.0
+++++
+<titleabbrev>6.0</titleabbrev>
+++++
+
+This section discusses the changes that you need to be aware of when migrating
+your application to Kibana 6.0.
+
+See also <<release-highlights>> and <<release-notes>>. 
+
+[float]
+=== Saved objects `bulk_get` and `find` endpoints renamed
+//{pull}17512[#17512]
+
+*Details:*
+To support sending larger and more expressive queries to the Saved Objects find
+API, we added a POST endpoint for find and therefore needed a way to disambiguate
+the find API from from the POST API used to create Saved Objects.
+
+*Impact:*
+Starting in {kib} 6.3, endpoints that are not simple CRUD operations on a single
+object will be named and their name will start with an underscore. For example,
+{es} `GET /api/saved_objects` is now `GET /api/saved_objects/_find`,
+`GET /api/saved_objects/{type}` is now `GET /api/saved_objects/_find?type={type}`,
+and `GET /api/saved_objects/bulk_get` is now `GET /api/saved_objects/_bulk_get`.
+
+[float]
+=== Types removed from Kibana index
+*Details:*
+With the imminent {ref}/removal-of-types.html[removal of types in Elasticsearch], we have updated our index to not rely on types. Kibana 5.6.x can support both of these mappings to minimize downtime. A new UI is provided with X-Pack to assist with the migration of the Elastic stack.
+
+*Impact:*
+
+* Types have been removed from the `.kibana` index. You will need migrate your Kibana index either {kibana-ref}/migrating-6.0-index.html[manually], or through the Upgrade Assistant in X-Pack.
+* Upon upgrade of a typical deployment with indices created on a regular basis (e.g. coming from Logstash) to 6.0, new indices will have to include only a single `_type`.  If you have multiple different values for _type in a single index, we recommend to move `_type` to another field or separate the different types of documents into different indices. Any dashboards relying on filtering and aggregating on `_type` will continue to work, but will not show any meaningful data. Users will need to update dashboards to rely on aggregating and filtering on the new field, instead of `_type`, if they want to leverage that information going forward.
+
+[float]
+=== Removed option to use unsupported scripting languages
+*Details:* Kibana 5.x allowed users to create scripted fields using any scripting language enabled in Elasticsearch.
+Kibana 6.0 will only support Painless and Lucene expression based scripts.
+
+*Impact:* You will need to migrate your groovy, python, javascript, etc. scripted fields to Painless or Lucene expressions.
+
+
+[float]
+=== Changed response format of status API
+*Details:* In an effort to align with our style guidelines and provide a digestible response,
+the status API has changed:
+
+* Properties are now snake cased and several have been renamed
+* Metrics now provide the latest available data instead of samples over time
+
+*Impact:* You will need to update anything using the status API and expecting the previous response format.
+
+
+[float]
+=== Timelion requires comma to separate queries
+*Details:* Kibana 5.x allowed users to use spaces as a query separator in timelion `.es(400) .es(500)`.
+This is no longer the case. Now, only commas are a valid query separator: e.g. `.es(400), .es(500)`
+
+*Impact:* You will need to migrate your stored timelion queries to the new syntax.
+
+
+[float]
+=== Requires 64 bit operating system
+*Details:* Kibana 6.0.0 and onward only support 64 bit operating systems.
+
+*Impact:* You will need to install Kibana 6.x on a 64 bit operating system. No extra data migration steps are necessary when moving from 32 bit to 64 bit.
+
+
+[float]
+=== NODE_ENV no longer has an impact on Kibana
+*Details:* Setting the NODE_ENV environment variable can break Kibana processes in unexpected ways, which is especially unfortunate since it is a common environment variable to have configured on a system, and you wouldn't expect it to break anything in Kibana. Kibana will now effectively ignore NODE_ENV entirely.
+
+*Impact:* If you're developing a custom plugin that depends on NODE_ENV, you will need to update it to use a different, custom environment variable.
+
+
+[float]
+=== Kibana 4.x configuration names using `_` instead of `.` have been removed
+*Details:* In Kibana 4.2, we renamed all configuration names in kibana.yml to use `.` as a separator instead of `_`, though the legacy configurations would still continue to work. In 5.0, we started logging deprecation notices whenever the legacy configurations were encountered. In 6.0 onward, legacy configuration names that use an underscore instead of a dot will no longer work.
+
+*Impact:* Any usages of underscore separated configuration names in kibana.yml need to be updated to their modern equivalents. See <<settings,Configuring Kibana>> for accepted configurations.
+
+[float]
+=== Time-interval based index patterns are no longer supported
+*Details:*  Starting in Kibana 6.0.0 we removed the ability to create index patterns that use a date-pattern and interval to identify Elasticsearch indices. Index patterns must now use wildcards which are more performant in most cases.
+
+*Impact:* Existing index patterns and saved objects will continue to function without issue, and in a subsequent release we will provide utilities to migrate your index patterns/saved objects.
+
+
+[float]
+=== Removed same port http to https redirect behavior
+*Details:* Kibana 5.x redirected requests from http to https on the same port if TLS was configured. Starting in Kibana 6.0.0, Kibana no longer redirects basic http traffic to https.
+
+*Impact:* With the new configuration setting `server.ssl.redirectHttpFromPort` you can specify a port that will redirect from http to https. This cannot be the same port as the https port.
+
+
+[float]
+=== Removed "expand index pattern when searching" setting for index patterns
+*Details:* Since 4.3, index patterns could be configured to do a pre-flight field_stats request before a search in order to determine exact indices that could contain matching documents. Elasticsearch now optimizes searches internally in a similar way and has also removed the field_stats API, so this option was removed from Kibana entirely.
+
+*Impact:* No change is required for existing Kibana index patterns. Those previously configured with this option will gracefully use the new Elasticsearch optimizations instead, as will all new index patterns.
+
+[float]
+=== Replace markdown parser `marked` with `markdown-it`
+*Details:* Starting in 6.0.0, Kibana will use `markdown-it` to parse markdown text. Kibana switched to `markdown-it` because `marked` is no longer actively maintained. Markdown-it supports CommonMark and GFM (GitHub Flavored Markdown) Tables and Strikethrough.
+
+*Impact:* There may be slight changes in parsed markdown. Review markdown as needed.
+
+
+[float]
+=== Simplified `Coordinate Map - Heatmap` configuration controls
+*Details:* Replaced `Coordinate Map - Heatmap` configuration controls `Radius`, `Blur`, `Maximum Zoom`, and `Minimum opacity` with a single control, `Cluster size`.
+
+*Impact:* No change is required for existing Coordinate Map visualizations, `Cluster size` will be set to the default value. `Cluster size` may need to be adjusted as needed.
+
+[float]
+=== {reporting}
+
+* When {security} is enabled, reports will only be accessible to the user that created them.
+* When {security} is enabled, user authorization is controlled by the
+`xpack.reporting.roles.allow` setting in the `kibana.yml` which defaults to
+`['reporting_user']`. Users will no longer have access to the underlying {reporting}
+indices in {es} when assigned to the built-in `reporting_user` role. If using
+custom reporting roles, the privileges to the indices will need to be removed, and the
+role will need to be added to the `xpack.reporting.roles.allow` setting.
+
+[float]
+=== {watcher}
+
+* The watch `_status` field has been renamed to `status`, as underscores in
+field names will not be allowed.
+* The built-in HTTP client used in webhooks, the http input and the http email
+attachment has been replaced. This results in the need to always escape all
+parts of an URL.
+* The new built-in HTTP client also enforces a maximum request size, which
+defaults to 10mb.

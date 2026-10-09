@@ -1,0 +1,7 @@
+{
+  "repository": "https://github.com/elastic/kibana",
+  "tag": "v6.7.0",
+  "revision": "e09a026ba3803569800034af6ce923cdc1864a08",
+  "source_archive_sha256": "b24ee4bec0412494191e3c4306ae5a83670c2d52d737d291193e23b445fe7b74",
+  "release_image": "docker.elastic.co/kibana/kibana:6.7.0@sha256:84718c5dfaad5cd8949f2c8129d033730218f7af4f3ffd15acdb2e84b523caab"
+}
