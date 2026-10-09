@@ -1,0 +1,6 @@
+@import './sass-at-import.scss';
+
+.sass {
+  /* injected via vite.config.js */
+  color: $injectedColor;
+}

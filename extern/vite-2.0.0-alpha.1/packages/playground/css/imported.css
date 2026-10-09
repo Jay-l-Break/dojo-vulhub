@@ -1,0 +1,18 @@
+@import './imported-at-import.css';
+
+.imported {
+  color: green;
+}
+
+pre {
+  background-color: #eee;
+  width: 300px;
+  padding: 1em 1.5em;
+  border-radius: 10px;
+}
+
+.postcss {
+  .nesting {
+    color: pink;
+  }
+}
