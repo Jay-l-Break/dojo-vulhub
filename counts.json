@@ -1,0 +1,60 @@
+{
+  "benchmark": "dojo-vulhub",
+  "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
+  "generated_at": "2026-10-09T07:50:35.086754+00:00",
+  "source_cases": 333,
+  "language_candidates": 55,
+  "excluded_cases": 278,
+  "status_counts": {
+    "blocked": 0,
+    "candidate": 52,
+    "excluded": 278,
+    "failed": 0,
+    "in_progress": 3,
+    "successful": 0
+  },
+  "successful_datapoints": 0,
+  "failed_datapoints": 0,
+  "blocked_cases": 0,
+  "pending_cases": 55,
+  "oracle_occurrences": {},
+  "oracle_occurrence_total": 0,
+  "failure_categories": {},
+  "blocker_categories": {},
+  "excluded_by_target_language": {
+    "C": 6,
+    "C or C++": 42,
+    "Erlang": 4,
+    "Go": 11,
+    "Go admission controller": 1,
+    "Java": 148,
+    "Lua": 2,
+    "PHP": 45,
+    "PHP CGI runtime": 1,
+    "PHP runtime": 9,
+    "Perl": 1,
+    "Ruby": 6,
+    "Rust": 1,
+    "Shell and C": 1
+  },
+  "verified_version_groups": {
+    "Django 1.10": 1,
+    "Gradio 4.0.0": 1,
+    "Node pg 7.1.0": 1
+  },
+  "passing_vulnerability_ids": [],
+  "published_source_branches": [
+    {
+      "id": "django-006",
+      "commit": "45facb0cd2d5c3bf7bec88a2fb02bdeb878f620a"
+    },
+    {
+      "id": "gradio-001",
+      "commit": "8f689400725fbe6470c05d2e2ccd9a5b2398797d"
+    },
+    {
+      "id": "node-002",
+      "commit": "4e5f7a6f97b330128d7a88352043ed4127315a1a"
+    }
+  ]
+}
