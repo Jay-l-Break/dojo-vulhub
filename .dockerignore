@@ -1,0 +1,9 @@
+web/node_modules
+web/regression
+web/**/tests/
+web/**/*.pyc
+web/**/__pycache__
+.DS_Store
+docs/en_US/_build/**/*
+src-build/**/*
+dist/**/*
