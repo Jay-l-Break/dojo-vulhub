@@ -20,15 +20,15 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T11:54:58.121727+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T11:57:24.603348+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
-Passing datapoints: 52.
+Passing datapoints: 53.
 Failed cases: 0.
 Blocked cases: 1.
-Assigned cases: 2.
+Assigned cases: 1.
 Cases awaiting assignment: 0.
-Passing datapoints have 56 validated oracle occurrences.
+Passing datapoints have 57 validated oracle occurrences.
 The figure and [`counts.json`](counts.json) use these ledger totals.
 
 ## Failure categories
@@ -74,6 +74,7 @@ The figure and [`counts.json`](counts.json) use these ledger totals.
 - [`pgadmin-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/pgadmin-002) at `aca8c5f899cfa944a3810dd6ee4c71c391724d8e`
 - [`pgadmin-003`](https://github.com/Jay-l-Break/dojo-vulhub/tree/pgadmin-003) at `e02b428f9dcd23f81bcca5cd26f5353beb456732`
 - [`pgadmin-004`](https://github.com/Jay-l-Break/dojo-vulhub/tree/pgadmin-004) at `bb916e41b93f2806323487310d0d0e11ae5c8d0e`
+- [`pickle-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/pickle-001) at `54276f46377aa6fa7a30d76f1fc69d8b3769911e`
 - [`react-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/react-001) at `1338a6bb08d8937a3c5250635b459f3b9e2b27b9`
 - [`rocketchat-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/rocketchat-001) at `e6ad104052c0454c0ba8fb81d5f52ff26869fb8c`
 - [`saltstack-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/saltstack-001) at `0509226b74b0c276d8ebb52ec0d9a5ab22b0f9fa`

@@ -1,7 +1,7 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T11:54:58.121727+00:00",
+  "generated_at": "2026-10-09T11:57:24.603348+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
@@ -10,22 +10,22 @@
     "candidate": 0,
     "excluded": 278,
     "failed": 0,
-    "in_progress": 2,
-    "successful": 52
+    "in_progress": 1,
+    "successful": 53
   },
-  "successful_datapoints": 52,
+  "successful_datapoints": 53,
   "failed_datapoints": 0,
   "blocked_cases": 1,
-  "pending_cases": 2,
+  "pending_cases": 1,
   "oracle_occurrences": {
     "authentication_bypass": 4,
     "other": 5,
-    "remote_code_execution": 30,
+    "remote_code_execution": 31,
     "unauthorized_database_read": 3,
     "unauthorized_file_access": 11,
     "unauthorized_file_creation": 3
   },
-  "oracle_occurrence_total": 56,
+  "oracle_occurrence_total": 57,
   "failure_categories": {},
   "blocker_categories": {
     "Windows protocol handler unavailable on Linux": 1
@@ -76,6 +76,7 @@
     "pgAdmin 5.4": 2,
     "pgAdmin 8.10": 1,
     "pgAdmin 9.2": 1,
+    "pickle-source-16e8fa9": 1,
     "react-rsc-19.0.0": 1,
     "rocketchat-3.8.0-rc.0": 1,
     "saltstack-2018.3.0": 3,
@@ -125,6 +126,7 @@
     "pgadmin-002",
     "pgadmin-003",
     "pgadmin-004",
+    "pickle-001",
     "react-001",
     "rocketchat-001",
     "saltstack-001",
@@ -289,6 +291,10 @@
     {
       "id": "aiohttp-001",
       "commit": "21d7c493968e544088d61341dda072dc40932b31"
+    },
+    {
+      "id": "pickle-001",
+      "commit": "54276f46377aa6fa7a30d76f1fc69d8b3769911e"
     },
     {
       "id": "react-001",
