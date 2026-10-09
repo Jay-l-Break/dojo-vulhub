@@ -20,12 +20,12 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T11:13:28.738509+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T11:14:40.323939+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
-There are 44 passing datapoints, 0 failed cases, and 0 blocked cases.
-Another 4 cases are assigned and 7 await assignment.
-Passing datapoints have 48 validated oracle occurrences.
+There are 45 passing datapoints, 0 failed cases, and 0 blocked cases.
+Another 4 cases are assigned and 6 await assignment.
+Passing datapoints have 49 validated oracle occurrences.
 The figure and [`counts.json`](counts.json) use these ledger totals.
 
 ## Failure categories
@@ -47,6 +47,7 @@ No cases have a confirmed failure or blocker yet.
 - [`django-004`](https://github.com/Jay-l-Break/dojo-vulhub/tree/django-004) at `13c2c51377065a30e8a7f89f1b3e4b1c60383ba2`
 - [`django-005`](https://github.com/Jay-l-Break/dojo-vulhub/tree/django-005) at `d2e9c84e7907ba048ddef39f31387825d2c800d4`
 - [`django-006`](https://github.com/Jay-l-Break/dojo-vulhub/tree/django-006) at `45facb0cd2d5c3bf7bec88a2fb02bdeb878f620a`
+- [`electron-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/electron-002) at `0de0f9f0b762eda44afbcd9b56c78d3ddebe2d0d`
 - [`flask-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/flask-001) at `80302968d7aa25e2b051af1cbde1669ac0af64dd`
 - [`gradio-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/gradio-001) at `8f689400725fbe6470c05d2e2ccd9a5b2398797d`
 - [`gradio-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/gradio-002) at `feaf27cbb35995412b3294d2aedd35cff05d8ef3`
