@@ -1,0 +1,7 @@
+{
+  "upstream_repository": "https://github.com/saltstack/salt",
+  "upstream_tag": "v2018.3.0rc1",
+  "upstream_commit": "c389995a5c1687adb0136ec2fa6aa252fe36963c",
+  "source_archive_sha256": "4bc6e7329a7d9d093a7dab3ef95134a1aa5800b6aa132d7510acc8de03db38e8",
+  "source_adjustment": "Redacted one upstream Twilio example account identifier from a docstring"
+}
