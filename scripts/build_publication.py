@@ -40,6 +40,24 @@ def read_ledger(path: Path) -> dict:
                     if entry["final_status"] != "excluded"]
     if len(selected_ids) != len(set(selected_ids)) or None in selected_ids:
         raise ValueError("Selected vulnerability IDs are missing or duplicated")
+    assigned_by_application: dict[str, list[dict]] = {}
+    for entry in entries:
+        if not entry.get("vulnerability_id"):
+            continue
+        application_slug = re.sub(
+            r"[^a-z0-9]+", "-", entry["application"].lower(),
+        ).strip("-")
+        assigned_by_application.setdefault(application_slug, []).append(entry)
+    for application_slug, assigned in assigned_by_application.items():
+        for sequence, entry in enumerate(
+            sorted(assigned, key=lambda item: item["source_id"]), start=1,
+        ):
+            expected_id = f"{application_slug}-{sequence:03}"
+            if entry["vulnerability_id"] != expected_id:
+                raise ValueError(
+                    f"Non-deterministic vulnerability ID for {entry['source_id']}: "
+                    f"expected {expected_id}"
+                )
     return ledger
 
 

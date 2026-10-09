@@ -1,7 +1,7 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T08:08:18.036999+00:00",
+  "generated_at": "2026-10-09T08:11:36.299492+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
@@ -45,7 +45,9 @@
   "verified_version_groups": {
     "Django 1.10.0": 2,
     "Gradio 4.0.0": 2,
-    "Node pg 7.1.0": 1
+    "Node pg 7.1.0": 1,
+    "aiohttp 1.1.0": 1,
+    "pgAdmin 5.4": 1
   },
   "passing_vulnerability_ids": [
     "django-003",
@@ -74,6 +76,10 @@
     {
       "id": "node-002",
       "commit": "4e5f7a6f97b330128d7a88352043ed4127315a1a"
+    },
+    {
+      "id": "aiohttp-001",
+      "commit": "f6055e3f76f2f5f95865a45ffea6cff8648ed21a"
     }
   ]
 }

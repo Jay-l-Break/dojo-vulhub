@@ -19,7 +19,7 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T08:08:18.036999+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T08:11:36.299492+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
 There are 5 passing datapoints, 0 failed cases, and 0 blocked cases.
@@ -33,6 +33,7 @@ No cases have a confirmed failure or blocker yet.
 
 ## Published source branches
 
+- [`aiohttp-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/aiohttp-001) at `f6055e3f76f2f5f95865a45ffea6cff8648ed21a`
 - [`django-003`](https://github.com/Jay-l-Break/dojo-vulhub/tree/django-003) at `758859083b3f3d18d280d25c98a1515dd978b920`
 - [`django-006`](https://github.com/Jay-l-Break/dojo-vulhub/tree/django-006) at `45facb0cd2d5c3bf7bec88a2fb02bdeb878f620a`
 - [`gradio-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/gradio-001) at `8f689400725fbe6470c05d2e2ccd9a5b2398797d`
