@@ -1,0 +1,23 @@
+services:
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.db
+    environment:
+      POSTGRES_PASSWORD: ${NODE_002_DB_PASSWORD:-node-002-local-test}
+      POSTGRES_DB: example
+      POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /tmp/node-002-db-ready && pg_isready -U postgres -d example"]
+      interval: 2s
+      retries: 20
+  backend:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PASSWORD: ${NODE_002_DB_PASSWORD:-node-002-local-test}
+    ports:
+      - "${DOJO_HOST_PORT:-80}:80"

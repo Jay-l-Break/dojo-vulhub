@@ -1,0 +1,19 @@
+{
+  "name": "node_postgres_example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "postgres"
+  ],
+  "author": "phith0n",
+  "license": "MIT",
+  "dependencies": {
+    "koa": "^2.3.0",
+    "pg": "2.4.0"
+  }
+}
