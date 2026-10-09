@@ -1,0 +1,21 @@
+services:
+  backend:
+    build: .
+    environment:
+      DB_HOST: db
+      DB_NAME: xss
+      DB_USER: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-local-compose-django-001-db}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-}
+    ports:
+      - "${DOJO_HOST_PORT:-80}:80"
+    depends_on:
+      - db
+      - victim
+  db:
+    image: postgres:9.6-alpine
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-local-compose-django-001-db}
+      POSTGRES_DB: xss
+  victim:
+    build: victim
