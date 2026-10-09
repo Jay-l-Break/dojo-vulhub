@@ -20,12 +20,12 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T10:37:06.582245+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T10:44:08.991628+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
-There are 37 passing datapoints, 0 failed cases, and 0 blocked cases.
-Another 4 cases are assigned and 14 await assignment.
-Passing datapoints have 41 validated oracle occurrences.
+There are 38 passing datapoints, 0 failed cases, and 0 blocked cases.
+Another 4 cases are assigned and 13 await assignment.
+Passing datapoints have 42 validated oracle occurrences.
 The figure and [`counts.json`](counts.json) use these ledger totals.
 
 ## Failure categories
@@ -58,6 +58,7 @@ No cases have a confirmed failure or blocker yet.
 - [`next-js-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/next-js-001) at `8e8bc97d61a5f1ad71022a9cc2afe185ec807f7e`
 - [`node-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/node-001) at `5d086b74e3f7b1b56823dbadc729fb0a852e6191`
 - [`node-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/node-002) at `0128e84df40cf7fb22b329b1f605834a49d852bc`
+- [`pdfjs-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/pdfjs-001) at `040756f5f3a980149b4597d86707b465bc0db808`
 - [`pgadmin-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/pgadmin-001) at `1c4944d9e8fbb9f1f3ba6f9e6fc116c1a7195168`
 - [`pgadmin-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/pgadmin-002) at `aca8c5f899cfa944a3810dd6ee4c71c391724d8e`
 - [`pgadmin-003`](https://github.com/Jay-l-Break/dojo-vulhub/tree/pgadmin-003) at `e02b428f9dcd23f81bcca5cd26f5353beb456732`
