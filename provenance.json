@@ -1,0 +1,12 @@
+{
+  "application": "OpenClaw",
+  "deployed_package": "clawdbot@2026.1.21-1",
+  "deployed_package_tarball": "vendor/clawdbot-2026.1.21-1.tgz",
+  "deployed_package_sha256": "c1c4079cb9d55de92ce50295553a23b161ee97982bfa5a4de3bfb02c24e61d16",
+  "deployed_package_npm_git_head": "4c9b4971f787c86405493124710719eec9623fea",
+  "official_source_tag": "v2026.1.21",
+  "official_source_revision": "80c1edc3ff43b3bd3b7b545eed79f303d992f7dc",
+  "official_source_archive": "vendor/openclaw-source-v2026.1.21.tar.gz",
+  "official_source_sha256": "8bf2dcdf943c3f57e334282adc664a02d5541016e94507d08bd6fe43a02ed6c3",
+  "runtime_source_note": "The npm tarball is the exact deployed JavaScript artifact and includes source maps. Its npm gitHead is no longer fetchable from the current upstream Git repository. The official tag archive is a source reference for the same release family."
+}

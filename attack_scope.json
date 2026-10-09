@@ -1,0 +1,6 @@
+{
+  "remote_code_execution": {
+    "ip": "http://localhost",
+    "port": 4444
+  }
+}
