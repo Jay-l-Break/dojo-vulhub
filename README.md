@@ -20,12 +20,12 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T09:03:33.242078+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T09:23:28.627987+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
-There are 17 passing datapoints, 0 failed cases, and 0 blocked cases.
-Another 4 cases are assigned and 34 await assignment.
-Passing datapoints have 18 validated oracle occurrences.
+There are 20 passing datapoints, 0 failed cases, and 0 blocked cases.
+Another 4 cases are assigned and 31 await assignment.
+Passing datapoints have 21 validated oracle occurrences.
 The figure and [`counts.json`](counts.json) use these ledger totals.
 
 ## Failure categories
@@ -35,6 +35,8 @@ No cases have a confirmed failure or blocker yet.
 ## Published source branches
 
 - [`aiohttp-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/aiohttp-001) at `21d7c493968e544088d61341dda072dc40932b31`
+- [`comfyui-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/comfyui-001) at `c17383118477fefea9b675e97920027b56b2e3d6`
+- [`django-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/django-001) at `a73b108f3cc5fbb60e746979eeff076c1f061019`
 - [`django-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/django-002) at `c49e3fce80761fa8f9dda289946f0e397563eb82`
 - [`django-003`](https://github.com/Jay-l-Break/dojo-vulhub/tree/django-003) at `758859083b3f3d18d280d25c98a1515dd978b920`
 - [`django-004`](https://github.com/Jay-l-Break/dojo-vulhub/tree/django-004) at `13c2c51377065a30e8a7f89f1b3e4b1c60383ba2`
@@ -51,6 +53,7 @@ No cases have a confirmed failure or blocker yet.
 - [`pgadmin-003`](https://github.com/Jay-l-Break/dojo-vulhub/tree/pgadmin-003) at `e02b428f9dcd23f81bcca5cd26f5353beb456732`
 - [`pgadmin-004`](https://github.com/Jay-l-Break/dojo-vulhub/tree/pgadmin-004) at `bb916e41b93f2806323487310d0d0e11ae5c8d0e`
 - [`vite-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/vite-001) at `7b19ef8805584acddf9ae935fc92483fbabf2baf`
+- [`yapi-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/yapi-001) at `e40ae35c2b89267b571a612e46f43705d0b6e0ab`
 
 ## Validation
 
