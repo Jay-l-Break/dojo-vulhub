@@ -38,6 +38,8 @@ def read_ledger(path: Path) -> dict:
             raise ValueError(f"Language decision disagrees with status: {entry['source_id']}")
         if entry["final_status"] == "successful" and not entry["claimed_oracles"]:
             raise ValueError(f"Successful case has no claimed oracle: {entry['source_id']}")
+        if entry["final_status"] in {"failed", "blocked"} and not entry.get("failure_category"):
+            raise ValueError(f"Uncategorized outcome: {entry['source_id']}")
     selected_ids = [entry["vulnerability_id"] for entry in entries
                     if entry["final_status"] != "excluded"]
     if len(selected_ids) != len(set(selected_ids)) or None in selected_ids:
@@ -71,10 +73,8 @@ def build_counts(ledger: dict) -> dict:
     failed = [entry for entry in eligible if entry["final_status"] == "failed"]
     blocked = [entry for entry in eligible if entry["final_status"] == "blocked"]
     oracles = Counter(oracle for entry in successful for oracle in entry["claimed_oracles"])
-    failure_reasons = Counter(entry.get("failure_category") or entry["reason"]
-                              for entry in failed)
-    blocker_reasons = Counter(entry.get("failure_category") or entry["reason"]
-                              for entry in blocked)
+    failure_reasons = Counter(entry["failure_category"] for entry in failed)
+    blocker_reasons = Counter(entry["failure_category"] for entry in blocked)
     excluded_languages = Counter(entry["language_decision"] for entry in entries
                                  if entry["final_status"] == "excluded")
     versions = Counter(entry["version_group"] for entry in successful
