@@ -100,7 +100,7 @@ def build_counts(ledger: dict) -> dict:
         "passing_vulnerability_ids": sorted(entry["vulnerability_id"] for entry in successful),
         "published_source_branches": [
             {"id": entry["vulnerability_id"], "commit": entry["source_branch_commit"]}
-            for entry in eligible if entry.get("source_branch_commit")
+            for entry in successful if entry.get("source_branch_commit")
         ],
     }
     if counts["excluded_cases"] + counts["language_candidates"] != counts["source_cases"]:

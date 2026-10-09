@@ -20,7 +20,7 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T09:32:59.785364+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T09:40:52.449667+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
 There are 22 passing datapoints, 0 failed cases, and 0 blocked cases.
