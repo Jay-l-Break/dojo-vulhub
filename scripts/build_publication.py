@@ -79,6 +79,8 @@ def build_counts(ledger: dict) -> dict:
                                  if entry["final_status"] == "excluded")
     versions = Counter(entry["version_group"] for entry in successful
                        if entry.get("version_group"))
+    repins = sorted(entry["vulnerability_id"] for entry in successful
+                    if entry.get("version_repin_required"))
     counts = {
         "benchmark": ledger["benchmark"],
         "vulhub_revision": ledger["vulhub_revision"],
@@ -97,6 +99,7 @@ def build_counts(ledger: dict) -> dict:
         "blocker_categories": dict(sorted(blocker_reasons.items())),
         "excluded_by_target_language": dict(sorted(excluded_languages.items())),
         "verified_version_groups": dict(sorted(versions.items())),
+        "version_repins_pending": repins,
         "passing_vulnerability_ids": sorted(entry["vulnerability_id"] for entry in successful),
         "published_source_branches": [
             {"id": entry["vulnerability_id"], "commit": entry["source_branch_commit"]}
@@ -247,6 +250,7 @@ def render_readme(counts: dict) -> str:
         f"Assigned cases: {status['in_progress']}.",
         f"Cases awaiting assignment: {status['candidate']}.",
         f"Passing datapoints have {counts['oracle_occurrence_total']} validated oracle occurrences.",
+        f"Earlier version repins are pending for {len(counts['version_repins_pending'])} passing datapoints.",
         "The figure and [`counts.json`](counts.json) use these ledger totals.",
         "",
         "## Failure categories",

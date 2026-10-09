@@ -1,7 +1,7 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T12:29:53.624784+00:00",
+  "generated_at": "2026-10-09T12:33:39.116671+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
@@ -31,17 +31,17 @@
     "Windows protocol handler unavailable on Linux": 1
   },
   "excluded_by_target_language": {
-    "C": 6,
-    "C or C++": 42,
+    "C": 7,
+    "C or C++": 41,
     "Clojure": 2,
     "Erlang": 4,
     "Go": 11,
     "Go admission controller": 1,
     "Java": 146,
     "Lua": 2,
-    "PHP": 45,
+    "PHP": 46,
     "PHP CGI runtime": 1,
-    "PHP runtime": 9,
+    "PHP runtime": 8,
     "Perl": 1,
     "Ruby": 6,
     "Rust": 1,
@@ -89,6 +89,11 @@
     "vite-6.1.0-beta.1": 1,
     "yapi-1.3.13": 2
   },
+  "version_repins_pending": [
+    "saltstack-001",
+    "saltstack-002",
+    "saltstack-003"
+  ],
   "passing_vulnerability_ids": [
     "aiohttp-001",
     "airflow-001",
