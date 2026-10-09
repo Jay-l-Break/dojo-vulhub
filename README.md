@@ -19,11 +19,11 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T08:32:05.772276+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T08:40:47.327040+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
 There are 11 passing datapoints, 0 failed cases, and 0 blocked cases.
-Another 4 cases are assigned and 40 await assignment.
+Another 5 cases are assigned and 39 await assignment.
 Passing datapoints have 11 validated oracle occurrences.
 The figure and [`counts.json`](counts.json) use these ledger totals.
 
@@ -44,6 +44,7 @@ No cases have a confirmed failure or blocker yet.
 - [`node-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/node-002) at `0128e84df40cf7fb22b329b1f605834a49d852bc`
 - [`pgadmin-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/pgadmin-001) at `1c4944d9e8fbb9f1f3ba6f9e6fc116c1a7195168`
 - [`pgadmin-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/pgadmin-002) at `aca8c5f899cfa944a3810dd6ee4c71c391724d8e`
+- [`vite-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/vite-001) at `7b19ef8805584acddf9ae935fc92483fbabf2baf`
 
 ## Validation
 

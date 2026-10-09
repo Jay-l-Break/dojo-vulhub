@@ -77,7 +77,7 @@ def build_counts(ledger: dict) -> dict:
                               for entry in blocked)
     excluded_languages = Counter(entry["language_decision"] for entry in entries
                                  if entry["final_status"] == "excluded")
-    versions = Counter(entry["version_group"] for entry in eligible
+    versions = Counter(entry["version_group"] for entry in successful
                        if entry.get("version_group"))
     counts = {
         "benchmark": ledger["benchmark"],
