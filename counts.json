@@ -1,30 +1,31 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T10:12:36.433550+00:00",
+  "generated_at": "2026-10-09T10:15:30.770930+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
   "status_counts": {
     "blocked": 0,
-    "candidate": 22,
+    "candidate": 20,
     "excluded": 278,
     "failed": 0,
     "in_progress": 3,
-    "successful": 30
+    "successful": 32
   },
-  "successful_datapoints": 30,
+  "successful_datapoints": 32,
   "failed_datapoints": 0,
   "blocked_cases": 0,
-  "pending_cases": 25,
+  "pending_cases": 23,
   "oracle_occurrences": {
+    "authentication_bypass": 1,
     "other": 4,
     "remote_code_execution": 15,
     "unauthorized_database_read": 3,
-    "unauthorized_file_access": 9,
+    "unauthorized_file_access": 10,
     "unauthorized_file_creation": 2
   },
-  "oracle_occurrence_total": 33,
+  "oracle_occurrence_total": 35,
   "failure_categories": {},
   "blocker_categories": {},
   "excluded_by_target_language": {
@@ -51,14 +52,14 @@
     "Node.js 8.5.0": 1,
     "Vite 2.0.0-alpha.1": 1,
     "aiohttp 1.1.0": 1,
-    "airflow-1.8.0": 2,
+    "airflow-1.8.0": 3,
     "comfyui-manager-3.3": 2,
     "django-1.10": 5,
     "django-3.1.0": 1,
     "langflow-1.0.0": 1,
     "langflow-1.3.0": 1,
     "mongo-express 0.15.0": 1,
-    "n8n-1.53.0": 1,
+    "n8n-1.53.0": 2,
     "pgAdmin 5.4": 2,
     "pgAdmin 8.10": 1,
     "pgAdmin 9.2": 1,
@@ -71,6 +72,7 @@
     "aiohttp-001",
     "airflow-001",
     "airflow-002",
+    "airflow-003",
     "comfyui-001",
     "comfyui-002",
     "django-001",
@@ -86,6 +88,7 @@
     "langflow-002",
     "mongo-express-001",
     "n8n-001",
+    "n8n-002",
     "node-001",
     "node-002",
     "pgadmin-001",
@@ -107,6 +110,10 @@
     {
       "id": "airflow-002",
       "commit": "b99690ae297308c75a6a92a70d21de1c97208193"
+    },
+    {
+      "id": "airflow-003",
+      "commit": "50e6ed8c4889f3cb56ab100bf483ba5b53039664"
     },
     {
       "id": "comfyui-001",
@@ -167,6 +174,10 @@
     {
       "id": "n8n-001",
       "commit": "e008711653bffcebbcaa5d82e3bd95bc44d69f46"
+    },
+    {
+      "id": "n8n-002",
+      "commit": "40de2bc596b21a2b19c4f2f3b9ad1c469a65c517"
     },
     {
       "id": "node-001",

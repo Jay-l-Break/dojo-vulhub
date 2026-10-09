@@ -20,12 +20,12 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T10:12:36.433550+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T10:15:30.770930+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
-There are 30 passing datapoints, 0 failed cases, and 0 blocked cases.
-Another 3 cases are assigned and 22 await assignment.
-Passing datapoints have 33 validated oracle occurrences.
+There are 32 passing datapoints, 0 failed cases, and 0 blocked cases.
+Another 3 cases are assigned and 20 await assignment.
+Passing datapoints have 35 validated oracle occurrences.
 The figure and [`counts.json`](counts.json) use these ledger totals.
 
 ## Failure categories
@@ -37,6 +37,7 @@ No cases have a confirmed failure or blocker yet.
 - [`aiohttp-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/aiohttp-001) at `21d7c493968e544088d61341dda072dc40932b31`
 - [`airflow-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/airflow-001) at `e622fecd25edd57c6f94dbbeda0cd67f3ea247cb`
 - [`airflow-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/airflow-002) at `b99690ae297308c75a6a92a70d21de1c97208193`
+- [`airflow-003`](https://github.com/Jay-l-Break/dojo-vulhub/tree/airflow-003) at `50e6ed8c4889f3cb56ab100bf483ba5b53039664`
 - [`comfyui-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/comfyui-001) at `c17383118477fefea9b675e97920027b56b2e3d6`
 - [`comfyui-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/comfyui-002) at `aeaabf5c816082de61dacc5509d66dc0dab7be46`
 - [`django-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/django-001) at `a73b108f3cc5fbb60e746979eeff076c1f061019`
@@ -52,6 +53,7 @@ No cases have a confirmed failure or blocker yet.
 - [`langflow-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/langflow-002) at `3fd5e2791ca54f078ef220ab465093e35ba7cfbe`
 - [`mongo-express-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/mongo-express-001) at `3a72f3f343e1725fb5bce524fbacf03b8d7d9c76`
 - [`n8n-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/n8n-001) at `e008711653bffcebbcaa5d82e3bd95bc44d69f46`
+- [`n8n-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/n8n-002) at `40de2bc596b21a2b19c4f2f3b9ad1c469a65c517`
 - [`node-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/node-001) at `5d086b74e3f7b1b56823dbadc729fb0a852e6191`
 - [`node-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/node-002) at `0128e84df40cf7fb22b329b1f605834a49d852bc`
 - [`pgadmin-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/pgadmin-001) at `1c4944d9e8fbb9f1f3ba6f9e6fc116c1a7195168`
