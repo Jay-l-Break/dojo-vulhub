@@ -20,12 +20,14 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T11:22:48.454461+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T11:42:11.576456+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
-There are 47 passing datapoints, 0 failed cases, and 1 blocked cases.
-Another 4 cases are assigned and 3 await assignment.
-Passing datapoints have 51 validated oracle occurrences.
+Passing datapoints: 49.
+Failed cases: 0.
+Blocked cases: 1.
+Another 3 cases are assigned and 2 await assignment.
+Passing datapoints have 53 validated oracle occurrences.
 The figure and [`counts.json`](counts.json) use these ledger totals.
 
 ## Failure categories
@@ -38,6 +40,7 @@ The figure and [`counts.json`](counts.json) use these ledger totals.
 - [`airflow-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/airflow-001) at `e622fecd25edd57c6f94dbbeda0cd67f3ea247cb`
 - [`airflow-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/airflow-002) at `b99690ae297308c75a6a92a70d21de1c97208193`
 - [`airflow-003`](https://github.com/Jay-l-Break/dojo-vulhub/tree/airflow-003) at `50e6ed8c4889f3cb56ab100bf483ba5b53039664`
+- [`celery-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/celery-001) at `82d3adeacf21b422a1dce31ac287d6f79a7c195e`
 - [`chartbrew-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/chartbrew-001) at `8eaea933f2e1df76ac0fab121e75761e1aaaed8a`
 - [`comfyui-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/comfyui-001) at `c17383118477fefea9b675e97920027b56b2e3d6`
 - [`comfyui-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/comfyui-002) at `aeaabf5c816082de61dacc5509d66dc0dab7be46`
@@ -69,6 +72,7 @@ The figure and [`counts.json`](counts.json) use these ledger totals.
 - [`pgadmin-003`](https://github.com/Jay-l-Break/dojo-vulhub/tree/pgadmin-003) at `e02b428f9dcd23f81bcca5cd26f5353beb456732`
 - [`pgadmin-004`](https://github.com/Jay-l-Break/dojo-vulhub/tree/pgadmin-004) at `bb916e41b93f2806323487310d0d0e11ae5c8d0e`
 - [`react-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/react-001) at `1338a6bb08d8937a3c5250635b459f3b9e2b27b9`
+- [`rocketchat-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/rocketchat-001) at `e6ad104052c0454c0ba8fb81d5f52ff26869fb8c`
 - [`saltstack-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/saltstack-001) at `0509226b74b0c276d8ebb52ec0d9a5ab22b0f9fa`
 - [`saltstack-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/saltstack-002) at `2234e33b3e3fff328e317af4eaa63ed350d7c0c1`
 - [`saltstack-003`](https://github.com/Jay-l-Break/dojo-vulhub/tree/saltstack-003) at `85994dee5bf9b5f4421aaf16af4009675c3e45c8`

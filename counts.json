@@ -1,31 +1,31 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T11:22:48.454461+00:00",
+  "generated_at": "2026-10-09T11:42:11.576456+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
   "status_counts": {
     "blocked": 1,
-    "candidate": 3,
+    "candidate": 2,
     "excluded": 278,
     "failed": 0,
-    "in_progress": 4,
-    "successful": 47
+    "in_progress": 3,
+    "successful": 49
   },
-  "successful_datapoints": 47,
+  "successful_datapoints": 49,
   "failed_datapoints": 0,
   "blocked_cases": 1,
-  "pending_cases": 7,
+  "pending_cases": 5,
   "oracle_occurrences": {
-    "authentication_bypass": 3,
+    "authentication_bypass": 4,
     "other": 4,
-    "remote_code_execution": 27,
+    "remote_code_execution": 28,
     "unauthorized_database_read": 3,
     "unauthorized_file_access": 11,
     "unauthorized_file_creation": 3
   },
-  "oracle_occurrence_total": 51,
+  "oracle_occurrence_total": 53,
   "failure_categories": {},
   "blocker_categories": {
     "Windows protocol handler unavailable on Linux": 1
@@ -55,6 +55,7 @@
     "Vite 2.0.0-alpha.1": 1,
     "aiohttp 1.1.0": 1,
     "airflow-1.8.0": 3,
+    "celery-2.2.0": 1,
     "chartbrew-v1.0.0-beta.9": 1,
     "comfyui-manager-3.3": 2,
     "django-1.10": 5,
@@ -74,6 +75,7 @@
     "pgAdmin 8.10": 1,
     "pgAdmin 9.2": 1,
     "react-rsc-19.0.0": 1,
+    "rocketchat-3.8.0-rc.0": 1,
     "saltstack-2018.3.0": 3,
     "superset-1.5.0": 2,
     "supervisor-3.0b1": 1,
@@ -87,6 +89,7 @@
     "airflow-001",
     "airflow-002",
     "airflow-003",
+    "celery-001",
     "chartbrew-001",
     "comfyui-001",
     "comfyui-002",
@@ -118,6 +121,7 @@
     "pgadmin-003",
     "pgadmin-004",
     "react-001",
+    "rocketchat-001",
     "saltstack-001",
     "saltstack-002",
     "saltstack-003",
@@ -143,6 +147,10 @@
     {
       "id": "airflow-003",
       "commit": "50e6ed8c4889f3cb56ab100bf483ba5b53039664"
+    },
+    {
+      "id": "celery-001",
+      "commit": "82d3adeacf21b422a1dce31ac287d6f79a7c195e"
     },
     {
       "id": "chartbrew-001",
@@ -271,6 +279,10 @@
     {
       "id": "react-001",
       "commit": "1338a6bb08d8937a3c5250635b459f3b9e2b27b9"
+    },
+    {
+      "id": "rocketchat-001",
+      "commit": "e6ad104052c0454c0ba8fb81d5f52ff26869fb8c"
     },
     {
       "id": "saltstack-001",
