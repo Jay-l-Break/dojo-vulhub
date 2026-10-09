@@ -1,0 +1,4 @@
+src/frontend
+src/backend/base/tests
+src/backend/tests
+.git
