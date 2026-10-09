@@ -20,11 +20,11 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T10:48:54.672778+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T10:50:04.025006+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
 There are 39 passing datapoints, 0 failed cases, and 0 blocked cases.
-Another 3 cases are assigned and 13 await assignment.
+Another 4 cases are assigned and 12 await assignment.
 Passing datapoints have 43 validated oracle occurrences.
 The figure and [`counts.json`](counts.json) use these ledger totals.
 
