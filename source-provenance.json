@@ -1,0 +1,9 @@
+{
+  "application": "Gradio",
+  "version": "4.0.0",
+  "upstream_repository": "https://github.com/gradio-app/gradio",
+  "upstream_revision": "1e9e5913b862e7d542116da055eff57b01458e10",
+  "distribution": "gradio-4.0.0-py3-none-any.whl",
+  "distribution_sha256": "c199985017326a509e85f3273f47882d9e7d2266e4866a01b1da9c08f99bc002",
+  "source_note": "The distribution contains the pinned upstream Python source and compiled frontend assets."
+}
