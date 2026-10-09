@@ -1,7 +1,7 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T12:44:21.464464+00:00",
+  "generated_at": "2026-10-09T12:47:44.113504+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
@@ -81,8 +81,8 @@
     "pickle-source-16e8fa9": 1,
     "react-rsc-19.0.0": 1,
     "rocketchat-3.8.0-rc.0": 1,
-    "saltstack-2018.3.0": 2,
-    "saltstack-2018.3.0rc1": 1,
+    "saltstack-2018.3.0": 1,
+    "saltstack-2018.3.0rc1": 2,
     "scrapyd-0.10": 1,
     "superset-1.5.0": 2,
     "supervisor-3.0b1": 1,
@@ -93,7 +93,6 @@
   },
   "version_repins_pending": [
     "budibase-001",
-    "saltstack-001",
     "saltstack-002"
   ],
   "passing_vulnerability_ids": [
@@ -319,7 +318,7 @@
     },
     {
       "id": "saltstack-001",
-      "commit": "0509226b74b0c276d8ebb52ec0d9a5ab22b0f9fa"
+      "commit": "1d445b27c4ed1f13ce34105ad90e93badd6d874f"
     },
     {
       "id": "saltstack-002",
