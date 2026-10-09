@@ -1,28 +1,28 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T08:11:36.299492+00:00",
+  "generated_at": "2026-10-09T08:20:16.863787+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
   "status_counts": {
     "blocked": 0,
-    "candidate": 46,
+    "candidate": 44,
     "excluded": 278,
     "failed": 0,
     "in_progress": 4,
-    "successful": 5
+    "successful": 7
   },
-  "successful_datapoints": 5,
+  "successful_datapoints": 7,
   "failed_datapoints": 0,
   "blocked_cases": 0,
-  "pending_cases": 50,
+  "pending_cases": 48,
   "oracle_occurrences": {
     "remote_code_execution": 1,
-    "unauthorized_database_read": 2,
-    "unauthorized_file_access": 2
+    "unauthorized_database_read": 3,
+    "unauthorized_file_access": 3
   },
-  "oracle_occurrence_total": 5,
+  "oracle_occurrence_total": 7,
   "failure_categories": {},
   "blocker_categories": {},
   "excluded_by_target_language": {
@@ -44,22 +44,29 @@
   },
   "verified_version_groups": {
     "Django 1.10.0": 2,
+    "Django 3.1.0": 1,
     "Gradio 4.0.0": 2,
     "Node pg 7.1.0": 1,
-    "aiohttp 1.1.0": 1,
+    "Node.js 8.5.0": 1,
     "pgAdmin 5.4": 1
   },
   "passing_vulnerability_ids": [
     "django-003",
+    "django-005",
     "django-006",
     "gradio-001",
     "gradio-002",
-    "node-002"
+    "node-001",
+    "pgadmin-001"
   ],
   "published_source_branches": [
     {
       "id": "django-003",
       "commit": "758859083b3f3d18d280d25c98a1515dd978b920"
+    },
+    {
+      "id": "django-005",
+      "commit": "d2e9c84e7907ba048ddef39f31387825d2c800d4"
     },
     {
       "id": "django-006",
@@ -74,8 +81,16 @@
       "commit": "feaf27cbb35995412b3294d2aedd35cff05d8ef3"
     },
     {
+      "id": "node-001",
+      "commit": "5d086b74e3f7b1b56823dbadc729fb0a852e6191"
+    },
+    {
       "id": "node-002",
-      "commit": "4e5f7a6f97b330128d7a88352043ed4127315a1a"
+      "commit": "66c1fdc9851460cad635c3af10dac0f27ef09df0"
+    },
+    {
+      "id": "pgadmin-001",
+      "commit": "1c4944d9e8fbb9f1f3ba6f9e6fc116c1a7195168"
     },
     {
       "id": "aiohttp-001",

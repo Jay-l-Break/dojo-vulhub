@@ -19,12 +19,12 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T08:11:36.299492+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T08:20:16.863787+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
-There are 5 passing datapoints, 0 failed cases, and 0 blocked cases.
-Another 4 cases are assigned and 46 await assignment.
-Passing datapoints have 5 validated oracle occurrences.
+There are 7 passing datapoints, 0 failed cases, and 0 blocked cases.
+Another 4 cases are assigned and 44 await assignment.
+Passing datapoints have 7 validated oracle occurrences.
 The figure and [`counts.json`](counts.json) use these ledger totals.
 
 ## Failure categories
@@ -35,10 +35,13 @@ No cases have a confirmed failure or blocker yet.
 
 - [`aiohttp-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/aiohttp-001) at `f6055e3f76f2f5f95865a45ffea6cff8648ed21a`
 - [`django-003`](https://github.com/Jay-l-Break/dojo-vulhub/tree/django-003) at `758859083b3f3d18d280d25c98a1515dd978b920`
+- [`django-005`](https://github.com/Jay-l-Break/dojo-vulhub/tree/django-005) at `d2e9c84e7907ba048ddef39f31387825d2c800d4`
 - [`django-006`](https://github.com/Jay-l-Break/dojo-vulhub/tree/django-006) at `45facb0cd2d5c3bf7bec88a2fb02bdeb878f620a`
 - [`gradio-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/gradio-001) at `8f689400725fbe6470c05d2e2ccd9a5b2398797d`
 - [`gradio-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/gradio-002) at `feaf27cbb35995412b3294d2aedd35cff05d8ef3`
-- [`node-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/node-002) at `4e5f7a6f97b330128d7a88352043ed4127315a1a`
+- [`node-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/node-001) at `5d086b74e3f7b1b56823dbadc729fb0a852e6191`
+- [`node-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/node-002) at `66c1fdc9851460cad635c3af10dac0f27ef09df0`
+- [`pgadmin-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/pgadmin-001) at `1c4944d9e8fbb9f1f3ba6f9e6fc116c1a7195168`
 
 ## Validation
 
