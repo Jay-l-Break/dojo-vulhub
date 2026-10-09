@@ -148,7 +148,7 @@ def render_svg(counts: dict) -> str:
     detail_count = (len(counts["oracle_occurrences"])
                     + len(counts["failure_categories"])
                     + len(counts["blocker_categories"]))
-    canvas_height = max(1160, 420 + detail_count * 125)
+    canvas_height = max(1120, 345 + detail_count * 110)
     source_height = 720
     candidate_height = max(20, source_height * eligible / max(total, 1))
     rejected_height = source_height - candidate_height

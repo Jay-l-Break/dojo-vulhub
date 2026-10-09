@@ -1,7 +1,7 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T12:22:36.711584+00:00",
+  "generated_at": "2026-10-09T12:29:53.624784+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
@@ -10,22 +10,22 @@
     "candidate": 0,
     "excluded": 278,
     "failed": 0,
-    "in_progress": 1,
-    "successful": 53
+    "in_progress": 0,
+    "successful": 54
   },
-  "successful_datapoints": 53,
+  "successful_datapoints": 54,
   "failed_datapoints": 0,
   "blocked_cases": 1,
-  "pending_cases": 1,
+  "pending_cases": 0,
   "oracle_occurrences": {
-    "authentication_bypass": 4,
+    "authentication_bypass": 5,
     "other": 5,
     "remote_code_execution": 31,
     "unauthorized_database_read": 3,
     "unauthorized_file_access": 11,
     "unauthorized_file_creation": 3
   },
-  "oracle_occurrence_total": 57,
+  "oracle_occurrence_total": 58,
   "failure_categories": {},
   "blocker_categories": {
     "Windows protocol handler unavailable on Linux": 1
@@ -62,6 +62,7 @@
     "django-1.10": 5,
     "django-3.1.0": 1,
     "electron-1.7.13": 1,
+    "jumpserver-2.28.0": 1,
     "jupyter-notebook-4.0.0": 1,
     "kibana-5.0.0-alpha2": 1,
     "kibana-6.5.0": 1,
@@ -108,6 +109,7 @@
     "flask-001",
     "gradio-001",
     "gradio-002",
+    "jumpserver-001",
     "jupyter-001",
     "kibana-001",
     "kibana-002",
@@ -215,6 +217,10 @@
     {
       "id": "gradio-002",
       "commit": "feaf27cbb35995412b3294d2aedd35cff05d8ef3"
+    },
+    {
+      "id": "jumpserver-001",
+      "commit": "15f8461d13dae96e3ab6b729a75082bfa78332c8"
     },
     {
       "id": "jupyter-001",

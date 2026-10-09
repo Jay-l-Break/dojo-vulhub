@@ -20,15 +20,15 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T12:22:36.711584+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T12:29:53.624784+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
-Passing datapoints: 53.
+Passing datapoints: 54.
 Failed cases: 0.
 Blocked cases: 1.
-Assigned cases: 1.
+Assigned cases: 0.
 Cases awaiting assignment: 0.
-Passing datapoints have 57 validated oracle occurrences.
+Passing datapoints have 58 validated oracle occurrences.
 The figure and [`counts.json`](counts.json) use these ledger totals.
 
 ## Failure categories
@@ -56,6 +56,7 @@ The figure and [`counts.json`](counts.json) use these ledger totals.
 - [`flask-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/flask-001) at `80302968d7aa25e2b051af1cbde1669ac0af64dd`
 - [`gradio-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/gradio-001) at `8f689400725fbe6470c05d2e2ccd9a5b2398797d`
 - [`gradio-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/gradio-002) at `feaf27cbb35995412b3294d2aedd35cff05d8ef3`
+- [`jumpserver-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/jumpserver-001) at `15f8461d13dae96e3ab6b729a75082bfa78332c8`
 - [`jupyter-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/jupyter-001) at `7b3a7c52f3da79859f7375ff32d5a10b54b16afc`
 - [`kibana-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/kibana-001) at `3968f240d86ca5e931457037374bc49c27db0e4f`
 - [`kibana-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/kibana-002) at `0bc0423d4a70747a14a4ab4efc285e0e5fde2a9e`

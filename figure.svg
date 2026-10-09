@@ -1,44 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="2048" height="1295" viewBox="0 0 2048 1295">
+<svg xmlns="http://www.w3.org/2000/svg" width="2048" height="1120" viewBox="0 0 2048 1120">
 <style>.count{font:700 34px Arial,sans-serif;fill:#151515}.detail{font:22px Arial,sans-serif;fill:#575757}</style>
 <rect width="100%" height="100%" fill="#fff"/>
 <path d="M325 210 C487.5 210 487.5 160 650 160 L650 278.9189189189189 C487.5 278.9189189189189 487.5 328.9189189189189 325 328.9189189189189 Z" fill="#3079d7" fill-opacity="0.28"/>
 <path d="M325 328.9189189189189 C487.5 328.9189189189189 487.5 400 650 400 L650 1001.081081081081 C487.5 1001.081081081081 487.5 930.0 325 930.0 Z" fill="#aaa9a6" fill-opacity="0.48"/>
-<path d="M675 160.0 C887.5 160.0 887.5 160 1100 160 L1100 274.5945945945946 C887.5 274.5945945945946 887.5 274.5945945945946 675 274.5945945945946 Z" fill="#2f7ed8" fill-opacity="0.3"/>
-<path d="M675 274.5945945945946 C887.5 274.5945945945946 887.5 620 1100 620 L1100 625 C887.5 625 887.5 276.7567567567568 675 276.7567567567568 Z" fill="#f49a5b" fill-opacity="0.3"/>
-<path d="M675 276.7567567567568 C887.5 276.7567567567568 887.5 850 1100 850 L1100 855 C887.5 855 887.5 278.91891891891896 675 278.91891891891896 Z" fill="#b9b9b5" fill-opacity="0.3"/>
-<path d="M1125 160.0 C1407.5 160.0 1407.5 120 1690 120 L1690 128.04172593646277 C1407.5 128.04172593646277 1407.5 168.04172593646277 1125 168.04172593646277 Z" fill="#2f7ed8" fill-opacity="0.32"/>
-<rect x="1690" y="120" width="25" height="8.041725936462779" rx="3" fill="#2f7ed8"/>
-<text x="1735" y="147" text-anchor="start" class="count">4</text><text x="1735" y="176" text-anchor="start" class="detail">Authentication bypass</text>
-<path d="M1125 168.04172593646277 C1407.5 168.04172593646277 1407.5 210 1690 210 L1690 220.05215742057848 C1407.5 220.05215742057848 1407.5 178.09388335704125 1125 178.09388335704125 Z" fill="#2f7ed8" fill-opacity="0.32"/>
-<rect x="1690" y="210" width="25" height="10.052157420578475" rx="3" fill="#2f7ed8"/>
+<path d="M675 160.0 C887.5 160.0 887.5 160 1100 160 L1100 276.7567567567568 C887.5 276.7567567567568 887.5 276.7567567567568 675 276.7567567567568 Z" fill="#2f7ed8" fill-opacity="0.3"/>
+<path d="M675 276.7567567567568 C887.5 276.7567567567568 887.5 620 1100 620 L1100 625 C887.5 625 887.5 278.91891891891896 675 278.91891891891896 Z" fill="#f49a5b" fill-opacity="0.3"/>
+<path d="M1125 160.0 C1407.5 160.0 1407.5 120 1690 120 L1690 130.06523765144453 C1407.5 130.06523765144453 1407.5 170.06523765144453 1125 170.06523765144453 Z" fill="#2f7ed8" fill-opacity="0.32"/>
+<rect x="1690" y="120" width="25" height="10.065237651444548" rx="3" fill="#2f7ed8"/>
+<text x="1735" y="147" text-anchor="start" class="count">5</text><text x="1735" y="176" text-anchor="start" class="detail">Authentication bypass</text>
+<path d="M1125 170.06523765144453 C1407.5 170.06523765144453 1407.5 210 1690 210 L1690 220.06523765144453 C1407.5 220.06523765144453 1407.5 180.13047530288907 1125 180.13047530288907 Z" fill="#2f7ed8" fill-opacity="0.32"/>
+<rect x="1690" y="210" width="25" height="10.065237651444548" rx="3" fill="#2f7ed8"/>
 <text x="1735" y="237" text-anchor="start" class="count">5</text><text x="1735" y="266" text-anchor="start" class="detail">Application flag</text>
-<path d="M1125 178.09388335704125 C1407.5 178.09388335704125 1407.5 300 1690 300 L1690 362.32337600758655 C1407.5 362.32337600758655 1407.5 240.4172593646278 1125 240.4172593646278 Z" fill="#2f7ed8" fill-opacity="0.32"/>
-<rect x="1690" y="300" width="25" height="62.32337600758653" rx="3" fill="#2f7ed8"/>
+<path d="M1125 180.1304753028891 C1407.5 180.1304753028891 1407.5 300 1690 300 L1690 362.4044734389562 C1407.5 362.4044734389562 1407.5 242.5349487418453 1125 242.5349487418453 Z" fill="#2f7ed8" fill-opacity="0.32"/>
+<rect x="1690" y="300" width="25" height="62.4044734389562" rx="3" fill="#2f7ed8"/>
 <text x="1735" y="327" text-anchor="start" class="count">31</text><text x="1735" y="356" text-anchor="start" class="detail">Code execution</text>
-<path d="M1125 240.4172593646278 C1407.5 240.4172593646278 1407.5 407.32337600758655 1690 407.32337600758655 L1690 414.32337600758655 C1407.5 414.32337600758655 1407.5 246.44855381697488 1125 246.44855381697488 Z" fill="#2f7ed8" fill-opacity="0.32"/>
-<rect x="1690" y="407.32337600758655" width="25" height="7" rx="3" fill="#2f7ed8"/>
-<text x="1735" y="434.32337600758655" text-anchor="start" class="count">3</text><text x="1735" y="463.32337600758655" text-anchor="start" class="detail">Database read</text>
-<path d="M1125 246.44855381697488 C1407.5 246.44855381697488 1407.5 497.32337600758655 1690 497.32337600758655 L1690 519.4381223328592 C1407.5 519.4381223328592 1407.5 268.5633001422475 1125 268.5633001422475 Z" fill="#2f7ed8" fill-opacity="0.32"/>
-<rect x="1690" y="497.32337600758655" width="25" height="22.11474632527264" rx="3" fill="#2f7ed8"/>
-<text x="1735" y="524.3233760075866" text-anchor="start" class="count">11</text><text x="1735" y="553.3233760075866" text-anchor="start" class="detail">Private file access</text>
-<path d="M1125 268.5633001422475 C1407.5 268.5633001422475 1407.5 587.3233760075866 1690 587.3233760075866 L1690 594.3233760075866 C1407.5 594.3233760075866 1407.5 274.5945945945946 1125 274.5945945945946 Z" fill="#2f7ed8" fill-opacity="0.32"/>
-<rect x="1690" y="587.3233760075866" width="25" height="7" rx="3" fill="#2f7ed8"/>
-<text x="1735" y="614.3233760075866" text-anchor="start" class="count">3</text><text x="1735" y="643.3233760075866" text-anchor="start" class="detail">File creation</text>
-<path d="M1125 620.0 C1407.5 620.0 1407.5 677.3233760075866 1690 677.3233760075866 L1690 684.3233760075866 C1407.5 684.3233760075866 1407.5 625.0 1125 625.0 Z" fill="#f49a5b" fill-opacity="0.32"/>
-<rect x="1690" y="677.3233760075866" width="25" height="7" rx="3" fill="#f49a5b"/>
-<text x="1735" y="704.3233760075866" text-anchor="start" class="count">1</text><text x="1735" y="733.3233760075866" text-anchor="start" class="detail">Windows protocol handler</text><text x="1735" y="758.3233760075866" text-anchor="start" class="detail">unavailable on Linux</text>
+<path d="M1125 242.5349487418453 C1407.5 242.5349487418453 1407.5 407.4044734389562 1690 407.4044734389562 L1690 414.4044734389562 C1407.5 414.4044734389562 1407.5 248.57409133271204 1125 248.57409133271204 Z" fill="#2f7ed8" fill-opacity="0.32"/>
+<rect x="1690" y="407.4044734389562" width="25" height="7" rx="3" fill="#2f7ed8"/>
+<text x="1735" y="434.4044734389562" text-anchor="start" class="count">3</text><text x="1735" y="463.4044734389562" text-anchor="start" class="detail">Database read</text>
+<path d="M1125 248.57409133271204 C1407.5 248.57409133271204 1407.5 497.4044734389562 1690 497.4044734389562 L1690 519.5479962721342 C1407.5 519.5479962721342 1407.5 270.71761416589004 1125 270.71761416589004 Z" fill="#2f7ed8" fill-opacity="0.32"/>
+<rect x="1690" y="497.4044734389562" width="25" height="22.143522833178007" rx="3" fill="#2f7ed8"/>
+<text x="1735" y="524.4044734389562" text-anchor="start" class="count">11</text><text x="1735" y="553.4044734389562" text-anchor="start" class="detail">Private file access</text>
+<path d="M1125 270.71761416589004 C1407.5 270.71761416589004 1407.5 587.4044734389562 1690 587.4044734389562 L1690 594.4044734389562 C1407.5 594.4044734389562 1407.5 276.7567567567568 1125 276.7567567567568 Z" fill="#2f7ed8" fill-opacity="0.32"/>
+<rect x="1690" y="587.4044734389562" width="25" height="7" rx="3" fill="#2f7ed8"/>
+<text x="1735" y="614.4044734389562" text-anchor="start" class="count">3</text><text x="1735" y="643.4044734389562" text-anchor="start" class="detail">File creation</text>
+<path d="M1125 620.0 C1407.5 620.0 1407.5 677.4044734389562 1690 677.4044734389562 L1690 684.4044734389562 C1407.5 684.4044734389562 1407.5 625.0 1125 625.0 Z" fill="#f49a5b" fill-opacity="0.32"/>
+<rect x="1690" y="677.4044734389562" width="25" height="7" rx="3" fill="#f49a5b"/>
+<text x="1735" y="704.4044734389562" text-anchor="start" class="count">1</text><text x="1735" y="733.4044734389562" text-anchor="start" class="detail">Windows protocol handler</text><text x="1735" y="758.4044734389562" text-anchor="start" class="detail">unavailable on Linux</text>
 <rect x="300" y="210" width="25" height="720" rx="3" fill="#777775"/>
 <rect x="650" y="160" width="25" height="118.91891891891892" rx="3" fill="#2f7ed8"/>
 <rect x="650" y="400" width="25" height="601.081081081081" rx="3" fill="#777775"/>
 <text x="280" y="125" text-anchor="end" class="count">333</text><text x="280" y="154" text-anchor="end" class="detail">Vulhub cases</text>
 <text x="640" y="75" text-anchor="end" class="count">55</text><text x="640" y="104" text-anchor="end" class="detail">JavaScript and Python</text>
 <text x="680" y="1040" text-anchor="start" class="count">278</text><text x="680" y="1069" text-anchor="start" class="detail">Other target languages</text>
-<rect x="1100" y="160" width="25" height="114.5945945945946" rx="3" fill="#2f7ed8"/>
-<text x="1140" y="105" text-anchor="start" class="count">53</text><text x="1140" y="134" text-anchor="start" class="detail">Successful datapoints</text>
+<rect x="1100" y="160" width="25" height="116.75675675675676" rx="3" fill="#2f7ed8"/>
+<text x="1140" y="105" text-anchor="start" class="count">54</text><text x="1140" y="134" text-anchor="start" class="detail">Successful datapoints</text>
 <rect x="1100" y="390" width="25" height="5" rx="3" fill="#ed6434"/>
 <text x="1140" y="335" text-anchor="start" class="count">0</text><text x="1140" y="364" text-anchor="start" class="detail">Failed datapoints</text>
 <rect x="1100" y="620" width="25" height="5" rx="3" fill="#f49a5b"/>
 <text x="1140" y="565" text-anchor="start" class="count">1</text><text x="1140" y="594" text-anchor="start" class="detail">Blocked cases</text>
 <rect x="1100" y="850" width="25" height="5" rx="3" fill="#b9b9b5"/>
-<text x="1140" y="795" text-anchor="start" class="count">1</text><text x="1140" y="824" text-anchor="start" class="detail">Work pending</text>
+<text x="1140" y="795" text-anchor="start" class="count">0</text><text x="1140" y="824" text-anchor="start" class="detail">Work pending</text>
 </svg>
