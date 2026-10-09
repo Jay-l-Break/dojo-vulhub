@@ -1,30 +1,30 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T09:56:55.504269+00:00",
+  "generated_at": "2026-10-09T10:05:15.671570+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
   "status_counts": {
     "blocked": 0,
-    "candidate": 25,
+    "candidate": 22,
     "excluded": 278,
     "failed": 0,
-    "in_progress": 4,
-    "successful": 26
+    "in_progress": 5,
+    "successful": 28
   },
-  "successful_datapoints": 26,
+  "successful_datapoints": 28,
   "failed_datapoints": 0,
   "blocked_cases": 0,
-  "pending_cases": 29,
+  "pending_cases": 27,
   "oracle_occurrences": {
     "other": 4,
-    "remote_code_execution": 13,
+    "remote_code_execution": 14,
     "unauthorized_database_read": 3,
-    "unauthorized_file_access": 7,
-    "unauthorized_file_creation": 1
+    "unauthorized_file_access": 8,
+    "unauthorized_file_creation": 2
   },
-  "oracle_occurrence_total": 28,
+  "oracle_occurrence_total": 31,
   "failure_categories": {},
   "blocker_categories": {},
   "excluded_by_target_language": {
@@ -51,22 +51,24 @@
     "Node.js 8.5.0": 1,
     "Vite 2.0.0-alpha.1": 1,
     "aiohttp 1.1.0": 1,
-    "airflow-1.8.0": 1,
+    "airflow-1.8.0": 2,
     "comfyui-manager-3.3": 2,
     "django-1.10": 5,
     "django-3.1.0": 1,
     "langflow-1.0.0": 1,
+    "langflow-1.3.0": 1,
     "mongo-express 0.15.0": 1,
-    "n8n-1.65.0": 1,
     "pgAdmin 5.4": 2,
     "pgAdmin 8.10": 1,
     "pgAdmin 9.2": 1,
     "vite-2.3.0": 1,
+    "vite-4.4.0-beta.0": 1,
     "yapi-1.3.13": 2
   },
   "passing_vulnerability_ids": [
     "aiohttp-001",
     "airflow-001",
+    "airflow-002",
     "comfyui-001",
     "comfyui-002",
     "django-001",
@@ -79,8 +81,8 @@
     "gradio-001",
     "gradio-002",
     "langflow-001",
+    "langflow-002",
     "mongo-express-001",
-    "n8n-001",
     "node-001",
     "node-002",
     "pgadmin-001",
@@ -89,6 +91,7 @@
     "pgadmin-004",
     "vite-001",
     "vite-002",
+    "vite-003",
     "yapi-001",
     "yapi-002"
   ],
@@ -96,6 +99,10 @@
     {
       "id": "airflow-001",
       "commit": "e622fecd25edd57c6f94dbbeda0cd67f3ea247cb"
+    },
+    {
+      "id": "airflow-002",
+      "commit": "b99690ae297308c75a6a92a70d21de1c97208193"
     },
     {
       "id": "comfyui-001",
@@ -146,12 +153,12 @@
       "commit": "66be9dd9cd9a93d26aaec19f0bd3d2d2e6d7c06a"
     },
     {
-      "id": "mongo-express-001",
-      "commit": "3a72f3f343e1725fb5bce524fbacf03b8d7d9c76"
+      "id": "langflow-002",
+      "commit": "3fd5e2791ca54f078ef220ab465093e35ba7cfbe"
     },
     {
-      "id": "n8n-001",
-      "commit": "c4e860a574a59352b199ef595f1d34bb5e1a7d92"
+      "id": "mongo-express-001",
+      "commit": "3a72f3f343e1725fb5bce524fbacf03b8d7d9c76"
     },
     {
       "id": "node-001",
@@ -188,6 +195,10 @@
     {
       "id": "vite-002",
       "commit": "184c86cb41b787a698da3428560f9f618b860e0d"
+    },
+    {
+      "id": "vite-003",
+      "commit": "7fb4a5dcb5fe54893697c7873eaa6fb05d2a60b6"
     },
     {
       "id": "yapi-001",
