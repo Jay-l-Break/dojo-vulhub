@@ -3,26 +3,26 @@
 <rect width="100%" height="100%" fill="#fff"/>
 <path d="M325 210 C487.5 210 487.5 160 650 160 L650 278.9189189189189 C487.5 278.9189189189189 487.5 328.9189189189189 325 328.9189189189189 Z" fill="#3079d7" fill-opacity="0.28"/>
 <path d="M325 328.9189189189189 C487.5 328.9189189189189 487.5 400 650 400 L650 1001.081081081081 C487.5 1001.081081081081 487.5 930.0 325 930.0 Z" fill="#aaa9a6" fill-opacity="0.48"/>
-<path d="M675 160.0 C887.5 160.0 887.5 160 1100 160 L1100 165 C887.5 165 887.5 164.32432432432432 675 164.32432432432432 Z" fill="#2f7ed8" fill-opacity="0.3"/>
-<path d="M675 164.32432432432432 C887.5 164.32432432432432 887.5 850 1100 850 L1100 964.5945945945946 C887.5 964.5945945945946 887.5 278.9189189189189 675 278.9189189189189 Z" fill="#b9b9b5" fill-opacity="0.3"/>
-<path d="M1125 160.0 C1407.5 160.0 1407.5 120 1690 120 L1690 127 C1407.5 127 1407.5 162.5 1125 162.5 Z" fill="#2f7ed8" fill-opacity="0.32"/>
+<path d="M675 160.0 C887.5 160.0 887.5 160 1100 160 L1100 166.48648648648648 C887.5 166.48648648648648 887.5 166.48648648648648 675 166.48648648648648 Z" fill="#2f7ed8" fill-opacity="0.3"/>
+<path d="M675 166.48648648648648 C887.5 166.48648648648648 887.5 850 1100 850 L1100 962.4324324324324 C887.5 962.4324324324324 887.5 278.9189189189189 675 278.9189189189189 Z" fill="#b9b9b5" fill-opacity="0.3"/>
+<path d="M1125 160.0 C1407.5 160.0 1407.5 120 1690 120 L1690 127 C1407.5 127 1407.5 162.16216216216216 1125 162.16216216216216 Z" fill="#2f7ed8" fill-opacity="0.32"/>
 <rect x="1690" y="120" width="25" height="7" rx="3" fill="#2f7ed8"/>
 <text x="1735" y="147" text-anchor="start" class="count">1</text><text x="1735" y="176" text-anchor="start" class="detail">Database read</text>
-<path d="M1125 162.5 C1407.5 162.5 1407.5 210 1690 210 L1690 217 C1407.5 217 1407.5 165.0 1125 165.0 Z" fill="#2f7ed8" fill-opacity="0.32"/>
+<path d="M1125 162.16216216216216 C1407.5 162.16216216216216 1407.5 210 1690 210 L1690 217 C1407.5 217 1407.5 166.48648648648648 1125 166.48648648648648 Z" fill="#2f7ed8" fill-opacity="0.32"/>
 <rect x="1690" y="210" width="25" height="7" rx="3" fill="#2f7ed8"/>
-<text x="1735" y="237" text-anchor="start" class="count">1</text><text x="1735" y="266" text-anchor="start" class="detail">Private file access</text>
+<text x="1735" y="237" text-anchor="start" class="count">2</text><text x="1735" y="266" text-anchor="start" class="detail">Private file access</text>
 <rect x="300" y="210" width="25" height="720" rx="3" fill="#777775"/>
 <rect x="650" y="160" width="25" height="118.91891891891892" rx="3" fill="#2f7ed8"/>
 <rect x="650" y="400" width="25" height="601.081081081081" rx="3" fill="#777775"/>
 <text x="280" y="125" text-anchor="end" class="count">333</text><text x="280" y="154" text-anchor="end" class="detail">Vulhub cases</text>
 <text x="640" y="75" text-anchor="end" class="count">55</text><text x="640" y="104" text-anchor="end" class="detail">JavaScript and Python</text>
-<text x="640" y="315" text-anchor="end" class="count">278</text><text x="640" y="344" text-anchor="end" class="detail">Other target languages</text>
-<rect x="1100" y="160" width="25" height="5" rx="3" fill="#2f7ed8"/>
-<text x="1090" y="118" text-anchor="end" class="count">2</text><text x="1090" y="147" text-anchor="end" class="detail">Successful datapoints</text>
+<text x="680" y="1040" text-anchor="start" class="count">278</text><text x="680" y="1069" text-anchor="start" class="detail">Other target languages</text>
+<rect x="1100" y="160" width="25" height="6.486486486486487" rx="3" fill="#2f7ed8"/>
+<text x="1140" y="105" text-anchor="start" class="count">3</text><text x="1140" y="134" text-anchor="start" class="detail">Successful datapoints</text>
 <rect x="1100" y="390" width="25" height="5" rx="3" fill="#ed6434"/>
-<text x="1090" y="348" text-anchor="end" class="count">0</text><text x="1090" y="377" text-anchor="end" class="detail">Failed datapoints</text>
+<text x="1140" y="335" text-anchor="start" class="count">0</text><text x="1140" y="364" text-anchor="start" class="detail">Failed datapoints</text>
 <rect x="1100" y="620" width="25" height="5" rx="3" fill="#f49a5b"/>
-<text x="1090" y="578" text-anchor="end" class="count">0</text><text x="1090" y="607" text-anchor="end" class="detail">Blocked cases</text>
-<rect x="1100" y="850" width="25" height="114.5945945945946" rx="3" fill="#b9b9b5"/>
-<text x="1090" y="808" text-anchor="end" class="count">53</text><text x="1090" y="837" text-anchor="end" class="detail">Work pending</text>
+<text x="1140" y="565" text-anchor="start" class="count">0</text><text x="1140" y="594" text-anchor="start" class="detail">Blocked cases</text>
+<rect x="1100" y="850" width="25" height="112.43243243243244" rx="3" fill="#b9b9b5"/>
+<text x="1140" y="795" text-anchor="start" class="count">52</text><text x="1140" y="824" text-anchor="start" class="detail">Work pending</text>
 </svg>

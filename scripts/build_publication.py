@@ -181,13 +181,13 @@ def render_svg(counts: dict) -> str:
         node(650, 400, rejected_height, "#777775"),
         label(280, 125, total, "Vulhub cases", "end"),
         label(640, 75, eligible, "JavaScript and Python", "end"),
-        label(640, 315, excluded, "Other target languages", "end"),
+        label(680, 1040, excluded, "Other target languages"),
     ])
     for key, count, name, color, y in outcomes:
         geometry = next((item for item in outcome_geometry if item[0] == key), None)
         height = geometry[5] if geometry else 5
         svg.append(node(1100, y, height, color))
-        svg.append(label(1090, y - 42, count, name, "end"))
+        svg.append(label(1140, y - 55, count, name))
     svg.append('</svg>')
     return "\n".join(svg) + "\n"
 
