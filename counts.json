@@ -1,7 +1,7 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T12:33:39.116671+00:00",
+  "generated_at": "2026-10-09T12:37:50.874074+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
@@ -37,7 +37,7 @@
     "Erlang": 4,
     "Go": 11,
     "Go admission controller": 1,
-    "Java": 146,
+    "Java": 145,
     "Lua": 2,
     "PHP": 46,
     "PHP CGI runtime": 1,
@@ -45,6 +45,7 @@
     "Perl": 1,
     "Ruby": 6,
     "Rust": 1,
+    "Scala/JVM": 1,
     "Shell and C": 1
   },
   "verified_version_groups": {
@@ -90,6 +91,7 @@
     "yapi-1.3.13": 2
   },
   "version_repins_pending": [
+    "budibase-001",
     "saltstack-001",
     "saltstack-002",
     "saltstack-003"
