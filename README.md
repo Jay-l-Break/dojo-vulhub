@@ -20,7 +20,7 @@ A version joins a group only after a live exploit test confirms it.
 
 ## Current status
 
-The count data comes from the manager ledger and was generated at `2026-10-09T12:47:44.113504+00:00`.
+The count data comes from the manager ledger and was generated at `2026-10-09T12:57:54.524368+00:00`.
 The inventory has 333 cases.
 Language selection keeps 55 candidates and excludes 278 cases.
 Passing datapoints: 54.
@@ -29,7 +29,7 @@ Blocked cases: 1.
 Assigned cases: 0.
 Cases awaiting assignment: 0.
 Passing datapoints have 58 validated oracle occurrences.
-Earlier version repins are pending for 2 passing datapoints.
+Earlier version repins are pending for 1 passing datapoints.
 The figure and [`counts.json`](counts.json) use these ledger totals.
 
 ## Failure categories
@@ -42,7 +42,7 @@ The figure and [`counts.json`](counts.json) use these ledger totals.
 - [`airflow-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/airflow-001) at `e622fecd25edd57c6f94dbbeda0cd67f3ea247cb`
 - [`airflow-002`](https://github.com/Jay-l-Break/dojo-vulhub/tree/airflow-002) at `b99690ae297308c75a6a92a70d21de1c97208193`
 - [`airflow-003`](https://github.com/Jay-l-Break/dojo-vulhub/tree/airflow-003) at `50e6ed8c4889f3cb56ab100bf483ba5b53039664`
-- [`budibase-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/budibase-001) at `f42353b48b682a2c38c7c390b7fb18d712efb31e`
+- [`budibase-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/budibase-001) at `3aefdfa6c4f8803e49455945bcb348d8e70f61a7`
 - [`celery-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/celery-001) at `ca33ca6d3868ab058995f508d7759867abd98881`
 - [`chartbrew-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/chartbrew-001) at `8eaea933f2e1df76ac0fab121e75761e1aaaed8a`
 - [`comfyui-001`](https://github.com/Jay-l-Break/dojo-vulhub/tree/comfyui-001) at `c17383118477fefea9b675e97920027b56b2e3d6`

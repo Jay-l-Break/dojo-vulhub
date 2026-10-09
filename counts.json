@@ -1,7 +1,7 @@
 {
   "benchmark": "dojo-vulhub",
   "vulhub_revision": "8fd63916f7a8711e2e01dda0d27237e4d6175d38",
-  "generated_at": "2026-10-09T12:47:44.113504+00:00",
+  "generated_at": "2026-10-09T12:57:54.524368+00:00",
   "source_cases": 333,
   "language_candidates": 55,
   "excluded_cases": 278,
@@ -56,7 +56,7 @@
     "Vite 2.0.0-alpha.1": 1,
     "aiohttp 1.1.0": 1,
     "airflow-1.8.0": 3,
-    "budibase-0.0.999-alpha.11": 1,
+    "budibase-0.3.0": 1,
     "celery-0.3.0": 1,
     "chartbrew-v1.0.0-beta.9": 1,
     "comfyui-manager-3.3": 2,
@@ -92,7 +92,6 @@
     "yapi-1.3.13": 2
   },
   "version_repins_pending": [
-    "budibase-001",
     "saltstack-002"
   ],
   "passing_vulnerability_ids": [
@@ -166,7 +165,7 @@
     },
     {
       "id": "budibase-001",
-      "commit": "f42353b48b682a2c38c7c390b7fb18d712efb31e"
+      "commit": "3aefdfa6c4f8803e49455945bcb348d8e70f61a7"
     },
     {
       "id": "celery-001",
