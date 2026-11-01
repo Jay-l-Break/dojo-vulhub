@@ -10,6 +10,7 @@
 import PGSchema from './schema.ui';
 import { getNodePrivilegeRoleSchema } from '../../../../static/js/privilege.ui';
 import { getNodeListByName } from '../../../../../../static/js/node_ajax';
+import { AllPermissionTypes } from '../../../../../../static/js/constants';
 
 define('pgadmin.node.schema', [
   'sources/gettext', 'sources/url_for',
@@ -51,11 +52,13 @@ define('pgadmin.node.schema', [
           applies: ['object', 'context'], callback: 'show_obj_properties',
           category: 'create', priority: 1, label: gettext('Schema...'),
           data: {action: 'create'},
+          shortcut_preference: ['browser', 'sub_menu_create'],
         },{
           name: 'create_schema', node: 'schema', module: this,
           applies: ['object', 'context'], callback: 'show_obj_properties',
           category: 'create', priority: 1, label: gettext('Schema...'),
-          data: {action: 'create'},
+          shortcut_preference: ['browser', 'sub_menu_create'],
+          data: {action: 'create'}, 
         },{
           name: 'create_schema', node: 'database', module: this,
           applies: ['object', 'context'], callback: 'show_obj_properties',
@@ -64,7 +67,8 @@ define('pgadmin.node.schema', [
         },{
           name: 'generate_erd', node: 'schema', module: this,
           applies: ['object', 'context'], callback: 'generate_erd',
-          priority: 5, label: gettext('ERD For Schema')
+          priority: 5, label: gettext('ERD For Schema'),
+          permission: AllPermissionTypes.TOOLS_ERD_TOOL,
         }]);
       },
       can_create_schema: function(node) {

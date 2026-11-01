@@ -8,7 +8,7 @@
 //////////////////////////////////////////////////////////////
 /* Common form components used in pgAdmin */
 
-import React, { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import {
   Box, FormControl, OutlinedInput, FormHelperText, ToggleButton, ToggleButtonGroup,
@@ -121,20 +121,20 @@ const StyledGrid = styled(Grid)(({theme}) => ({
 }));
 
 /* Wrapper on any form component to add label, error indicator and help message */
-export function FormInput({ children, error, className, label, helpMessage, required, testcid, lid, withContainer=true, labelGridBasis=3, controlGridBasis=9, labelTooltip='' }) {
+export function FormInput({ children, error, className, label, helpMessage, required, testcid, lid, withContainer=true, labelGridBasis=3, controlGridBasis=9, labelTooltip='', errorMessage='' }) {
 
   const cid = testcid || _.uniqueId('c');
   const helpid = `h${cid}`;
   if(!withContainer) {
     return (
       (<>
-        <StyledGrid item lg={labelGridBasis} md={labelGridBasis} sm={12} xs={12}>
+        <StyledGrid size={{ lg: labelGridBasis, md: labelGridBasis, sm: 12, xs: 12}}>
           <InputLabel id={lid} htmlFor={lid ? undefined : cid} className={'Form-label ' + (error ? 'Form-labelError' : null)} required={required}>
             {label}
             <FormIcon type={MESSAGE_TYPE.ERROR} style={{ marginLeft: 'auto', visibility: error ? 'unset' : 'hidden' }} />
           </InputLabel>
         </StyledGrid>
-        <StyledGrid item lg={controlGridBasis} md={controlGridBasis} sm={12} xs={12}>
+        <StyledGrid size={{ lg: controlGridBasis, md: controlGridBasis, sm: 12, xs: 12}}>
           <FormControl error={Boolean(error)} fullWidth>
             {React.cloneElement(children, { cid, helpid })}
           </FormControl>
@@ -149,8 +149,8 @@ export function FormInput({ children, error, className, label, helpMessage, requ
     <FormIcon type={MESSAGE_TYPE.ERROR} style={{ marginLeft: 'auto', visibility: error ? 'unset' : 'hidden' }} />
   </InputLabel>;
   return (
-    <StyledGrid container spacing={0} className={className} data-testid="form-input">
-      <Grid item lg={labelGridBasis} md={labelGridBasis} sm={12} xs={12}>
+    <StyledGrid container spacing={0} className={className} data-testid="form-input" width="100%">
+      <Grid size={{ lg: labelGridBasis, md: labelGridBasis, sm: 12, xs: 12 }}>
         {
           labelTooltip ?
             <Tooltip title={labelTooltip}>
@@ -158,11 +158,12 @@ export function FormInput({ children, error, className, label, helpMessage, requ
             </Tooltip> : labelComponent
         }
       </Grid>
-      <Grid item lg={controlGridBasis} md={controlGridBasis} sm={12} xs={12}>
+      <Grid size={{ lg: controlGridBasis, md: controlGridBasis, sm: 12, xs: 12 }}>
         <FormControl error={Boolean(error)} fullWidth>
           {React.cloneElement(children, { cid, helpid })}
         </FormControl>
         <FormHelperText id={helpid} variant="outlined">{HTMLReactParse(helpMessage || '')}</FormHelperText>
+        {errorMessage && <FormHelperText variant="outlined" error= {true} style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{HTMLReactParse(errorMessage)}</FormHelperText> }
       </Grid>
     </StyledGrid>
   );
@@ -179,7 +180,8 @@ FormInput.propTypes = {
   withContainer: PropTypes.bool,
   labelGridBasis: PropTypes.number,
   controlGridBasis: PropTypes.number,
-  labelTooltip: PropTypes.string
+  labelTooltip: PropTypes.string,
+  errorMessage: PropTypes.string
 };
 
 export function InputSQL({ value, options={}, onChange, className, controlProps, inputRef, ...props }) {
@@ -255,7 +257,7 @@ const DATE_TIME_FORMAT = {
   TIME_24: 'HH:mm:ss',
 };
 
-export function InputDateTimePicker({ value, onChange, readonly, controlProps, ...props }) {
+export function InputDateTimePicker({ value, onChange, readonly, controlProps, error, ...props }) {
   let format = '';
   let placeholder = '';
   let regExp = /[a-zA-Z]/;
@@ -306,7 +308,7 @@ export function InputDateTimePicker({ value, onChange, readonly, controlProps, .
     ampm: controlProps.ampm ? controlProps.ampm : undefined,
     disablePast: controlProps.disablePast || false,
     onChange: handleChange,
-    slotProps: {textField: {placeholder:placeholder}}
+    slotProps: {textField: {placeholder:placeholder, error: error}}
   };
 
   if (controlProps?.pickerType === 'Date') {
@@ -328,12 +330,13 @@ InputDateTimePicker.propTypes = {
   onChange: PropTypes.func,
   readonly: PropTypes.bool,
   controlProps: PropTypes.object,
+  error: PropTypes.bool,
 };
 
 export function FormInputDateTimePicker({ hasError, required, label, className, helpMessage, testcid, labelTooltip, ...props }) {
   return (
     <FormInput required={required} label={label} error={hasError} className={className} helpMessage={helpMessage} testcid={testcid} labelTooltip={labelTooltip}>
-      <InputDateTimePicker {...props} />
+      <InputDateTimePicker error={hasError} {...props} />
     </FormInput>
   );
 }
@@ -351,8 +354,7 @@ FormInputDateTimePicker.propTypes = {
 };
 
 /* Use forwardRef to pass ref prop to OutlinedInput */
-export const InputText = forwardRef(({
-  cid, helpid, readonly, disabled, value, onChange, controlProps, type, size, inputStyle, ...props }, ref) => {
+export function InputText({ref, cid, helpid, readonly, disabled, value, onChange, controlProps, type, size, inputStyle, ...props }) {
 
   const maxlength = typeof(controlProps?.maxLength) != 'undefined' ? controlProps.maxLength : 255;
   const patterns = {
@@ -390,7 +392,7 @@ export const InputText = forwardRef(({
 
   const filteredProps = _.pickBy(props, (_v, key)=>(
     /* When used in ButtonGroup, following props should be skipped */
-    !['color', 'disableElevation', 'disableFocusRipple', 'disableRipple'].includes(key)
+    (!['color', 'disableElevation', 'disableFocusRipple', 'disableRipple'].includes(key))
   ));
 
   return (
@@ -424,7 +426,7 @@ export const InputText = forwardRef(({
       {...(['numeric', 'int'].indexOf(type) > -1 ? { type: 'tel' } : { type: type })}
     />
   );
-});
+};
 InputText.displayName = 'InputText';
 InputText.propTypes = {
   cid: PropTypes.string,
@@ -534,9 +536,7 @@ export function InputSwitch({ cid, helpid, value, onChange, readonly, controlPro
         readonly ? () => {/*This is intentional (SonarQube)*/ } : onChange
       }
       id={cid}
-      inputProps={{
-        'aria-describedby': helpid,
-      }}
+      slotProps={{input: { 'aria-describedby': helpid }}}
       {...controlProps}
       {...props}
       className={(readonly || props.disabled) ? 'Form-readOnlySwitch' : null}
@@ -583,7 +583,7 @@ export function InputCheckbox({ cid, helpid, value, onChange, controlProps, read
           checked={Boolean(value)}
           onChange={readonly ? () => {/*This is intentional (SonarQube)*/ } : onChange}
           color="primary"
-          inputProps={{ 'aria-describedby': helpid, 'title': controlProps.label}}
+          slotProps={{input: { 'aria-describedby': helpid, 'title': controlProps.label }}}
           {...props} />
       }
       disabled={disabled}
@@ -636,7 +636,7 @@ export function InputRadio({ helpid, value, onChange, controlProps, readonly, la
           }
           value={value}
           name="radio-button-demo"
-          inputProps={{ 'aria-label': value, 'aria-describedby': helpid }}
+          slotProps={{input: { 'aria-label': value, 'aria-describedby': helpid }}}
           disableRipple
         />
       }
@@ -656,14 +656,14 @@ InputRadio.propTypes = {
   labelPlacement: PropTypes.string
 };
 
-export const ToggleCheckButton = forwardRef(({ value, selected, label, ...props }, ref) => {
+export function ToggleCheckButton({ref, value, selected, label, ...props}) {
   return (
     <ToggleButton ref={ref} value={value} component={selected ? PrimaryButton : DefaultButton}
       aria-label={label} {...props}>
       <CheckRoundedIcon style={{ visibility: selected ? 'visible' : 'hidden', fontSize: '1.2rem' }} />&nbsp;{label}
     </ToggleButton>
   );
-});
+};
 ToggleCheckButton.displayName = 'ToggleCheckButton';
 ToggleCheckButton.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.bool]),
@@ -672,7 +672,7 @@ ToggleCheckButton.propTypes = {
   label: PropTypes.string,
 };
 
-export const InputToggle = forwardRef(({ cid, value, onChange, options, disabled, readonly, helpid, ...props }, ref) => {
+export function InputToggle({ ref, cid, value, onChange, options, disabled, readonly, helpid, ...props }) {
   return (
     <>
       <ToggleButtonGroup
@@ -695,7 +695,7 @@ export const InputToggle = forwardRef(({ cid, value, onChange, options, disabled
       {helpid && <input style={{display: 'none'}} defaultValue={options?.find((o)=>o.value==value)?.label} id={cid} aria-describedby={helpid} />}
     </>
   );
-});
+};
 InputToggle.displayName = 'InputToggle';
 InputToggle.propTypes = {
   cid: PropTypes.string,
@@ -916,8 +916,7 @@ InputSelectNonSearch.propTypes = {
   })),
 };
 
-export const InputSelect = forwardRef(({
-  cid, helpid, onChange, options, readonly = false, value, controlProps = {}, optionsLoaded, optionsReloadBasis, disabled, ...props }, ref) => {
+export function InputSelect({ref, cid, helpid, onChange, options, readonly = false, value, controlProps = {}, optionsLoaded, optionsReloadBasis, disabled, onError, ...props}) {
   const [[finalOptions, isLoading], setFinalOptions] = useState([[], true]);
   const theme = useTheme();
 
@@ -953,6 +952,11 @@ export const InputSelect = forwardRef(({
           }
           setFinalOptions([res || [], false]);
         }
+      })
+      .catch((err)=>{
+        let error_msg = err.response.data.errormsg;
+        onError?.(error_msg);
+        setFinalOptions([[], false]);
       });
     return () => umounted = true;
   }, [optionsReloadBasis]);
@@ -975,7 +979,7 @@ export const InputSelect = forwardRef(({
   const onChangeOption = useCallback((selectVal) => {
     if (_.isArray(selectVal)) {
       // Check if select all option is selected
-      if (!_.isUndefined(selectVal.find(x => x.label === '<Select All>'))) {
+      if (!_.isUndefined(selectVal.find(x => x.label === gettext('<Select All>')))) {
         selectVal = filteredOptions;
       }
       /* If multi select options need to be in some format by UI, use formatter */
@@ -1006,7 +1010,7 @@ export const InputSelect = forwardRef(({
     value: realValue,
     menuPortalTarget: document.body,
     styles: styles,
-    inputId: cid,
+    inputId: `${cid}-autocomplete`,
     placeholder: (readonly || disabled) ? '' : controlProps.placeholder || gettext('Select an item...'),
     maxLength: controlProps.maxLength,
     ...otherProps,
@@ -1039,7 +1043,7 @@ export const InputSelect = forwardRef(({
       </>
     );
   }
-});
+};
 InputSelect.displayName = 'InputSelect';
 InputSelect.propTypes = {
   cid: PropTypes.string,
@@ -1052,14 +1056,20 @@ InputSelect.propTypes = {
   onChange: PropTypes.func,
   disabled: PropTypes.bool,
   readonly: PropTypes.bool,
+  onError: PropTypes.func,
 };
 
 
 export function FormInputSelect({
   hasError, required, className, label, helpMessage, testcid, labelTooltip, ...props }) {
+  const [selectError, setSelectError] = useState(null);
+  const handleSelectError = (errorMessage) => {
+    setSelectError(errorMessage);
+  };
+
   return (
-    <FormInput required={required} label={label} error={hasError} className={className} helpMessage={helpMessage} testcid={testcid} labelTooltip={labelTooltip}>
-      <InputSelect ref={props.inputRef} {...props} />
+    <FormInput required={required} label={label} error={hasError} className={className} helpMessage={helpMessage} testcid={testcid} labelTooltip={labelTooltip} errorMessage={selectError}>
+      <InputSelect ref={props.inputRef} onError={handleSelectError} {...props} />
     </FormInput>
   );
 }
@@ -1280,7 +1290,8 @@ const StyledNotifierMessageBox = styled(Box)(({theme}) => ({
   '& .FormFooter-message': {
     color: theme.palette.text.primary,
     marginLeft: theme.spacing(0.5),
-    whiteSpace: 'pre-line'
+    whiteSpace: 'pre-line',
+    userSelect: 'text'
   },
   '& .FormFooter-messageCenter': {
     color: theme.palette.text.primary,
@@ -1351,6 +1362,7 @@ export function InputTree({hasCheckbox, treeData, onChange, ...props}){
       });
     return () => umounted = true;
   }, []);
+
   return <>{isLoading ? <Loader message={gettext('Loading')}></Loader> : <PgTreeView data={finalData} hasCheckbox={hasCheckbox} selectionChange={onChange} {...props}></PgTreeView>}</>;
 }
 

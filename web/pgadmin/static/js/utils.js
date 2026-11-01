@@ -17,8 +17,9 @@ import usePreferences from '../../preferences/static/js/store';
 import pgAdmin from 'sources/pgadmin';
 import { isMac } from './keyboard_shortcuts';
 import { WORKSPACES } from '../../browser/static/js/constants';
+import { getCode } from '@fluentui/keyboard-key';
 
-export function parseShortcutValue(obj) {
+export function parseShortcutValue(obj, useCode=false) {
   let shortcut = '';
   if (!obj){
     return null;
@@ -27,11 +28,11 @@ export function parseShortcutValue(obj) {
   if (obj.shift) { shortcut += 'shift+'; }
   if (isMac() && obj.ctrl_is_meta) { shortcut += 'meta+'; }
   else if (obj.control) { shortcut += 'ctrl+'; }
-  shortcut += obj?.key.char?.toLowerCase();
+  shortcut += useCode ? obj?.key.key_code : obj?.key.char?.toLowerCase();
   return shortcut;
 }
 
-export function parseKeyEventValue(e) {
+export function parseKeyEventValue(e, useCode=false) {
   let shortcut = '';
   if(!e) {
     return null;
@@ -40,7 +41,7 @@ export function parseKeyEventValue(e) {
   if (e.shiftKey) { shortcut += 'shift+'; }
   if (isMac() && e.metaKey) { shortcut += 'meta+'; }
   else if (e.ctrlKey) { shortcut += 'ctrl+'; }
-  shortcut += e.key.toLowerCase();
+  shortcut += useCode? getCode(e) : e.key.toLowerCase();
   return shortcut;
 }
 
@@ -48,7 +49,6 @@ export function isShortcutValue(obj) {
   if(!obj) return false;
   return [obj.alt, obj.control, obj?.key, obj?.key?.char].every((k)=>!_.isUndefined(k));
 }
-
 
 export function getEnterKeyHandler(clickHandler) {
   return (e)=>{
@@ -278,12 +278,12 @@ export function CSVToArray(strData, strDelimiter, quoteChar){
 export function hasBinariesConfiguration(pgBrowser, serverInformation) {
   const module = 'paths';
   let preference_name = 'pg_bin_dir';
-  let msg = gettext('Please configure the PostgreSQL Binary Path in the Preferences dialog.');
+  let msg = gettext('Please configure the PostgreSQL Binary Path in the Preferences.');
 
   if ((serverInformation.type && serverInformation.type === 'ppas') ||
     serverInformation.server_type === 'ppas') {
     preference_name = 'ppas_bin_dir';
-    msg = gettext('Please configure the EDB Advanced Server Binary Path in the Preferences dialog.');
+    msg = gettext('Please configure the EDB Advanced Server Binary Path in the Preferences.');
   }
 
   const preference = usePreferences.getState().getPreferences(module, preference_name);
@@ -369,46 +369,7 @@ export function checkTrojanSource(content, isPasteEvent) {
   }
 }
 
-export async function downloadBlob(blob, fileName) {
-  const {automatically_open_downloaded_file, prompt_for_download_location} = usePreferences.getState().getPreferencesForModule('misc');
-  const urlCreator = window.URL || window.webkitURL;
-  const downloadUrl = urlCreator.createObjectURL(blob);
-  if (getBrowser().name == 'IE' && window.navigator.msSaveBlob) {
-    // IE10+ : (has Blob, but not a[download] or URL)
-    window.navigator.msSaveBlob(blob, fileName);
-  } else if (getBrowser().name == 'Electron') {
-    await window.electronUI.onFileDownload({downloadUrl, fileName, automatically_open_downloaded_file, prompt_for_download_location});
-  } else {
-    const link = document.createElement('a');
-    link.setAttribute('href', downloadUrl);
-    link.setAttribute('download', fileName);
-    link.style.setProperty('visibility ', 'hidden');
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-}
-
-export async function downloadUrlData(downloadUrl, fileName) {
-  const {automatically_open_downloaded_file, prompt_for_download_location} = usePreferences.getState().getPreferencesForModule('misc');
-  if (getBrowser().name == 'Electron') {
-    window.electronUI.onFileDownload({downloadUrl, fileName, automatically_open_downloaded_file, prompt_for_download_location});
-  } else {
-    let link = document.createElement('a');
-    link.setAttribute('href', downloadUrl);
-    link.setAttribute('download', fileName);
-    link.click();
-    link.remove();
-  }
-}
-
-export function downloadFile(textData, fileName, fileType) {
-  const respBlob = new Blob([textData], {type : fileType});
-  downloadBlob(respBlob, fileName);
-}
-
-export function toPrettySize(rawSize, from='B') {
+export function toPrettySize(rawSize, from='B', decimalFixed=null) {
   try {
     //if the integer need to be converted to K for thousands, M for millions , B for billions only
     if (from == '') {
@@ -416,6 +377,9 @@ export function toPrettySize(rawSize, from='B') {
     }
     let conVal = convert(rawSize).from(from).toBest();
     conVal.val = Math.round(conVal.val * 100) / 100;
+    if(decimalFixed) {
+      conVal.val = conVal.val.toFixed(decimalFixed);
+    }
     return `${conVal.val} ${conVal.unit}`;
   }
   catch {
@@ -596,17 +560,6 @@ export function requestAnimationAndFocus(ele) {
   });
 }
 
-export function measureText(text, font) {
-  if(!measureText.ele) {
-    measureText.ele = document.createElement('div');
-    measureText.ele.style.cssText = `position: absolute; visibility: hidden; white-space: nowrap; font: ${font}`;
-    document.body.appendChild(measureText.ele);
-  }
-  measureText.ele.textContent = text;
-  const dim = measureText.ele.getBoundingClientRect();
-  return {width: dim.width, height: dim.height};
-}
-
 const CHART_THEME_COLORS = {
   'light':['#1F77B4', '#FF7F0E', '#2CA02C', '#D62728', '#9467BD', '#8C564B',
     '#E377C2', '#7F7F7F', '#BCBD22', '#17BECF', '#3366CC', '#DC3912', '#FF9900',
@@ -632,7 +585,7 @@ export function getRandomColor() {
 
 // Using this function instead of 'btoa' directly.
 // https://developer.mozilla.org/en-US/docs/Glossary/Base64#the_unicode_problem
-function stringToBase64(str) {
+export function stringToBase64(str) {
   return btoa(
     Array.from(
       new TextEncoder().encode(str),

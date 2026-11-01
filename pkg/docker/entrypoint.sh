@@ -48,7 +48,8 @@ CA_FILE = '/etc/ssl/certs/ca-certificates.crt'
 LOG_FILE = '/dev/null'
 HELP_PATH = '../../docs'
 DEFAULT_BINARY_PATHS = {
-        'pg': '/usr/local/pgsql-17',
+        'pg': '/usr/local/pgsql-18',
+        'pg-18': '/usr/local/pgsql-18',
         'pg-17': '/usr/local/pgsql-17',
         'pg-16': '/usr/local/pgsql-16',
         'pg-15': '/usr/local/pgsql-15',
@@ -188,5 +189,5 @@ fi
 if [ -n "${PGADMIN_ENABLE_TLS}" ]; then
     exec /venv/bin/gunicorn --limit-request-line "${GUNICORN_LIMIT_REQUEST_LINE:-8190}" --timeout "${TIMEOUT}" --bind "${BIND_ADDRESS}" -w 1 --threads "${GUNICORN_THREADS:-25}" --access-logfile "${GUNICORN_ACCESS_LOGFILE:--}" --keyfile /certs/server.key --certfile /certs/server.cert -c gunicorn_config.py run_pgadmin:app
 else
-    exec /venv/bin/gunicorn --limit-request-line "${GUNICORN_LIMIT_REQUEST_LINE:-8190}" --timeout "${TIMEOUT}" --bind "${BIND_ADDRESS}" -w 1 --threads "${GUNICORN_THREADS:-25}" --access-logfile "${GUNICORN_ACCESS_LOGFILE:--}" -c gunicorn_config.py run_pgadmin:app
+    exec /venv/bin/gunicorn --limit-request-line "${GUNICORN_LIMIT_REQUEST_LINE:-8190}" --limit-request-fields "${GUNICORN_LIMIT_REQUEST_FIELDS:-100}" --limit-request-field_size "${GUNICORN_LIMIT_REQUEST_FIELD_SIZE:-8190}" --timeout "${TIMEOUT}" --bind "${BIND_ADDRESS}" -w 1 --threads "${GUNICORN_THREADS:-25}" --access-logfile "${GUNICORN_ACCESS_LOGFILE:--}" -c gunicorn_config.py run_pgadmin:app
 fi

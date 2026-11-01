@@ -14,6 +14,7 @@ import DatabaseSchema from './database.ui';
 import { showServerPassword } from '../../../../../../static/js/Dialogs/index';
 import _ from 'lodash';
 import getApiInstance, { parseApiError } from '../../../../../../static/js/api_instance';
+import { AllPermissionTypes } from '../../../../../static/js/constants';
 
 define('pgadmin.node.database', [
   'sources/gettext', 'sources/url_for',
@@ -84,12 +85,14 @@ define('pgadmin.node.database', [
           category: 'create', priority: 4, label: gettext('Database...'),
           data: {action: 'create'},
           enable: 'can_create_database',
+          shortcut_preference: ['browser', 'sub_menu_create'],
         },{
           name: 'create_database', node: 'database', module: this,
           applies: ['object', 'context'], callback: 'show_obj_properties',
           category: 'create', priority: 4, label: gettext('Database...'),
           data: {action: 'create'},
           enable: 'can_create_database',
+          shortcut_preference: ['browser', 'sub_menu_create'],
         },{
           name: 'connect_database', node: 'database', module: this,
           applies: ['object', 'context'], callback: 'connect_database',
@@ -100,7 +103,7 @@ define('pgadmin.node.database', [
         },{
           name: 'delete_database_force', node: 'database', module: this,
           applies: ['object', 'context'], callback: 'delete_database_force',
-          category: 'delete', priority: 2, label: gettext('Delete (Force)'),
+          category: 'delete', priority: 2, label: gettext('Drop (Force)'),
           enable : canDeleteWithForce,
         }, {
           name: 'disconnect_database', node: 'database', module: this,
@@ -122,7 +125,8 @@ define('pgadmin.node.database', [
           priority: 5, label: gettext('ERD For Database'),
           enable: (node) => {
             return node.allowConn;
-          }
+          },
+          permission: AllPermissionTypes.TOOLS_ERD_TOOL,
         }]);
 
         _.bindAll(this, 'connection_lost');

@@ -59,11 +59,13 @@ define('pgadmin.node.function', [
           applies: ['object', 'context'], callback: 'show_obj_properties',
           category: 'create', priority: 4, label: gettext('Function...'),
           data: {action: 'create', check: true}, enable: 'canCreate',
+          shortcut_preference: ['browser', 'sub_menu_create'],
         },{
           name: 'create_function', node: 'function', module: this,
           applies: ['object', 'context'], callback: 'show_obj_properties',
           category: 'create', priority: 4, label: gettext('Function...'),
           data: {action: 'create', check: true}, enable: 'canCreate',
+          shortcut_preference: ['browser', 'sub_menu_create'],
         },{
           name: 'create_function', node: 'schema', module: this,
           applies: ['object', 'context'], callback: 'show_obj_properties',
@@ -74,6 +76,7 @@ define('pgadmin.node.function', [
 
       },
       getSchema: function(treeNodeInfo, itemNodeData) {
+        let nodeObj = pgBrowser.Nodes['extension'];
         return new FunctionSchema(
           (privileges)=>getNodePrivilegeRoleSchema(this, treeNodeInfo, itemNodeData, privileges),
           ()=>getNodeVariableSchema(this, treeNodeInfo, itemNodeData, false, false),
@@ -83,6 +86,16 @@ define('pgadmin.node.function', [
               cacheLevel: 'database'
             }
             ),
+            extensionsList:()=>getNodeAjaxOptions('nodes', nodeObj, treeNodeInfo, itemNodeData, { cacheLevel: 'server'},
+              (data)=>{
+                let res = [];
+                if (data && _.isArray(data)) {
+                  _.each(data, function(d) {
+                    res.push({label: d.label, value: d.label, data: d});
+                  });
+                }
+                return res;
+              }),
             getTypes: ()=>getNodeAjaxOptions('get_types', this, treeNodeInfo, itemNodeData),
             getLanguage: ()=>getNodeAjaxOptions('get_languages', this, treeNodeInfo, itemNodeData),
             getSupportFunctions: ()=>getNodeAjaxOptions('get_support_functions', this, treeNodeInfo, itemNodeData, {

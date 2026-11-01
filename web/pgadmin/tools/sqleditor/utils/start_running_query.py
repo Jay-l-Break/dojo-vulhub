@@ -84,8 +84,11 @@ class StartRunningQuery:
                 from pgadmin.tools.sqleditor.utils import \
                     query_tool_connection_check
 
-                _, _, _, _, _, response = \
+                status, errmsg, _, _, _, response = \
                     query_tool_connection_check(trans_id)
+                # If database does not exist then show error msg
+                if not status:
+                    result = errmsg
                 # This is required for asking user to enter password
                 # when password is not saved for the server
                 if response is not None:
@@ -98,7 +101,7 @@ class StartRunningQuery:
                 session_obj,
                 effective_sql_statement,
                 trans_id,
-                transaction_object
+                transaction_object,
             )
 
             can_edit = transaction_object.can_edit()
@@ -134,17 +137,19 @@ class StartRunningQuery:
         StartRunningQuery.save_transaction_in_session(session_obj,
                                                       trans_id, trans_obj)
 
-        # If auto commit is False and transaction status is Idle
-        # then call is_begin_not_required() function to check BEGIN
-        # is required or not.
+        if trans_obj.server_cursor and sql != 'COMMIT;' and sql != 'ROLLBACK;':
+            conn.release_async_cursor()
 
         if StartRunningQuery.is_begin_required_for_sql_query(trans_obj,
-                                                             conn, sql):
+                                                             conn, sql
+                                                             ):
             conn.execute_void("BEGIN;")
 
         is_rollback_req = StartRunningQuery.is_rollback_statement_required(
             trans_obj,
             conn)
+
+        trans_obj.set_thread_native_id(None)
 
         @copy_current_request_context
         def asyn_exec_query(conn, sql, trans_obj, is_rollback_req,
@@ -153,9 +158,15 @@ class StartRunningQuery:
             # and formatted_error is True.
             with app.app_context():
                 try:
-                    _, _ = conn.execute_async(sql)
-                    # # If the transaction aborted for some reason and
-                    # # Auto RollBack is True then issue a rollback to cleanup.
+                    if trans_obj.server_cursor and (sql == 'COMMIT;' or
+                                                    sql == 'ROLLBACK;'):
+                        conn.execute_void(sql)
+                    else:
+                        _, _ = conn.execute_async(
+                            sql, server_cursor=trans_obj.server_cursor)
+                        # If the transaction aborted for some reason and
+                        # Auto RollBack is True then issue a rollback
+                        # to cleanup.
                     if is_rollback_req:
                         conn.execute_void("ROLLBACK;")
                 except Exception as e:
@@ -175,10 +186,12 @@ class StartRunningQuery:
 
     @staticmethod
     def is_begin_required_for_sql_query(trans_obj, conn, sql):
-        return (not trans_obj.auto_commit and
-                conn.transaction_status() == TX_STATUS_IDLE and
-                is_begin_required(sql)
-                )
+
+        return ((trans_obj.server_cursor and trans_obj.auto_commit) or (
+            not trans_obj.auto_commit and
+            conn.transaction_status() == TX_STATUS_IDLE and
+            is_begin_required(sql)
+        ))
 
     @staticmethod
     def is_rollback_statement_required(trans_obj, conn):

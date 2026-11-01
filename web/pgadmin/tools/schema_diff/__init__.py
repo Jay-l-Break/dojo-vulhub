@@ -10,12 +10,11 @@
 """A blueprint module implementing the schema_diff frame."""
 import json
 import pickle
-import secrets
 import copy
 
-from flask import Response, session, url_for, request
+from flask import Response, session, request
 from flask import render_template, current_app as app
-from flask_security import current_user
+from flask_security import current_user, permissions_required
 from pgadmin.user_login_check import pga_login_required
 from flask_babel import gettext
 from pgadmin.utils import PgAdminModule
@@ -26,11 +25,12 @@ from pgadmin.tools.schema_diff.node_registry import SchemaDiffRegistry
 from pgadmin.tools.schema_diff.model import SchemaDiffModel
 from config import PG_DEFAULT_DRIVER
 from pgadmin.utils.driver import get_driver
-from pgadmin.utils.constants import PREF_LABEL_DISPLAY, MIMETYPE_APP_JS,\
+from pgadmin.utils.constants import PREF_LABEL_DISPLAY, \
     ERROR_MSG_TRANS_ID_NOT_FOUND
 from sqlalchemy import or_
 from pgadmin.authenticate import socket_login_required
 from pgadmin import socketio
+from pgadmin.tools.user_management.PgAdminPermissions import AllPermissionTypes
 
 MODULE_NAME = 'schema_diff'
 COMPARE_MSG = gettext("Comparing objects...")
@@ -120,9 +120,11 @@ def index():
 
 @blueprint.route(
     '/panel/<int:trans_id>/<path:editor_title>',
-    methods=["GET"],
+    methods=["POST"],
     endpoint='panel'
 )
+@permissions_required(AllPermissionTypes.tools_schema_diff)
+@pga_login_required
 def panel(trans_id, editor_title):
     """
     This method calls index.html to render the schema diff.
@@ -130,6 +132,7 @@ def panel(trans_id, editor_title):
     Args:
         editor_title: Title of the editor
     """
+    params = {}
     # If title has slash(es) in it then replace it
     if request.args and request.args['fslashes'] != '':
         try:
@@ -140,11 +143,18 @@ def panel(trans_id, editor_title):
         except IndexError as e:
             app.logger.exception(e)
 
+    if request.args:
+        params = {k: v for k, v in request.args.items()}
+    if request.form:
+        for key, val in request.form.items():
+            params[key] = val
+
     return render_template(
         "schema_diff/index.html",
         _=gettext,
         trans_id=trans_id,
         editor_title=editor_title,
+        params=json.dumps(params)
     )
 
 

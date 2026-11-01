@@ -10,12 +10,13 @@
 """Implements Restore Utility"""
 
 import json
+import re
 
 from flask import render_template, request, current_app, Response
 from flask_babel import gettext as _
 # This unused import is required as API test cases will fail if we remove it,
 # Have to identify the cause and then remove it.
-from flask_security import current_user
+from flask_security import current_user, permissions_required
 from pgadmin.user_login_check import pga_login_required
 from pgadmin.misc.bgprocess.processes import BatchProcess, IProcessDesc
 from pgadmin.utils import PgAdminModule, fs_short_path, does_utility_exist, \
@@ -25,6 +26,7 @@ from pgadmin.utils.ajax import make_json_response, bad_request, \
 
 from config import PG_DEFAULT_DRIVER
 from pgadmin.utils.constants import MIMETYPE_APP_JS, SERVER_NOT_FOUND
+from pgadmin.tools.user_management.PgAdminPermissions import AllPermissionTypes
 
 # set template path for sql scripts
 MODULE_NAME = 'restore'
@@ -115,19 +117,6 @@ class RestoreMessage(IProcessDesc):
 @pga_login_required
 def index():
     return bad_request(errormsg=_("This URL cannot be called directly."))
-
-
-@blueprint.route("/restore.js")
-@pga_login_required
-def script():
-    """render own javascript"""
-    return Response(
-        response=render_template(
-            "restore/js/restore.js", _=_
-        ),
-        status=200,
-        mimetype=MIMETYPE_APP_JS
-    )
 
 
 def _get_create_req_data():
@@ -347,7 +336,7 @@ def get_restore_util_args(data, manager, server, driver, conn, filepath):
                      False)
         set_multiple('indexes', '--index', data, args, driver, conn, False)
 
-    args.append(fs_short_path(filepath))
+    args.append(filepath)
 
     return args
 
@@ -386,7 +375,43 @@ def use_restore_utility(data, manager, server, driver, conn, filepath):
     return None, utility, args
 
 
+def has_meta_commands(path, chunk_size=8 * 1024 * 1024):
+    """
+    Quickly detect lines starting with '\' in large SQL files.
+    Works even when lines cross chunk boundaries.
+    """
+    # Look for start-of-line pattern: beginning or after newline,
+    # optional spaces, then backslash
+    pattern = re.compile(br'(^|\n)[ \t]*\\')
+
+    try:
+        with open(path, "rb") as f:
+            prev_tail = b""
+            while chunk := f.read(chunk_size):
+                data = prev_tail + chunk
+
+                # Search for pattern
+                if pattern.search(data):
+                    return True
+
+                # Keep a small tail to preserve line boundary context
+                prev_tail = data[-10:]  # keep last few bytes
+    except FileNotFoundError:
+        current_app.logger.error("File not found.")
+    except PermissionError:
+        current_app.logger.error("Insufficient permissions to access.")
+
+    return False
+
+
 def use_sql_utility(data, manager, server, filepath):
+    # Check the meta commands in file.
+    if has_meta_commands(filepath):
+        return _("Restore blocked: the selected PLAIN SQL file contains psql "
+                 "meta-commands (for example \\! or \\i). For safety, "
+                 "pgAdmin does not execute meta-commands from PLAIN restores. "
+                 "Please remove meta-commands."), None, None
+
     utility = manager.utility('sql')
     ret_val = does_utility_exist(utility)
     if ret_val:
@@ -398,6 +423,7 @@ def use_sql_utility(data, manager, server, filepath):
 
 
 @blueprint.route('/job/<int:sid>', methods=['POST'], endpoint='create_job')
+@permissions_required(AllPermissionTypes.tools_restore)
 @pga_login_required
 def create_restore_job(sid):
     """

@@ -10,11 +10,11 @@
 import MainMenuFactory from './MainMenuFactory';
 import _ from 'lodash';
 import { checkMasterPassword, showQuickSearch } from '../../../static/js/Dialogs/index';
-import { pgHandleItemError } from '../../../static/js/utils';
 import { send_heartbeat, stop_heartbeat } from './heartbeat';
 import getApiInstance from '../../../static/js/api_instance';
 import usePreferences, { setupPreferenceBroadcast } from '../../../preferences/static/js/store';
 import checkNodeVisibility from '../../../static/js/check_node_visibility';
+import {appAutoUpdateNotifier} from '../../../static/js/helpers/appAutoUpdateNotifier';
 
 define('pgadmin.browser', [
   'sources/gettext', 'sources/url_for', 'sources/pgadmin',
@@ -194,7 +194,7 @@ define('pgadmin.browser', [
       obj.check_corrupted_db_file();
       obj.Events.on('pgadmin:browser:tree:add', obj.onAddTreeNode.bind(obj));
       obj.Events.on('pgadmin:browser:tree:update', obj.onUpdateTreeNode.bind(obj));
-      obj.Events.on('pgadmin:browser:tree:refresh', obj.onRefreshTreeNodeReact.bind(obj));
+      obj.Events.on('pgadmin:browser:tree:refresh', obj.onRefreshTreeNode.bind(obj));
       obj.Events.on('pgadmin-browser:tree:loadfail', obj.onLoadFailNode.bind(obj));
       obj.bind_beforeunload();
 
@@ -206,6 +206,8 @@ define('pgadmin.browser', [
     uiloaded: function() {
       this.set_master_password('');
       this.check_version_update();
+      // Assign and Update shortcuts from preferences.
+      MainMenuFactory.subscribeShortcutChanges();
     },
     check_corrupted_db_file: function() {
       getApiInstance().get(
@@ -270,12 +272,34 @@ define('pgadmin.browser', [
       checkMasterPassword(data, self.masterpass_callback_queue, cancel_callback);
     },
 
-    check_version_update: function() {
+    check_version_update: async function(trigger_update_check=false) {
       getApiInstance().get(
-        url_for('misc.upgrade_check')
+        url_for('misc.upgrade_check') + '?trigger_update_check=' + trigger_update_check
       ).then((res)=> {
         const data = res.data.data;
-        if(data.outdated) {
+        window.electronUI?.sendDataForAppUpdate({
+          'check_for_updates': data.check_for_auto_updates,
+        });
+        const isDesktopWithAutoUpdate = pgAdmin.server_mode == 'False' && data.check_for_auto_updates && data.auto_update_url !== '';
+        const isUpdateAvailable = data.outdated && data.upgrade_version_int > data.current_version_int;
+        const noUpdateMessage = 'No update available.';
+        // This is for desktop installers whose auto_update_url is mentioned in https://www.pgadmin.org/versions.json
+        if (isDesktopWithAutoUpdate) {
+          if (isUpdateAvailable) {
+            const message = `${gettext('You are currently running version %s of %s, however the current version is %s.', data.current_version, data.product_name, data.upgrade_version)}`;
+            appAutoUpdateNotifier(
+              message,
+              'warning',
+              () => {
+                window.electronUI?.sendDataForAppUpdate(data);
+              },
+              null,
+              'Update available',
+              'download_update'
+            );
+          }
+        } else if(data.outdated) {
+          //This is for server mode or auto-update not supported desktop installer or not mentioned auto_update_url
           pgAdmin.Browser.notifier.warning(
             `
             ${gettext('You are currently running version %s of %s, <br/>however the current version is %s.', data.current_version, data.product_name, data.upgrade_version)}
@@ -285,9 +309,14 @@ define('pgadmin.browser', [
             null
           );
         }
-
-      }).catch(function() {
-        // Suppress any errors
+        // If the user manually triggered a check for updates (trigger_update_check is true)
+        // and no update is available (data.outdated is false), show an info notification.
+        if (!data.outdated && trigger_update_check){
+          appAutoUpdateNotifier(noUpdateMessage, 'info', null, 10000);
+        }
+      }).catch((error)=>{
+        console.error('Error during version check', error);
+        pgAdmin.Browser.notifier.error(gettext(`${error.response?.data?.errormsg || error?.message}`));
       });
     },
 
@@ -373,6 +402,7 @@ define('pgadmin.browser', [
                 _m.callback = () => {
                   showQuickSearch();
                 };
+                _m.shortcut_preference =['browser', 'open_quick_search'];
               }
 
               return {
@@ -391,6 +421,9 @@ define('pgadmin.browser', [
                 checked: _m.checked,
                 below: _m.below,
                 applies: _m.applies,
+                permission: _m.permission,
+                shortcut_preference: _m.shortcut_preference,
+                shortcut:_m.shortcut
               };
             };
 
@@ -405,7 +438,7 @@ define('pgadmin.browser', [
               }
               _menus[m.name]['menu_items'] = sub_menu_items;
             }
-          } else  {
+          } else {
             console.warn(
               'Developer warning: Category \'' +
                   a +
@@ -1194,173 +1227,39 @@ define('pgadmin.browser', [
       }
     },
 
-    onRefreshTreeNodeReact: function(_i, _opts) {
-      this.tree.refresh(_i).then(() =>{
-        if (_opts?.success) _opts.success();
-      });
-    },
+    onRefreshTreeNode: async function(nodeItem, opts) {
+      this.tree.toggleItemLoader(nodeItem, true);
 
-    onRefreshTreeNode: function(_i, _opts) {
-      let _d = _i && this.tree.itemData(_i),
-        n = this.Nodes[_d?._type],
-        ctx = {
-          b: this, // Browser
-          d: _d, // current parent
-          i: _i, // current item
-          p: null, // path of the old object
-          pathOfTreeItems: [], // path items
-          t: this.tree, // Tree Api
-          o: _opts,
-        },
-        isOpen,
-        idx = -1;
+      const itemNodeData = nodeItem && this.tree.itemData(nodeItem);
+      let nodeObj = this.Nodes[itemNodeData?._type];
 
-      this.Events.trigger('pgadmin-browser:tree:refreshing', _i, _d, n);
+      // If the node is a collection node, we can directly refresh it.
+      if(!nodeObj?.collection_node) {
+        // If the node is not a collection node, we need to fetch its data
+        // from the server and update the tree node.
+        try {
+          const url = nodeObj.generate_url(nodeItem, 'nodes', itemNodeData, true);
+          const api = getApiInstance();
+          const resp = await api.get(url);
+          // server response data comes in result
+          const respData = resp.data.data || resp.data.result;
 
-      if (!n) {
-        _i = null;
-        ctx.i = null;
-        ctx.d = null;
-      } else {
-        isOpen = (this.tree.isInode(_i) && this.tree.isOpen(_i));
-      }
-
-      ctx.branch = ctx.t.serialize(
-        _i, {}, function(i, el, d) {
-          idx++;
-          if (!idx || (d.inode && d.open)) {
-            return {
-              _id: d._id, _type: d._type, branch: d.branch, open: d.open,
-            };
-          }
-        });
-
-      if (!n) {
-        ctx.t.destroy({
-          success: function() {
-            ctx.t = ctx.b.tree;
-            ctx.i = null;
-            ctx.b._refreshNode(ctx, ctx.branch);
-          },
-          error: function() {
-            let fail = _opts.o?.fail || _opts?.fail;
-
-            if (typeof(fail) == 'function') {
-              fail();
-            }
-          },
-        });
-        return;
-      }
-
-      let api = getApiInstance();
-      let fetchNodeInfo = function(__i, __d, __n) {
-        let info = __n.getTreeNodeHierarchy(__i),
-          url = __n.generate_url(__i, 'nodes', __d, true);
-
-        api.get(
-          url
-        ).then(({data: res})=> {
-          // Node information can come as result/data
-          let newData = res.result || res.data;
-
-          newData._label = newData.label;
-          newData.label = _.escape(newData.label);
-
-          ctx.t.setLabel(ctx.i, {label: newData.label});
-          ctx.t.addIcon(ctx.i, {icon: newData.icon});
-          ctx.t.setId(ctx.i, {id: newData.id});
-          if (newData.inode)
-            ctx.t.setInode(ctx.i, {inode: true});
-
-          // This will update the tree item data.
-          let itemData = ctx.t.itemData(ctx.i);
-          _.extend(itemData, newData);
-
-          if (
-            __n.can_expand && typeof(__n.can_expand) == 'function'
-          ) {
-            if (!__n.can_expand(itemData)) {
-              ctx.t.unload(ctx.i);
-              return;
-            }
-          }
-          ctx.b._refreshNode(ctx, ctx.branch);
-          let success = (ctx?.o?.success) || ctx.success;
-          if (success && typeof(success) == 'function') {
-            success();
-          }
-        }).catch(function(error) {
-          if (!pgHandleItemError(
-            error, {item: __i, info: info}
-          )) {
-            if(error.response.headers['content-type'] == 'application/json') {
-              let jsonResp = error.response.data ?? {};
-              if(error.response.status == 410 && jsonResp.success == 0) {
-                let parent = ctx.t.parent(ctx.i);
-
-                ctx.t.remove(ctx.i, {
-                  success: function() {
-                    if (parent) {
-                    // Try to refresh the parent on error
-                      try {
-                        pgBrowser.Events.trigger(
-                          'pgadmin:browser:tree:refresh', parent
-                        );
-                      } catch (e) { console.warn(e.stack || e); }
-                    }
-                  },
-                });
-              }
-            }
-
-            pgAdmin.Browser.notifier.pgNotifier('error', error, gettext('Error retrieving details for the node.'), function (msg) {
-              if (msg == 'CRYPTKEY_SET') {
-                fetchNodeInfo(__i, __d, __n);
-              } else {
-                console.warn(arguments);
-              }
+          if(respData) {
+            this.tree.update(nodeItem, {
+              ...itemNodeData, ...respData
             });
+            this.tree.setLabel(nodeItem, {label: respData.label});
+            this.tree.addIcon(nodeItem, {icon: respData.icon});
           }
-        });
-      };
-
-      if (n?.collection_node) {
-        let p = ctx.i = this.tree.parent(_i),
-          unloadNode = function() {
-            this.tree.unload(_i, {
-              success: function() {
-                _i = p;
-                _d = ctx.d = ctx.t.itemData(ctx.i);
-                n = ctx.b.Nodes[_d._type];
-                _i = p;
-                fetchNodeInfo(_i, _d, n);
-              },
-              fail: function() { console.warn(arguments); },
-            });
-          }.bind(this);
-        if (!this.tree.isInode(_i)) {
-          this.tree.setInode(_i, { success: unloadNode });
-        } else {
-          unloadNode();
+        } catch (error) {
+          console.error('Failed to refresh tree node:', error);
+          return;
         }
-      } else if (isOpen) {
-        this.tree.unload(_i, {
-          success: fetchNodeInfo.bind(this, _i, _d, n),
-          fail: function() {
-            console.warn(arguments);
-          },
-        });
-      } else if (!this.tree.isInode(_i) && _d.inode) {
-        this.tree.setInode(_i, {
-          success: fetchNodeInfo.bind(this, _i, _d, n),
-          fail: function() {
-            console.warn(arguments);
-          },
-        });
-      } else {
-        fetchNodeInfo(_i, _d, n);
       }
+
+      await this.tree.refresh(nodeItem);
+      this.tree.toggleItemLoader(nodeItem, false);
+      opts?.success?.();
     },
 
     onLoadFailNode: function(_nodeData) {
@@ -1604,38 +1503,7 @@ define('pgadmin.browser', [
       }
 
     },
-
-    editor_shortcut_keys: {
-      // Autocomplete sql command
-      'Ctrl-Space': 'autocomplete',
-      'Cmd-Space': 'autocomplete',
-
-      'Alt-Up': 'goLineUp',
-      'Alt-Down': 'goLineDown',
-
-      // Move word by word left/right
-      'Ctrl-Alt-Left': 'goGroupLeft',
-      'Cmd-Alt-Left': 'goGroupLeft',
-      'Ctrl-Alt-Right': 'goGroupRight',
-      'Cmd-Alt-Right': 'goGroupRight',
-
-      // Allow user to delete Tab(s)
-      'Shift-Tab': 'indentLess',
-    },
-    editor_options: {
-      tabSize: parseInt(pgBrowser.utils.tabSize),
-      wrapCode: pgBrowser.utils.wrapCode,
-      insert_pair_brackets: pgBrowser.utils.insertPairBrackets,
-      brace_matching: pgBrowser.utils.braceMatching,
-      indent_with_tabs: pgBrowser.utils.is_indent_with_tabs,
-      highlightSelectionMatches:pgBrowser.utils.highlightSelectionMatches
-    },
   });
-
-  // Use spaces instead of tab
-  if (pgBrowser.utils.useSpaces == 'True') {
-    pgAdmin.Browser.editor_shortcut_keys.Tab = 'insertSoftTab';
-  }
 
   return pgAdmin.Browser;
 });

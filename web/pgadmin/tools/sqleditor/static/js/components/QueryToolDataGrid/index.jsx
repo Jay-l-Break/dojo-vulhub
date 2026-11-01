@@ -23,7 +23,6 @@ import PropTypes from 'prop-types';
 import gettext from 'sources/gettext';
 import PgReactDataGrid from '../../../../../../static/js/components/PgReactDataGrid';
 import { isMac } from '../../../../../../static/js/keyboard_shortcuts';
-import { measureText } from '../../../../../../static/js/utils';
 
 export const ROWNUM_KEY = '$_pgadmin_rownum_key_$';
 export const GRID_ROW_SELECT_KEY = '$_pgadmin_gridrowselect_key_$';
@@ -71,9 +70,9 @@ const StyledPgReactDataGrid = styled(PgReactDataGrid)(({stripedRows, theme})=>({
       backgroundColor: theme.palette.primary.light + '!important',
     }
   },
-  ... stripedRows && {'& .rdg-row.rdg-row-even': {
+  ... (stripedRows && {'& .rdg-row.rdg-row-even': {
     backgroundColor: theme.palette.grey[400],
-  }},
+  }}),
   '& .rdg-row': {
     '& .rdg-cell:nth-of-type(1)': {
       backgroundColor: theme.palette.grey[600] + '!important',
@@ -109,7 +108,7 @@ function CustomRow(props) {
     dataGridExtras.onSelectedCellChange?.(null);
   }
   const handleKeyDown = (e)=>{
-    dataGridExtras.handleShortcuts(e);
+    if (e.target.role == 'gridcell') dataGridExtras.handleShortcuts(e);
     if(e.code === 'Enter' && !props.isRowSelected && props.selectedCellIdx > 0) {
       props.selectCell(props.row, props.viewportColumns?.find(columns => columns.idx === props.selectedCellIdx), true);
     }
@@ -166,7 +165,7 @@ SelectAllHeaderRenderer.propTypes = {
   isCellSelected: PropTypes.bool,
 };
 
-function SelectableHeaderRenderer({column, selectedColumns, onSelectedColumnsChange, isCellSelected}) {
+function SelectableHeaderRenderer({column, isSelected, onColumnSelected, isCellSelected}) {
   const cellRef = useRef();
   const eventBus = useContext(QueryToolEventsContext);
   const dataGridExtras = useContext(DataGridExtrasContext);
@@ -175,17 +174,9 @@ function SelectableHeaderRenderer({column, selectedColumns, onSelectedColumnsCha
     dataGridExtras.onSelectedCellChange?.(null);
   }
 
-  const onClick = ()=>{
-    const newSelectedCols = new Set(selectedColumns);
-    if (newSelectedCols.has(column.idx)) {
-      newSelectedCols.delete(column.idx);
-    } else {
-      newSelectedCols.add(column.idx);
-    }
-    onSelectedColumnsChange(newSelectedCols);
+  const onClick = (e)=>{
+    onColumnSelected(column.idx, isSelected, (e.nativeEvent).shiftKey);
   };
-
-  const isSelected = selectedColumns.has(column.idx);
 
   useLayoutEffect(() => {
     if (!isCellSelected) return;
@@ -215,8 +206,8 @@ function SelectableHeaderRenderer({column, selectedColumns, onSelectedColumnsCha
 }
 SelectableHeaderRenderer.propTypes = {
   column: PropTypes.object,
-  selectedColumns: PropTypes.objectOf(Set),
-  onSelectedColumnsChange: PropTypes.func,
+  isSelected: PropTypes.bool,
+  onColumnSelected: PropTypes.func,
   isCellSelected: PropTypes.bool,
 };
 
@@ -265,7 +256,7 @@ function cellClassGetter(col, isSelected, dataChangeStore, rowKeyGetter){
   };
 }
 
-function initialiseColumns(columns, rows, totalRowCount, columnWidthBy) {
+function initialiseColumns(columns, rows, totalRowCount, columnWidthBy, maxColumnDataDisplayLength) {
   let retColumns = [
     ...columns,
   ];
@@ -274,7 +265,7 @@ function initialiseColumns(columns, rows, totalRowCount, columnWidthBy) {
   canvasContext.font = '12px Roboto';
 
   for(const col of retColumns) {
-    col.width = getColumnWidth(col, rows, canvasContext, columnWidthBy);
+    col.width = getColumnWidth(col, rows, canvasContext, columnWidthBy, maxColumnDataDisplayLength);
     col.resizable = true;
     col.editorOptions = {
       commitOnOutsideClick: false,
@@ -305,9 +296,9 @@ function RowNumColFormatter({row, rowKeyGetter, rowIdx, dataChangeStore, onSelec
   } else if(rowKey in (dataChangeStore?.deleted || {})) {
     rownum = rownum+'-';
   }
-  return (<div className='QueryTool-rowNumCell' onClick={()=>{
+  return (<div className='QueryTool-rowNumCell' onClick={(e)=>{
     onSelectedColumnsChange(new Set());
-    onRowSelectionChange({ type: 'ROW', row: row, checked: !isRowSelected, isShiftClick: false});
+    onRowSelectionChange({ type: 'ROW', row: row, checked: !isRowSelected, isShiftClick: (e.nativeEvent).shiftKey});
   }} onKeyDown={()=>{/* already taken care by parent */}}>
     {rownum}
   </div>);
@@ -320,13 +311,16 @@ RowNumColFormatter.propTypes = {
   onSelectedColumnsChange: PropTypes.func,
 };
 
-function formatColumns(columns, dataChangeStore, selectedColumns, onSelectedColumnsChange, rowKeyGetter) {
+function formatColumns(columns, dataChangeStore, selectedColumns, onColumnSelected, onSelectedColumnsChange, rowKeyGetter) {
   let retColumns = [
     ...columns,
   ];
 
-  const HeaderRenderer = (props)=>{
-    return <SelectableHeaderRenderer {...props} selectedColumns={selectedColumns} onSelectedColumnsChange={onSelectedColumnsChange}/>;
+  const HeaderRenderer = ({column, ...props})=>{
+    return <SelectableHeaderRenderer {...props} column={column} isSelected={selectedColumns.has(column.idx)} onColumnSelected={onColumnSelected}/>;
+  };
+  HeaderRenderer.propTypes = {
+    column: PropTypes.object,
   };
 
   for(const [idx, col] of retColumns.entries()) {
@@ -343,18 +337,22 @@ function formatColumns(columns, dataChangeStore, selectedColumns, onSelectedColu
   return retColumns;
 }
 
-function getColumnWidth(column, rows, canvas, columnWidthBy) {
+function getColumnWidth(column, rows, canvasContext, columnWidthBy, maxColumnDataDisplayLength) {
   const dataWidthReducer = (longest, nextRow) => {
     let value = nextRow[column.key];
     if(_.isNull(value) || _.isUndefined(value)) {
       value = '';
     }
     value = value.toString();
+    // If the length of the value is very large then we do not use the entire value and truncate it.
+    if (value.length > maxColumnDataDisplayLength) {
+      value = `${value.substring(0, maxColumnDataDisplayLength)}`;
+    }
     return longest.length > value.length ? longest : value;
   };
 
   let columnHeaderLen = column.display_name.length > column.display_type.length ?
-    measureText(column.display_name, '12px Roboto').width : measureText(column.display_type, '12px Roboto').width;
+    canvasContext.measureText(column.display_name).width : canvasContext.measureText(column.display_type).width;
   /* padding 12,  margin 4, icon-width 15, */
   columnHeaderLen += 15 + 12 + 4;
   if(column.column_type_internal == 'geometry' || column.column_type_internal == 'geography') {
@@ -363,7 +361,7 @@ function getColumnWidth(column, rows, canvas, columnWidthBy) {
   let width = columnHeaderLen;
   if(typeof(columnWidthBy) == 'number') {
     /* padding 16, border 1px */
-    width = 16 + measureText(rows.reduce(dataWidthReducer, ''), '12px Roboto').width + 1;
+    width = 16 + canvasContext.measureText(rows.reduce(dataWidthReducer, '')).width + 1;
     if(width > columnWidthBy && columnWidthBy > 0) {
       width = columnWidthBy;
     }
@@ -371,13 +369,38 @@ function getColumnWidth(column, rows, canvas, columnWidthBy) {
       width = columnHeaderLen;
     }
   }
-  return width;
+
+  // If column width is set in window object then use that.
+  return window.columnWidths?.[column.display_name] || width;
 }
 
 export default function QueryToolDataGrid({columns, rows, totalRowCount, dataChangeStore,
-  onSelectedCellChange, selectedColumns, onSelectedColumnsChange, columnWidthBy, startRowNum, ...props}) {
+  onSelectedCellChange, selectedColumns, onSelectedColumnsChange, columnWidthBy, startRowNum, maxColumnDataDisplayLength, ...props}) {
   const [readyColumns, setReadyColumns] = useState([]);
+  const [lastSelectedColumn, setLastSelectedColumn] = useState(null);
   const eventBus = useContext(QueryToolEventsContext);
+  const onColumnSelected = (columnIdx, isSelected, isShiftClick)=>{
+    const newSelectedCols = new Set(selectedColumns);
+    const start = isShiftClick && lastSelectedColumn ? Math.min(columnIdx, lastSelectedColumn) : columnIdx;
+    const end = isShiftClick && lastSelectedColumn ? Math.max(columnIdx, lastSelectedColumn) : columnIdx;
+    for (let i = start; i <= end; i++) {
+      if (isSelected) {
+        if (newSelectedCols.size == 1 || !isShiftClick) {
+          newSelectedCols.delete(i);
+        } else{
+          newSelectedCols.delete(i+1);
+        }
+      }
+      else {
+        newSelectedCols.add(i);
+      }
+    }
+
+    props.onSelectedRowsChange(new Set());
+    setLastSelectedColumn(columnIdx);
+    onSelectedColumnsChange(newSelectedCols);
+  };
+
   const onSelectedColumnsChangeWrapped = (arg)=>{
     props.onSelectedRowsChange(new Set());
     onSelectedColumnsChange(arg);
@@ -409,14 +432,20 @@ export default function QueryToolDataGrid({columns, rows, totalRowCount, dataCha
     onSelectedCellChange, handleShortcuts, startRowNum
   }), [onSelectedCellChange]);
 
+  // Save column width to window object on resize
+  const handleColumnResize = (column, width) => {
+    window.columnWidths = window.columnWidths || {};
+    window.columnWidths[column.display_name] = width;
+  };
+
   useEffect(()=>{
-    let initCols = initialiseColumns(columns, rows, totalRowCount, columnWidthBy);
-    setReadyColumns(formatColumns(initCols, dataChangeStore, selectedColumns, onSelectedColumnsChangeWrapped, props.rowKeyGetter));
+    let initCols = initialiseColumns(columns, rows, totalRowCount, columnWidthBy, maxColumnDataDisplayLength);
+    setReadyColumns(formatColumns(initCols, dataChangeStore, selectedColumns, onColumnSelected, onSelectedColumnsChangeWrapped, props.rowKeyGetter));
   }, [columns]);
 
   useEffect(()=>{
     setReadyColumns((prevCols)=>{
-      return formatColumns(prevCols, dataChangeStore, selectedColumns, onSelectedColumnsChangeWrapped, props.rowKeyGetter);
+      return formatColumns(prevCols, dataChangeStore, selectedColumns, onColumnSelected, onSelectedColumnsChangeWrapped, props.rowKeyGetter);
     });
   }, [dataChangeStore, selectedColumns]);
 
@@ -432,6 +461,7 @@ export default function QueryToolDataGrid({columns, rows, totalRowCount, dataCha
         enableCellSelect={true}
         onCopy={handleCopy}
         onMultiCopy={handleCopy}
+        onColumnResize={handleColumnResize}
         renderers={{
           renderRow: renderCustomRow,
         }}
@@ -452,9 +482,9 @@ export default function QueryToolDataGrid({columns, rows, totalRowCount, dataCha
 
           // This is needed to prevent Codemirror from triggering copy.
           if(mode == 'SELECT' && (e.ctrlKey || e.metaKey) && e.key !== 'Control' && e.keyCode == 67) {
-            // taken care by handleCopy.
             e.preventDefault();
             e.stopPropagation();
+            handleCopy();
           }
         }}
         {...props}
@@ -475,4 +505,5 @@ QueryToolDataGrid.propTypes = {
   rowKeyGetter: PropTypes.func,
   columnWidthBy: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   startRowNum: PropTypes.number,
+  maxColumnDataDisplayLength: PropTypes.number,
 };

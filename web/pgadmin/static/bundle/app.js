@@ -7,7 +7,6 @@
 //
 //////////////////////////////////////////////////////////////
 
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 import BrowserComponent from '../js/BrowserComponent';
 import MainMenuFactory from '../../browser/static/js/MainMenuFactory';
@@ -50,6 +49,10 @@ define('app', [
 
   // Create menus after all modules are initialized.
   MainMenuFactory.createMainMenus();
+
+  // Listen to menu click events and callback pgAdmin js code.
+  // This will be internally ignored if not running in electron.
+  MainMenuFactory.listenToElectronMenuClick();
 
   const root = ReactDOM.createRoot(document.querySelector('#root'));
   root.render(

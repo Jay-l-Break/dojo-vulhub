@@ -2,12 +2,12 @@
 //
 // pgAdmin 4 - PostgreSQL Tools
 //
-// Copyright (C) 2013 - 2023, The pgAdmin Development Team
+// Copyright (C) 2013 - 2025, The pgAdmin Development Team
 // This software is released under the PostgreSQL Licence
 //
 //////////////////////////////////////////////////////////////
 
-import React, { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import ReactDOMServer from 'react-dom/server';
 import PropTypes from 'prop-types';
 
@@ -54,9 +54,10 @@ import currentQueryHighlighterExtn from '../extensions/currentQueryHighlighter';
 import { autoCompleteCompartment, eolCompartment, indentNewLine, eol } from '../extensions/extraStates';
 import { OS_EOL } from '../../../../../tools/sqleditor/static/js/components/QueryToolConstants';
 import { useTheme } from '@mui/material';
+import plpgsqlFoldService from '../extensions/plpgsqlFoldService';
 
-const arrowRightHtml = ReactDOMServer.renderToString(<KeyboardArrowRightRoundedIcon style={{width: '16px'}} />);
-const arrowDownHtml = ReactDOMServer.renderToString(<ExpandMoreRoundedIcon style={{width: '16px'}} />);
+const arrowRightHtml = ReactDOMServer.renderToString(<KeyboardArrowRightRoundedIcon style={{width: '16px', fill: 'currentcolor'}} />);
+const arrowDownHtml = ReactDOMServer.renderToString(<ExpandMoreRoundedIcon style={{width: '16px', fill: 'currentcolor'}} />);
 
 function handleDrop(e, editor) {
   let dropDetails = null;
@@ -101,7 +102,6 @@ function handlePaste(e) {
   checkTrojanSource(copiedText, true);
 }
 
-
 function insertTabWithUnit({ state, dispatch }) {
   if (state.selection.ranges.some(r => !r.empty))
     return indentMore({ state, dispatch });
@@ -119,7 +119,6 @@ function insertTabWithUnit({ state, dispatch }) {
 /* React wrapper for CodeMirror */
 const defaultExtensions = [
   highlightSpecialChars(),
-  drawSelection(),
   rectangularSelection(),
   dropCursor(),
   crosshairCursor(),
@@ -157,11 +156,8 @@ const defaultExtensions = [
   }),
   autoCompleteCompartment.of([]),
   EditorView.clipboardOutputFilter.of((text, state)=>{
-    const lineSep = state.facet(eol);
-    // Fetch the primary selection from the editor's current state.
-    const selection = state.selection.main;
-    return state.doc.sliceString(selection.from, selection.to, lineSep);
-  })
+    return CustomEditorView.getSelectionFromState(state);
+  }),
 ];
 
 export default function Editor({
@@ -174,9 +170,10 @@ export default function Editor({
 
   const editorContainerRef = useRef();
   const editor = useRef();
-  const defaultOptions = {
+  const finalOptions = {
     lineNumbers: true,
     foldGutter: true,
+    ...options
   };
 
   const preferencesStore = usePreferences();
@@ -189,27 +186,12 @@ export default function Editor({
 
   useEffect(() => {
     if (!checkIsMounted()) return;
-    const finalOptions = { ...defaultOptions, ...options };
     const osEOL = OS_EOL === 'crlf' ? '\r\n' : '\n';
     const finalExtns = [
-      (language == 'json') ? json() : sql({dialect: PgSQL}),
       ...defaultExtensions,
     ];
     if (finalOptions.lineNumbers) {
       finalExtns.push(lineNumbers());
-    }
-    if (finalOptions.foldGutter) {
-      finalExtns.push(foldGutter({
-        markerDOM: (open)=>{
-          let icon = document.createElement('span');
-          if(open) {
-            icon.innerHTML = arrowDownHtml;
-          } else {
-            icon.innerHTML = arrowRightHtml;
-          }
-          return icon;
-        },
-      }));
     }
     if (editorContainerRef.current) {
       const state = EditorState.create({
@@ -288,8 +270,10 @@ export default function Editor({
   useEffect(() => {
     if (!checkIsMounted()) return;
     const keys = keymap.of([
-      customKeyMap??[], defaultKeymap, closeBracketsKeymap, historyKeymap,
-      foldKeymap, completionKeymap
+      // Filtering out the default keymaps so that it uses the custom keymaps.
+      customKeyMap??[], ...completionKeymap.filter(k => k.key != 'Ctrl-Space'),
+      defaultKeymap.filter(k => k.key != 'Mod-/'), closeBracketsKeymap, historyKeymap,
+      foldKeymap
     ].flat());
     editor.current?.dispatch({
       effects: shortcuts.current.reconfigure(keys)
@@ -299,13 +283,15 @@ export default function Editor({
   useEffect(() => {
     if (!checkIsMounted()) return;
     let pref = preferencesStore.getPreferencesForModule('sqleditor');
+    let editorPref = preferencesStore.getPreferencesForModule('editor');
     let newConfigExtn = [];
 
-    const fontSize = calcFontSize(pref.sql_font_size);
+    const fontSize = calcFontSize(editorPref.sql_font_size);
     newConfigExtn.push(EditorView.theme({
       '& .cm-scroller .cm-content': {
         fontSize: fontSize,
-        fontFamily: `${pref.sql_font_family}, ${theme.typography.fontFamilySourceCode}`,
+        fontVariantLigatures: editorPref.sql_font_ligatures ? 'normal' : 'none',
+        fontFamily: `${editorPref.sql_font_family}, ${theme.typography.fontFamilySourceCode}`,
       },
       '.cm-gutters': {
         fontSize: fontSize,
@@ -313,6 +299,7 @@ export default function Editor({
     }));
 
     const autoCompOptions = {
+      defaultKeymap: false,
       icons: false,
       addToOptions: [{
         render: (completion) => {
@@ -348,11 +335,11 @@ export default function Editor({
     }
 
     newConfigExtn.push(
-      EditorState.tabSize.of(pref.tab_size),
+      EditorState.tabSize.of(editorPref.tab_size),
     );
-    if (pref.use_spaces) {
+    if (editorPref.use_spaces) {
       newConfigExtn.push(
-        indentUnit.of(' '.repeat(pref.tab_size)),
+        indentUnit.of(' '.repeat(editorPref.tab_size)),
       );
     } else {
       newConfigExtn.push(
@@ -360,31 +347,69 @@ export default function Editor({
       );
     }
 
-    if(pref.indent_new_line) {
+    if(editorPref.indent_new_line) {
       newConfigExtn.push(indentNewLine.of(true));
     } else {
       newConfigExtn.push(indentNewLine.of(false));
     }
 
-    if (pref.wrap_code) {
+    if (editorPref.wrap_code) {
       newConfigExtn.push(
         EditorView.lineWrapping
       );
     }
 
-    if (pref.insert_pair_brackets) {
+    if (editorPref.insert_pair_brackets) {
       newConfigExtn.push(closeBrackets());
     }
 
-    if (pref.highlight_selection_matches){
+    if (editorPref.highlight_selection_matches){
       newConfigExtn.push(highlightSelectionMatches());
     }
 
-    if (pref.brace_matching) {
+    if (editorPref.brace_matching) {
       newConfigExtn.push(bracketMatching());
     }
     if (pref.underline_query_cursor){
       newConfigExtn.push(currentQueryHighlighterExtn());
+    }
+
+    if(!editorPref.plain_editor_mode) {
+      // lang override
+      if(language == 'json') {
+        newConfigExtn.push(json());
+      } else {
+        newConfigExtn.push(sql({dialect: PgSQL}));
+      }
+    }
+
+    if(editorPref.code_folding && finalOptions.foldGutter) {
+      newConfigExtn.push(foldGutter({
+        markerDOM: (open)=>{
+          let icon = document.createElement('span');
+          if(open) {
+            icon.innerHTML = arrowDownHtml;
+          } else {
+            icon.innerHTML = arrowRightHtml;
+          }
+          return icon;
+        },
+      }));
+    }
+
+    const CURSOR_BLINK_RATE_MAP = {
+      'none': 0,
+      'slow': 1800,
+      'medium': 1200,
+      'fast': 600,
+    };
+    newConfigExtn.push(drawSelection({
+      cursorBlinkRate: CURSOR_BLINK_RATE_MAP[editorPref.cursor_blink_rate] ?? 1200
+    }));
+
+    // add fold service conditionally
+    if(!editorPref.plain_editor_mode && editorPref.code_folding && language == 'pgsql') {
+      newConfigExtn.push(plpgsqlFoldService);
     }
 
     editor.current.dispatch({

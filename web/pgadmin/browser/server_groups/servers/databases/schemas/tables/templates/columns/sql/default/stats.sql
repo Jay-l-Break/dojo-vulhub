@@ -5,7 +5,10 @@ SELECT
     most_common_vals AS {{ conn|qtIdent(_('Most common values')) }},
     most_common_freqs AS {{ conn|qtIdent(_('Most common frequencies')) }},
     histogram_bounds AS {{ conn|qtIdent(_('Histogram bounds')) }},
-    correlation AS {{ conn|qtIdent(_('Correlation')) }}
+    correlation AS {{ conn|qtIdent(_('Correlation')) }},
+    most_common_elems AS {{ conn|qtIdent(_('Most common elements')) }},
+    most_common_elem_freqs AS {{ conn|qtIdent(_('Most common elements frequencies')) }},
+    elem_count_histogram AS {{ conn|qtIdent(_('Histogram element count')) }}
 FROM
     pg_catalog.pg_stats
 WHERE

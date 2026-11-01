@@ -20,7 +20,8 @@ import { io } from 'socketio';
 import { copyToClipboard } from '../../../../../static/js/clipboard';
 import 'pgadmin.browser.keyboard';
 import gettext from 'sources/gettext';
-
+import { useApplicationState } from '../../../../../settings/static/ApplicationStateProvider';
+import { LAYOUT_EVENTS } from '../../../../../static/js/helpers/Layout';
 
 const Root = styled(Box)(()=>({
   width: '100%',
@@ -111,21 +112,26 @@ function psql_terminal_io(term, socket, platform, pgAdmin) {
   });
 
   term.onKey(function (ev) {
-    socket.emit('socket_input', {'input': ev.key, 'key_name': ev.domEvent.code});
+    let key = ev.key;
+    /*
+      Using the Option/Alt key to type special characters (such as '\', '[', etc.) often does not register
+      the correct character in ev.key when using xterm.js. This is due to limitations in how browsers and
+      xterm.js handle modifier keys across platforms.
+      To address this, if the Alt/Option key is pressed and the key is a single character,
+      we use ev.domEvent.key, which more reliably represents the actual character intended by the user.
+    */
+    if (ev.domEvent.altKey && ev.domEvent.key.length === 1){
+      key = ev.domEvent.key;
+    }
+    socket.emit('socket_input', {'input': key, 'key_name': ev.domEvent.code});
   });
 }
 
 function psql_Addon(term) {
   const fitAddon = new FitAddon();
   term.loadAddon(fitAddon);
-
   term.loadAddon(new WebLinksAddon());
-
   term.loadAddon(new SearchAddon());
-
-  fitAddon.fit();
-  term.resize(15, 50);
-  fitAddon.fit();
   return fitAddon;
 }
 
@@ -137,34 +143,11 @@ function psql_socket() {
   });
 }
 
-export default function  PsqlComponent({ params, pgAdmin }) {
+export default function  PsqlComponent({ params, pgAdmin, panelId, panelDocker }) {
   const theme = useTheme();
   const termRef = React.useRef(null);
   const containerRef = React.useRef(null);
-
-  const initializePsqlTool = (params)=>{
-    const term = new Terminal({
-      cursorBlink: true,
-      scrollback: 5000,
-    });
-    /* Addon for fitAddon, webLinkAddon, SearchAddon */
-    const fitAddon = psql_Addon(term);
-
-    term.open(containerRef.current);
-
-    /*  Socket */
-    const socket = psql_socket();
-
-    psql_socket_io(socket, params.is_enable, params.sid, params.db, params.server_type, fitAddon, term, params.role);
-
-    psql_terminal_io(term, socket, params.platform, pgAdmin);
-
-    /*  Set terminal size */
-    setTimeout(function(){
-      socket.emit('resize', {'cols': term.cols, 'rows': term.rows});
-    }, 1000);
-    return [term, socket];
-  };
+  const {saveToolData, isSaveToolDataEnabled} = useApplicationState();
 
   const setTheme = ()=>{
     if(termRef.current) {
@@ -179,26 +162,59 @@ export default function  PsqlComponent({ params, pgAdmin }) {
   };
 
   useEffect(()=>{
-    const [term, socket] = initializePsqlTool(params);
+    // Initialize terminal
+    const term = new Terminal({
+      cursorBlink: true,
+      scrollback: 5000,
+    });
     termRef.current = term;
-
     setTheme();
 
-    termRef.current.focus();
+    /* Addon for fitAddon, webLinkAddon, SearchAddon */
+    const fitAddon = psql_Addon(term);
 
-    termRef.current.focus();
+    /*  Open terminal */
+    term.open(containerRef.current);
+
+    /*  Socket */
+    const socket = psql_socket();
+    psql_socket_io(socket, params.is_enable, params.sid, params.db, params.server_type, fitAddon, term, params.role);
+    psql_terminal_io(term, socket, params.platform, pgAdmin);
+
+    const setTerminalSize = ()=>{
+      // Set terminal size
+      fitAddon.fit();
+      setTimeout(function(){
+        socket.emit('resize', {'cols': term.cols, 'rows': term.rows});
+      }, 1000);
+
+      // Focus on terminal
+      termRef.current.focus();
+    };
+
+    setTerminalSize();
+
+    // Save tool data if enabled
+    if(isSaveToolDataEnabled('psql')){
+      saveToolData('psql', params,  params.trans_id, null);
+    }
+
+    const deregFocus = panelDocker.eventBus.registerListener(LAYOUT_EVENTS.ACTIVE, _.debounce((currentTabId)=>{
+      if(panelId == currentTabId) {
+        setTerminalSize();
+      }
+    }, 100));
 
     return () => {
+      deregFocus();
       term.dispose();
       socket.disconnect();
     };
-
   }, []);
 
   useEffect(()=>{
     setTheme();
   },[theme]);
-
 
   return (
     <Root ref={containerRef}>
@@ -213,7 +229,10 @@ PsqlComponent.propTypes = {
     db: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
     server_type: PropTypes.string,
     role: PropTypes.string,
-    platform: PropTypes.string
+    platform: PropTypes.string,
+    trans_id: PropTypes.number
   }),
   pgAdmin: PropTypes.object.isRequired,
+  panelId: PropTypes.string,
+  panelDocker: PropTypes.object,
 };

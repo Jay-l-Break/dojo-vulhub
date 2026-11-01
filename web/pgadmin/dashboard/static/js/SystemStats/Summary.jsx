@@ -6,7 +6,7 @@
 // This software is released under the PostgreSQL Licence
 //
 //////////////////////////////////////////////////////////////
-import React, { useState, useEffect, useRef, useReducer, useMemo } from 'react';
+import { useState, useEffect, useRef, useReducer, useMemo } from 'react';
 import { styled } from '@mui/material/styles';
 import gettext from 'sources/gettext';
 import PropTypes from 'prop-types';
@@ -250,26 +250,26 @@ function SummaryWrapper(props) {
   return (
     <>
       <Grid container spacing={0.5} sx={{height: 'auto', padding: '0px !important', marginBottom: '4px'}}>
-        <Grid item md={6}>
+        <Grid size={{ md: 6 }}>
           <div className='Summary-tableContainer'>
             <div className='Summary-containerHeader'>{gettext('OS information')}</div>
             <SummaryTable data={props.osStats} />
           </div>
         </Grid>
-        <Grid item md={6} sx={{padding: '4px'}}>
+        <Grid sx={{padding: '4px'}} size={{ md: 6 }}>
           <ChartContainer id='hpc-graph' title={gettext('Process & handle count')} datasets={props.processHandleCount.datasets}  errorMsg={props.errorMsg} isTest={props.isTest}>
             <StreamingChart data={props.processHandleCount} dataPointSize={DATA_POINT_SIZE} xRange={X_AXIS_LENGTH} options={options} showSecondAxis={true} />
           </ChartContainer>
         </Grid>
       </Grid>
       <Grid container spacing={0.5} sx={{height: 'auto', padding: '0px !important', marginBottom: '4px'}}>
-        <Grid item md={6}>
+        <Grid size={{ md: 6 }}>
           <div className='Summary-tableContainer'>
             <div className='Summary-containerHeader'>{gettext('CPU information')}</div>
             <SummaryTable data={props.cpuStats} />
           </div>
         </Grid>
-        <Grid item md={6} sm={12}>
+        <Grid size={{ md: 6, sm: 12 }}>
         </Grid>
       </Grid>
     </>

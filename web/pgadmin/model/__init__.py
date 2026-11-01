@@ -33,7 +33,7 @@ import config
 #
 ##########################################################################
 
-SCHEMA_VERSION = 43
+SCHEMA_VERSION = 48
 
 ##########################################################################
 #
@@ -57,6 +57,29 @@ roles_users = db.Table(
     db.Column('user_id', db.Integer(), db.ForeignKey(USER_ID)),
     db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
 )
+
+
+class PgAdminDbArrayString(types.TypeDecorator):
+    cache_ok = True
+    impl = types.String
+
+    def process_bind_param(self, value, dialect):
+        try:
+            if len(value) == 0:
+                return None
+
+            return ",".join(value)
+        except Exception as _:
+            return None
+
+    def process_result_value(self, value, dialect):
+        try:
+            if value == '':
+                return []
+
+            return value.split(',')
+        except Exception as _:
+            return []
 
 
 class PgAdminDbBinaryString(types.TypeDecorator):
@@ -92,6 +115,27 @@ class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(128), unique=True, nullable=False)
     description = db.Column(db.String(256), nullable=False)
+    # permissions needs to be an array, use custom type to support
+    # both SQLite and PostgreSQL
+    permissions = db.Column(PgAdminDbArrayString())
+
+    def get_permissions(self):
+        from pgadmin.tools.user_management.PgAdminPermissions \
+            import AllPermissionTypes
+        if self.name == 'Administrator':
+            return AllPermissionTypes.list()
+
+        return super().get_permissions()
+
+
+# We override the default UserMixin to change behaviour of has_permission
+# Administrator has all permissions
+class CustomUserMixin(UserMixin):
+    def has_permission(self, permission: str) -> bool:
+        if 'Administrator' in self.roles:
+            return True
+
+        return super().has_permission(permission)
 
 
 class User(db.Model, UserMixin):
@@ -178,6 +222,7 @@ class Server(db.Model):
         lazy='joined'
     )
     db_res = db.Column(db.Text(), nullable=True)
+    db_res_type = db.Column(db.String(32), default='databases')
     passexec_cmd = db.Column(db.Text(), nullable=True)
     passexec_expiration = db.Column(db.Integer(), nullable=True)
     bgcolor = db.Column(db.String(10), nullable=True)
@@ -201,6 +246,11 @@ class Server(db.Model):
         nullable=False
     )
     tunnel_identity_file = db.Column(db.String(64), nullable=True)
+    tunnel_prompt_password = db.Column(
+        db.Integer(), db.CheckConstraint(
+            'tunnel_prompt_password >= 0 AND tunnel_prompt_password <= 1'),
+        nullable=False
+    )
     tunnel_password = db.Column(PgAdminDbBinaryString())
     tunnel_keep_alive = db.Column(db.Integer(), nullable=True, default=0)
     shared = db.Column(db.Boolean(), nullable=False)
@@ -347,6 +397,16 @@ class QueryHistoryModel(db.Model):
     last_updated_flag = db.Column(db.String(), nullable=False)
 
 
+class ApplicationState(db.Model):
+    """Define the application state SQL table."""
+    __tablename__ = 'application_state'
+    uid = db.Column(db.Integer(), db.ForeignKey(USER_ID), nullable=False,
+                    primary_key=True)
+    id = db.Column(db.Integer(),nullable=False,primary_key=True)
+    connection_info = db.Column(MutableDict.as_mutable(types.JSON))
+    tool_data = db.Column(PgAdminDbBinaryString())
+
+
 class Database(db.Model):
     """
     Define a Database.
@@ -428,6 +488,11 @@ class SharedServer(db.Model):
         nullable=False
     )
     tunnel_identity_file = db.Column(db.String(64), nullable=True)
+    tunnel_prompt_password = db.Column(
+        db.Integer(), db.CheckConstraint(
+            'tunnel_prompt_password >= 0 AND tunnel_prompt_password <= 1'),
+        nullable=False
+    )
     tunnel_password = db.Column(PgAdminDbBinaryString())
     tunnel_keep_alive = db.Column(db.Integer(), nullable=True)
     shared = db.Column(db.Boolean(), nullable=False)

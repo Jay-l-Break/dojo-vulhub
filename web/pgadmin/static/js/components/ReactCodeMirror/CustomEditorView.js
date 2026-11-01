@@ -1,3 +1,12 @@
+/////////////////////////////////////////////////////////////
+//
+// pgAdmin 4 - PostgreSQL Tools
+//
+// Copyright (C) 2013 - 2025, The pgAdmin Development Team
+// This software is released under the PostgreSQL Licence
+//
+//////////////////////////////////////////////////////////////
+
 import {
   EditorView
 } from '@codemirror/view';
@@ -201,7 +210,13 @@ export default class CustomEditorView extends EditorView {
   }
 
   getSelection() {
-    return this.state.selection.ranges.map((range)=>this.state.sliceDoc(range.from, range.to)).join('') ?? '';
+    return CustomEditorView.getSelectionFromState(this.state);
+  }
+
+  static getSelectionFromState(state) {
+    // function to get selection from EditorState
+    const lineSep = state.facet(eol);
+    return state.selection.ranges.map((range)=>state.sliceDoc(range.from, range.to)).join(lineSep) ?? '';
   }
 
   replaceSelection(newValue) {

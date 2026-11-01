@@ -11,6 +11,8 @@ import pgAdmin from 'sources/pgadmin';
 import Menu, { MenuItem } from '../../../static/js/helpers/Menu';
 import getApiInstance from '../../../static/js/api_instance';
 import url_for from 'sources/url_for';
+import withCheckPermission from './withCheckPermission';
+import usePreferences from '../../../preferences/static/js/store';
 
 const MAIN_MENUS = [
   { label: gettext('File'), name: 'file', id: 'mnu_file', index: 0, addSeprator: true, hasDynamicMenuItems: false },
@@ -44,6 +46,12 @@ export default class MainMenuFactory {
     });
   }
 
+  static listenToElectronMenuClick() {
+    window.electronUI?.onMenuClick((menuName)=>{
+      MainMenuFactory.electronCallbacks[menuName]?.();
+    });
+  }
+
   static createMainMenus() {
     pgAdmin.Browser.MainMenus = [];
     MAIN_MENUS.forEach((_menu) => {
@@ -59,10 +67,6 @@ export default class MainMenuFactory {
     // enable disable will take care of dynamic menus.
     MainMenuFactory.enableDisableMenus();
 
-    window.electronUI?.onMenuClick((menuName)=>{
-      MainMenuFactory.electronCallbacks[menuName]?.();
-    });
-
     window.electronUI?.setMenus(MainMenuFactory.toElectron());
   }
 
@@ -71,7 +75,7 @@ export default class MainMenuFactory {
   }
 
   static createMenuItem(options) {
-    return new MenuItem({...options, callback: () => {
+    const callback = () => {
       // Some callbacks registered in 'callbacks' check and call specifiec callback function
       if (options.module && 'callbacks' in options.module && options.module.callbacks[options.callback]) {
         options.module.callbacks[options.callback].apply(options.module, [options.data, pgAdmin.Browser.tree?.selected()]);
@@ -89,14 +93,44 @@ export default class MainMenuFactory {
           pgAdmin.Browser.notifier.error(gettext('Error in opening window'));
         });
       }
-    }}, (menu, item)=> {
+    };
+    return new MenuItem({...options, callback: withCheckPermission(options, callback)}, (menu, item)=> {
       pgAdmin.Browser.Events.trigger('pgadmin:enable-disable-menu-items', menu, item);
       window.electronUI?.enableDisableMenuItems(menu?.serialize(), item?.serialize());
     });
   }
 
+  static updateShortcutsFromPreferences(prefStore)  {
+    const updateShortcuts = (item) => {
+      if (!item || typeof item !== 'object') return;
+
+      Object.values(item).forEach((menuItem) => {
+        if (!menuItem || typeof menuItem !== 'object') return;
+
+        if (menuItem?.shortcut_preference) {
+          const [module, key] = menuItem.shortcut_preference;
+          menuItem.shortcut = prefStore.getPreferences(module, key)?.value || null;
+        }
+        // Recurse only if it's a nested object.
+        if (!menuItem.name) {
+          updateShortcuts(menuItem);
+        }
+      });
+    };
+    let allMenus = pgAdmin.Browser?.all_menus_cache || {};
+    Object.values(allMenus).forEach(updateShortcuts);
+    MainMenuFactory.createMainMenus();
+  };
+
+  // Assign and Update menu shortcuts using preference.
+  static subscribeShortcutChanges() {
+    MainMenuFactory.updateShortcutsFromPreferences(usePreferences.getState());
+    usePreferences.subscribe(MainMenuFactory.updateShortcutsFromPreferences);
+  }
+
   static enableDisableMenus(item) {
-    let itemData = item ? pgAdmin.Browser.tree.itemData(item) : undefined;
+    item = item || pgAdmin.Browser.tree?.selected();
+    let itemData = pgAdmin.Browser.tree?.itemData(item);
 
     const checkForItems = (items)=>{
       items.forEach((mitem) => {

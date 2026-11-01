@@ -9,7 +9,7 @@
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 
 import { Box, Grid } from '@mui/material';
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
@@ -32,7 +32,7 @@ import { ResultGridComponent } from './ResultGridComponent';
 import { openSocket, socketApiGet } from '../../../../../static/js/socket_instance';
 import { parseApiError } from '../../../../../static/js/api_instance';
 import { usePgAdmin } from '../../../../../static/js/PgAdminProvider';
-
+import { useApplicationState } from '../../../../../settings/static/ApplicationStateProvider';
 
 function generateFinalScript(script_array, scriptHeader, script_body) {
   _.each(Object.keys(script_array).reverse(), function (s) {
@@ -117,6 +117,8 @@ export function SchemaDiffCompare({ params }) {
   const [isInit, setIsInit] = useState(true);
 
   const pgAdmin = usePgAdmin();
+  const {saveToolData, isSaveToolDataEnabled, getToolContent } = useApplicationState();
+  const oldSchemaDiffData = useRef(null);
 
   useEffect(() => {
     schemaDiffToolContext.api.get(url_for('schema_diff.servers')).then((res) => {
@@ -137,6 +139,29 @@ export function SchemaDiffCompare({ params }) {
     });
   }, []);
 
+  useEffect(()=>{
+    if(params.params?.restore == 'true'){
+      async function fetchData() {
+        const response = await getToolContent(params.transId);
+        oldSchemaDiffData.current = response?.data;
+      }
+      fetchData();
+    }
+  },[params.transId]);
+
+
+  useEffect(()=>{
+    if(oldSchemaDiffData.current){
+      _.each(oldSchemaDiffData.current,(d)=>{
+        if(d.diff_type == TYPE.SOURCE){
+          setSelectedSourceSid(d.selectedSourceSid);
+        }else{
+          setSelectedTargetSid(d.selectedTargetSid);
+        }
+      });
+    }
+  },[sourceGroupServerList]);
+
   useEffect(() => {
     // Register all eventes for debugger.
     eventBus.registerListener(
@@ -144,7 +169,6 @@ export function SchemaDiffCompare({ params }) {
 
     eventBus.registerListener(
       SCHEMA_DIFF_EVENT.TRIGGER_SELECT_DATABASE, triggerSelectDatabase);
-
 
     eventBus.registerListener(
       SCHEMA_DIFF_EVENT.TRIGGER_SELECT_SCHEMA, triggerSelectSchema);
@@ -159,7 +183,7 @@ export function SchemaDiffCompare({ params }) {
       SCHEMA_DIFF_EVENT.TRIGGER_GENERATE_SCRIPT, triggerGenerateScript);
 
   }, []);
-
+  
   function checkAndSetSourceData(diff_type, selectedOption) {
     if(selectedOption == null) {
       setSelectedRowIds([]);
@@ -264,6 +288,15 @@ export function SchemaDiffCompare({ params }) {
       pgAdmin.Browser.notifier.alert(gettext('Selection Error'),
         gettext('Please select the different source and target.'));
     } else {
+
+      if(isSaveToolDataEnabled('schema_diff')){
+        let toolData =  [
+          { diff_type: TYPE.SOURCE, selectedSourceSid: sourceData.sid, selectedSourceDid:sourceData.did, selectedSourceScid: sourceData.scid},
+          { diff_type: TYPE.TARGET, selectedTargetSid:targetData.sid, selectedTargetDid:targetData.did, selectedTargetScid:targetData.scid },
+        ];
+        saveToolData('schema_diff', null, params.transId, toolData);
+      }
+
       setLoaderText('Comparing objects... (this may take a few minutes)...');
       let url_params = {
         'trans_id': params.transId,
@@ -626,7 +659,6 @@ export function SchemaDiffCompare({ params }) {
       url_for('schema_diff.databases', { 'sid': sid })
     ).then((res) => {
       res.data.data.map((opt) => {
-
         if (opt.is_maintenance_db) {
           if (diff_type == TYPE.SOURCE) {
             setSelectedSourceDid(opt.value);
@@ -641,9 +673,20 @@ export function SchemaDiffCompare({ params }) {
       } else {
         setTargetDatabaseList(res.data.data);
       }
-
     });
   }
+
+  useEffect(()=>{
+    if(oldSchemaDiffData.current){
+      _.each(oldSchemaDiffData.current,(d)=>{
+        if(d.diff_type == TYPE.SOURCE){
+          setSelectedSourceDid(d.selectedSourceDid);
+        }else{
+          setSelectedTargetDid(d.selectedTargetDid);
+        }
+      });
+    }
+  },[targetDatabaseList, sourceDatabaseList]);
 
   function getSchemaList(sid, did, diff_type) {
     schemaDiffToolContext.api.get(
@@ -654,9 +697,20 @@ export function SchemaDiffCompare({ params }) {
       } else {
         setTargetSchemaList(res.data.data);
       }
-
     });
   }
+
+  useEffect(()=>{
+    if(oldSchemaDiffData.current){
+      _.each(oldSchemaDiffData.current,(d)=>{
+        if(d.diff_type == TYPE.SOURCE){
+          setSelectedSourceScid(d.selectedSourceScid);
+        }else{
+          setSelectedTargetScid(d.selectedTargetScid);
+        }
+      });
+    }
+  },[targetSchemaList, sourceSchemaList]);
 
   function showConnectServer(result, sid, diff_type, serverList) {
     schemaDiffToolContext.modal.showModal(gettext('Connect to server'), (closeModal) => {
@@ -693,7 +747,7 @@ export function SchemaDiffCompare({ params }) {
           direction="row"
           alignItems="center"
         >
-          <Grid item lg={7} md={7} sm={10} xs={10}>
+          <Grid size={{ lg: 7, md: 7, sm: 10, xs: 10 }}>
             <InputComponent
               label={gettext('Select Source')}
               serverList={sourceGroupServerList}
@@ -706,7 +760,7 @@ export function SchemaDiffCompare({ params }) {
               onServerSchemaChange={handleServerSchemaChange}
             ></InputComponent>
           </Grid>
-          <Grid item lg={5} md={5} sm={2} xs={2} sx={{  display: 'flex',flexDirection: 'row-reverse',paddingRight: '0.3rem'}}>
+          <Grid sx={{  display: 'flex',flexDirection: 'row-reverse',paddingRight: '0.3rem'}} size={{ lg: 5, md: 5, sm: 2, xs: 2 }}>
             <PgButtonGroup size="small">
               <PgIconButton data-test='schema-diff-help' title={gettext('Help')} icon={<HelpIcon />} onClick={onHelpClick} />
             </PgButtonGroup>
@@ -717,7 +771,7 @@ export function SchemaDiffCompare({ params }) {
           direction="row"
           alignItems="center"
         >
-          <Grid item lg={7} md={7} sm={10} xs={10}>
+          <Grid size={{ lg: 7, md: 7, sm: 10, xs: 10 }}>
             <InputComponent
               label={gettext('Select Target')}
               serverList={sourceGroupServerList}
@@ -731,7 +785,7 @@ export function SchemaDiffCompare({ params }) {
             ></InputComponent>
           </Grid>
 
-          <Grid item lg={5} md={5} sm={12} xs={12}>
+          <Grid size={{ lg: 5, md: 5, sm: 12, xs: 12 }}>
             <SchemaDiffButtonComponent
               sourceData={{
                 'sid': selectedSourceSid,

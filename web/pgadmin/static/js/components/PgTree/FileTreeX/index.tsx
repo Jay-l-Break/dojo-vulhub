@@ -32,7 +32,7 @@ export class FileTreeX extends React.Component<IFileTreeXProps> {
   private readonly pseudoActiveFileDec: Decoration;
   private activeFile: FileOrDir;
   private pseudoActiveFile: FileOrDir;
-  private readonly wrapperRef: React.RefObject<HTMLDivElement> = React.createRef();
+  private readonly wrapperRef: React.RefObject<HTMLDivElement | null> = React.createRef();
   private readonly events: Notificar<FileTreeXEvent>;
   private readonly disposables: DisposablesComposite;
   private keyboardHotkeys: KeyboardHotkeys;
@@ -152,6 +152,7 @@ export class FileTreeX extends React.Component<IFileTreeXProps> {
       resize: this.resize,
       showLoader: this.showLoader,
       hideLoader: this.hideLoader,
+      toggleItemLoader: this.toggleItemLoader,
     };
 
     model.decorations.addDecoration(this.activeFileDec);
@@ -554,6 +555,17 @@ export class FileTreeX extends React.Component<IFileTreeXProps> {
       dir._metadata.data.extraClasses.push(cssClass);
     }
 
+  };
+
+  private readonly toggleItemLoader = (item: FileOrDir, show=false) => {
+    const ref = FileTreeItem.itemIdToRefMap.get(item.id);
+    if (ref) {
+      if (show) {
+        this.showLoader(ref);
+      } else {
+        this.hideLoader(ref);
+      }
+    }
   };
 
   private readonly showLoader = (ref: HTMLDivElement) => {

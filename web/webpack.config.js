@@ -26,6 +26,16 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 const CopyPlugin = require('copy-webpack-plugin');
 const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
+let isSharpAvailable = true;
+try {
+  const sharp = require('sharp');
+  // It is possible that sharp is installed but fails on running
+  sharp();
+} catch {
+  isSharpAvailable = false;
+  console.warn('Sharp is not available, image optimization will be disabled.');
+}
+
 const envType = PRODUCTION ? 'production': 'development';
 const devToolVal = PRODUCTION ? false : 'eval';
 const analyzerMode = process.env.ANALYZE=='true' ? 'static' : 'disabled';
@@ -40,7 +50,7 @@ const providePlugin = new webpack.ProvidePlugin({
   'moment': 'moment',
   'window.moment':'moment',
   process: 'process/browser',
-  Buffer: ['buffer', 'Buffer']
+  Buffer: ['buffer', 'Buffer'],
 });
 
 // Helps in debugging each single file, it extracts the module files
@@ -121,22 +131,19 @@ module.exports = [{
         'webfonts-loader',
       ],
     },{
-      test: /\.jsx?$/,
-      exclude: [/node_modules/, /vendor/],
-      use: {
-        loader: 'babel-loader',
-      },
-    },{
       test: /\.m?js$/,
       resolve: {
         fullySpecified: false
       },
     },{
-      test: /\.tsx?$|\.ts?$/,
+      test: /\.tsx?$|\.ts?$|\.jsx?$/,
+      exclude: [/node_modules/, /vendor/],
       use: {
         loader: 'babel-loader',
         options: {
-          presets: [['@babel/preset-env', {'modules': 'commonjs', 'useBuiltIns': 'usage', 'corejs': 3}], '@babel/preset-react', '@babel/preset-typescript'],
+          presets: [['@babel/preset-env', {'modules': 'commonjs', 'useBuiltIns': 'usage', 'corejs': 3}], ['@babel/preset-react', {
+            'runtime': 'automatic'
+          }], '@babel/preset-typescript'],
           plugins: ['@babel/plugin-proposal-class-properties', '@babel/proposal-object-rest-spread'],
         },
       },
@@ -351,19 +358,29 @@ module.exports = [{
           compress: true,
         },
       }),
+    ].concat(isSharpAvailable ? [
       new ImageMinimizerPlugin({
         test: /\.(jpe?g|png|gif)$/i,
         minimizer: {
-          implementation: ImageMinimizerPlugin.imageminMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {
-            plugins: [
-              ['mozjpeg', { progressive: true }],
-              ['optipng', { optimizationLevel: 7 }],
-            ],
+            encodeOptions: {
+              jpeg: {
+                quality: 100,
+              },
+              webp: {
+                lossless: true,
+              },
+              avif: {
+                lossless: true,
+              },
+              png: {},
+              gif: {},
+            },
           },
         },
       }),
-    ] : [],
+    ] : []) : [],
     splitChunks: {
       cacheGroups: {
         vendor_sqleditor: {

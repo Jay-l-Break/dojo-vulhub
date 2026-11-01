@@ -7,7 +7,6 @@
 //
 //////////////////////////////////////////////////////////////
 
-import React from 'react';
 import { PgMenu, PgMenuDivider, PgMenuItem, PgSubMenu } from './Menu';
 import PropTypes from 'prop-types';
 import gettext from 'sources/gettext';
@@ -27,6 +26,7 @@ export default function ContextMenu({menuItems, position, onClose, label='contex
       }}
       hasCheck={hasCheck}
       checked={menuItem.checked}
+      shortcut={menuItem.shortcut} 
     >{menuItem.label}</PgMenuItem>;
   };
 

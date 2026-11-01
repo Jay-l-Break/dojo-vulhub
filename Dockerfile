@@ -1,4 +1,4 @@
-FROM dpage/pgadmin4:9.2@sha256:52cb72a9e3da275324ca0b9bb3891021366d501aad375db34584a7bca8ce02ff
+FROM dpage/pgadmin4:9.10@sha256:5db07bd334fd801c982dd74a1bbc8d98b81a3684dac21efa9e368c677811c98c
 
 COPY web/ /pgadmin4/
 COPY seed_public/servers.json /pgadmin4/servers.json

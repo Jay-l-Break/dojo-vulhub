@@ -2,7 +2,8 @@ const webpackShimAlias = require('./webpack.shim').resolveAlias;
 
 const webpackAliasToJestModules = ()=>{
   const ret = {
-    '\\.svg': '<rootDir>/regression/javascript/__mocks__/svg.js'
+    '\\.svg\\?svgr$': '<rootDir>/regression/javascript/__mocks__/svg.js',
+    'react-dom/server': 'react-dom/server.edge',
   };
   Object.keys(webpackShimAlias).forEach((an)=>{
     // eg - sources: ./pgadmin/static/js/ to '^sources/(.*)$': '<rootDir>/pgadmin/static/js/$1'
@@ -51,7 +52,7 @@ module.exports = {
   ],
   'testEnvironment': 'jsdom',
   'transformIgnorePatterns': [
-    '[/\\\\]node_modules[/\\\\](?!react-dnd|dnd-core|@react-dnd|react-resize-detector).+\\.(js|jsx|mjs|cjs|ts|tsx)$',
+    '[/\\\\]node_modules[/\\\\](?!react-dnd|dnd-core|@react-dnd|react-resize-detector|react-data-grid).+\\.(js|jsx|mjs|cjs|ts|tsx)$',
     '^.+\\.module\\.(css|sass|scss)$'
   ]
 };

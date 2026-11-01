@@ -7,7 +7,7 @@
 //
 //////////////////////////////////////////////////////////////
 
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { styled } from '@mui/material/styles';
 import gettext from 'sources/gettext';
 import PropTypes from 'prop-types';
@@ -42,7 +42,7 @@ export const STATUS = {
 function ConnectionStatusIcon({status}) {
   if(status == STATUS.CONNECTING) {
     return <CircularProgress style={{height: '18px', width: '18px'}} />;
-  } else if(status == STATUS.CONNECTED || status == STATUS.FAILED) {
+  } else if(status == STATUS.CONNECTED) {
     return <ConnectedIcon />;
   } else {
     return <DisconnectedIcon />;

@@ -104,13 +104,14 @@ export function showERDSqlTool(parentData, erdSqlId, queryToolTitle, queryToolMo
     },
     database: {
       _id: parentData.did,
-      label: parentData.database,
+      _label: parentData.database,
     },
   };
 
   const gridUrl = generateUrl(transId, parentData, erdSqlId);
   launchQueryTool(queryToolMod, transId, gridUrl, queryToolTitle, {});
 }
+
 
 export function launchQueryTool(queryToolMod, transId, gridUrl, queryToolTitle, params) {
   let retVal = queryToolMod.launch(transId, gridUrl, true, queryToolTitle, params);

@@ -20,7 +20,7 @@ which will fork a Python server process and display the UI.
 ## Prerequisites
 1. Install Node.js 20 and above (https://nodejs.org/en/download)
 2. yarn (https://yarnpkg.com/getting-started/install)
-3. Python 3.8 and above (https://www.python.org/downloads/)
+3. Python 3.9 and above (https://www.python.org/downloads/)
 4. PostgreSQL server (https://www.postgresql.org/download)
 
 Start by enabling Corepack, if it isn't already;
@@ -42,9 +42,9 @@ installed. Then, you can run the following commands on a *nix system to
 download the required packages and build the bundle:
 
 ```bash
-(venv) $ cd $PGADMIN4_SRC
-(venv) $ make install-node
-(venv) $ make bundle
+$ cd $PGADMIN4_SRC
+$ make install-node
+$ make bundle
 ```
 
 On Windows systems (where "make" is not available), the following commands
@@ -59,7 +59,7 @@ C:\$PGADMIN4_SRC\web> yarn run bundle
 # Configuring the Python Environment
 
 In order to run the Python code, a suitable runtime environment is required.
-Python version 3.8 and later are currently supported. It is recommended that a
+Python version 3.9 and later are currently supported. It is recommended that a
 Python Virtual Environment is setup for this purpose, rather than using the
 system Python environment. On Linux and Mac systems, the process is fairly
 simple - adapt as required for your distribution:
@@ -81,7 +81,7 @@ simple - adapt as required for your distribution:
    so update that to the latest:
 
    ```bash
-   $ pip install --upgrade pip
+   (venv) $ pip install --upgrade pip
    ```
 
 4. Ensure that a PostgreSQL installation's bin/ directory is in the path (so

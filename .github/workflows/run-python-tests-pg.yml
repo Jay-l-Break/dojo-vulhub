@@ -21,12 +21,17 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, ubuntu-22.04, windows-latest]
-        pgver: [13, 14, 15, 16, 17]
+        pgver: [13, 14, 15, 16, 17, 18]
 
     runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Update python version
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
       - name: Setup the PGDG APT repo on Linux
         if: ${{ matrix.os == 'ubuntu-22.04' }}
@@ -51,13 +56,14 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-22.04' }}
         run: |
           sudo apt update
-          sudo apt install -y libpq-dev libffi-dev libssl-dev libkrb5-dev zlib1g-dev postgresql-${{ matrix.pgver }} postgresql-${{ matrix.pgver }}-pldebugger pgagent
+          sudo apt install -y libpq-dev libffi-dev libssl-dev libkrb5-dev zlib1g-dev postgresql-${{ matrix.pgver }} postgresql-${{ matrix.pgver }}-pldebugger pgagent postgresql-${{ matrix.pgver }}-postgis-3
 
       - name: Install platform dependencies on macOS
         if: ${{ matrix.os == 'macos-latest' }}
         run: |
           brew install postgresql@${{ matrix.pgver }}
           echo "/opt/homebrew/opt/postgresql@${{ matrix.pgver }}/bin" >> $GITHUB_PATH
+
 
       - name: Uninstall PostgreSQL if already present on windows
         if: ${{ matrix.os == 'windows-latest' }}
@@ -73,12 +79,20 @@ jobs:
         run: |
           FOR /f "delims=" %%F IN ('python tools\get_sb_package.py "https://www.postgresql.org/applications-v2.xml" "postgresql_${{ matrix.pgver }}" "windows-x64"') DO SET INSTALLER_EXE=%%F
           ECHO Running %INSTALLER_EXE%...
-          %INSTALLER_EXE% --prefix C:\PostgreSQL\${{ matrix.pgver }} --datadir C:\PostgreSQL\${{ matrix.pgver }}\data --serverport 59${{ matrix.pgver }} --superpassword postgres --install_runtimes 0 --mode unattended --unattendedmodeui none --disable-components pgAdmin,stackbuilder --enable-components server,commandlinetools"
+          %INSTALLER_EXE% --prefix C:\PostgreSQL_custom\${{ matrix.pgver }} --datadir C:\PostgreSQL_custom\${{ matrix.pgver }}\data --serverport 59${{ matrix.pgver }} --superpassword postgres --install_runtimes 0 --mode unattended --unattendedmodeui none --disable-components pgAdmin,stackbuilder --enable-components server,commandlinetools"
           choco install -y mitkerberos
 
           REM Ignore error 3010 (reboot required)
           IF %ERRORLEVEL% EQU 3010 cmd /c "exit /b 0"
         shell: cmd
+
+      - name: Add pg_config path to PATH
+        shell: pwsh
+        run: |
+          $pgPath = "C:\\PostgreSQL_custom\\${{ matrix.pgver }}\\bin"
+          Write-Output $pgPath
+          Add-Content -Path $env:GITHUB_PATH -Value $pgPath
+          pg_config --version
 
       - name: Create the tablespace directory on Linux
         if: ${{ matrix.os == 'ubuntu-22.04' }}
@@ -113,6 +127,7 @@ jobs:
 
           psql -U postgres -p 59${{ matrix.pgver }} -c 'CREATE EXTENSION pgagent;'
           psql -U postgres -p 59${{ matrix.pgver }} -c 'CREATE EXTENSION pldbgapi;'
+          psql -U postgres -p 59${{ matrix.pgver }} -c 'CREATE EXTENSION postgis;'
 
       - name: Start PostgreSQL on macOS
         if: ${{ matrix.os == 'macos-latest' }}

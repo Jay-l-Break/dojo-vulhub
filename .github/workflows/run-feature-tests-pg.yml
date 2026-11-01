@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        pgver: [13, 14, 15, 16, 17]
+        pgver: [13, 14, 15, 16, 17, 18]
 
     runs-on: ubuntu-22.04
 
@@ -131,7 +131,7 @@ jobs:
                 "comment": "PostgreSQL ${{ matrix.pgver }} Server",
                 "db_username": "postgres",
                 "host": "/var/run/postgresql",
-                "db_password": "postgres",
+                "db_password": "",
                 "db_port": 59${{ matrix.pgver }},
                 "maintenance_db": "postgres",
                 "sslmode": "prefer",
@@ -154,7 +154,7 @@ jobs:
       - name: Upgrade yarn
         run: |
           yarn set version berry
-          yarn set version 3
+          yarn set version 4
 
       - name: Build the JS bundle
         run: |

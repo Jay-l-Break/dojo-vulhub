@@ -16,6 +16,7 @@ from ldap3 import Connection, Server, Tls, ALL, ALL_ATTRIBUTES, ANONYMOUS,\
 from ldap3.core.exceptions import LDAPSocketOpenError, LDAPBindError,\
     LDAPInvalidScopeError, LDAPAttributeError, LDAPInvalidFilterError,\
     LDAPStartTLSError, LDAPSSLConfigurationError
+from ldap3.utils.conv import escape_filter_chars
 from flask_babel import gettext
 from urllib.parse import urlparse
 
@@ -187,11 +188,11 @@ class LDAPAuthentication(BaseAuthentication):
         """Add the ldap user to the internal SQLite database."""
         if config.LDAP_AUTO_CREATE_USER:
             if config.LDAP_DN_CASE_SENSITIVE:
-                user = User.query.filter_by(username=self.username).first()
+                user = User.query.filter_by(username=self.username,
+                                            auth_source=LDAP).first()
             else:
-                user = User.query.filter(
-                    func.lower(User.username) == func.lower(
-                        self.username)).first()
+                user = User.query.filter_by(username=func.lower(self.username),
+                                            auth_source=LDAP).first()
 
             if user is None:
                 create_msg = ("Creating user {0} with email {1} "
@@ -212,10 +213,8 @@ class LDAPAuthentication(BaseAuthentication):
         ca_cert_file = getattr(config, 'LDAP_CA_CERT_FILE', None)
         cert_file = getattr(config, 'LDAP_CERT_FILE', None)
         key_file = getattr(config, 'LDAP_KEY_FILE', None)
-        cert_validate = ssl.CERT_NONE
-
-        if ca_cert_file and cert_file and key_file:
-            cert_validate = ssl.CERT_REQUIRED
+        cert_required = getattr(config, 'LDAP_CERT_VALIDATE', True)
+        cert_validate = ssl.CERT_REQUIRED if cert_required else ssl.CERT_NONE
 
         try:
             tls = Tls(
@@ -278,8 +277,10 @@ class LDAPAuthentication(BaseAuthentication):
             elif not search_base_dn or search_base_dn == '<Search-Base-DN>':
                 search_base_dn = config.LDAP_BASE_DN
 
-            search_filter = "({0}={1})".format(config.LDAP_USERNAME_ATTRIBUTE,
-                                               self.username)
+            search_filter = "({0}={1})".format(
+                config.LDAP_USERNAME_ATTRIBUTE,
+                escape_filter_chars(self.username)
+            )
             if config.LDAP_SEARCH_FILTER:
                 search_filter = "(&{0}{1})".format(search_filter,
                                                    config.LDAP_SEARCH_FILTER)

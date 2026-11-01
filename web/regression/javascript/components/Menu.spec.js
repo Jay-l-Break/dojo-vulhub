@@ -7,7 +7,6 @@
 //
 //////////////////////////////////////////////////////////////
 
-import React from 'react';
 
 import { withTheme } from '../fake_theme';
 import { fireEvent, render, screen } from '@testing-library/react';
@@ -82,7 +81,7 @@ describe('Menu', ()=>{
         }
       });
       const menuItem = screen.getByRole('menuitem');
-      expect(menuItem.textContent).toBe('Test(Ctrl + Shift + K)');
+      expect(menuItem.textContent).toBe('Test Ctrl + Shift + K');
     });
 
     it('not checked', ()=>{

@@ -25,9 +25,11 @@ import { showRenameTab } from '../../Dialogs';
 import usePreferences from '../../../../preferences/static/js/store';
 import _ from 'lodash';
 import UtilityView from '../../UtilityView';
-import ToolView from '../../ToolView';
+import ToolView, { getToolTabParams } from '../../ToolView';
+import { ApplicationStateProvider, useApplicationState } from '../../../../settings/static/ApplicationStateProvider';
+import { BROWSER_PANELS, WORKSPACES } from '../../../../browser/static/js/constants';
 
-function TabTitle({id, closable, defaultInternal}) {
+export function TabTitle({id, closable, defaultInternal}) {
   const layoutDocker = React.useContext(LayoutDockerContext);
   const internal = layoutDocker?.find(id)?.internal ?? defaultInternal;
   const [attrs, setAttrs] = useState({
@@ -44,7 +46,7 @@ function TabTitle({id, closable, defaultInternal}) {
   }, []);
 
   useEffect(()=>{
-    const deregister = layoutDocker.eventBus.registerListener(LAYOUT_EVENTS.REFRESH_TITLE, _.debounce((panelId)=>{
+    const deregister = layoutDocker.eventBus.registerListener(LAYOUT_EVENTS.REFRESH_TITLE, (panelId)=>{
       if(panelId == id) {
         const internal = layoutDocker?.find(id)?.internal??{};
         setAttrs({
@@ -52,8 +54,9 @@ function TabTitle({id, closable, defaultInternal}) {
           title: internal.title,
           tooltip: internal.tooltip ?? internal.title,
         });
+        layoutDocker.saveLayout();
       }
-    }, 100));
+    });
 
     return ()=>deregister?.();
   }, []);
@@ -247,7 +250,7 @@ export class LayoutDocker {
         if(child.children) {
           flattenLayout(child, arr);
         } else {
-          arr.push(...child.tabs??[]);
+          arr.push(...(child.tabs ?? []));
         }
       });
     };
@@ -393,10 +396,13 @@ export default function Layout({groups, noContextGroups, getLayoutInstance, layo
   const layoutDockerObj = React.useMemo(()=>new LayoutDocker(layoutId, props.defaultLayout, resetToTabPanel, noContextGroups), []);
   const prefStore = usePreferences();
   const dynamicTabsStyleRef = useRef();
+  const saveAppStateRef = useRef(prefStore?.getPreferencesForModule('misc')?.save_app_state);
+  const { deleteToolData } = useApplicationState();
 
   useEffect(()=>{
     layoutDockerObj.eventBus.registerListener(LAYOUT_EVENTS.REMOVE, (panelId)=>{
       layoutDockerObj.close(panelId);
+      deleteToolData(panelId);
     });
 
     layoutDockerObj.eventBus.registerListener(LAYOUT_EVENTS.CONTEXT, (e, id, extraMenus)=>{
@@ -406,6 +412,8 @@ export default function Layout({groups, noContextGroups, getLayoutInstance, layo
 
   useEffect(()=>{
     const dynamicTabs = prefStore.getPreferencesForModule('browser')?.dynamic_tabs;
+    const saveAppState = prefStore?.getPreferencesForModule('misc')?.save_app_state;
+
     // Add a class to set max width for non dynamic Tabs
     if(!dynamicTabs && !dynamicTabsStyleRef.current) {
       const css = '.dock-tab:not(div.dock-tab-active) { max-width: 180px; }',
@@ -418,6 +426,12 @@ export default function Layout({groups, noContextGroups, getLayoutInstance, layo
       dynamicTabsStyleRef.current.remove();
       dynamicTabsStyleRef.current = null;
     }
+
+    if(!saveAppState && saveAppStateRef.current){
+      layoutDockerObj.saveLayout();
+    }
+    saveAppStateRef.current = saveAppState;
+
   }, [prefStore]);
 
   const getTabMenuItems = (panelId)=>{
@@ -462,44 +476,93 @@ export default function Layout({groups, noContextGroups, getLayoutInstance, layo
     return ret;
   };
 
+  const saveTab = (tab) => {
+  // 'tab' here is the full TabData object, potentially with 'title', 'content', etc.
+  // We only want to save the 'id' and any custom properties needed by loadTab.
+    const savedTab = { id: tab.id };
+    if (saveAppStateRef.current && tab.metaData && !BROWSER_PANELS.DEBUGGER_TOOL.includes(tab.id.split('_')[0])) {
+    // add custom properties that were part of the original TabBase
+      const updatedMetaData = {
+        ...tab.metaData,
+        tabParams: {
+          ...( tab.metaData.tabParams || {}),
+          cached: tab?.cached,
+          internal: tab?.internal,
+          workSpace: layoutDockerObj?.layoutId.split('-')[1] || WORKSPACES.DEFAULT
+        },
+        restore: true,
+      };
+      savedTab.metaData = updatedMetaData;
+    }
+    return savedTab;
+  };
+
+  const flatDefaultLayout = useMemo(()=>{
+    const flat = [];
+    const flattenLayout = (box)=>{
+      box.children.forEach((child)=>{
+        if(child.children) {
+          flattenLayout(child);
+        }
+        else {
+          flat.push(...(child.tabs ?? []));
+        }
+      });
+    };
+    flattenLayout(props.defaultLayout.dockbox);
+    return flat;
+  }, [props.defaultLayout]);
+
+  const loadTab = (tab)=>{
+    const tabData = flatDefaultLayout.find((t)=>t.id == tab.id);
+    if(!tabData && tab.metaData) {
+      return LayoutDocker.getPanel(getToolTabParams(tab.id, tab.metaData.toolUrl, tab.metaData.formParams, tab.metaData.tabParams, tab.metaData?.restore));
+    }
+    return tabData;
+  };
+
   const contextMenuItems = getTabMenuItems(contextPanelId)
     .concat(contextExtraMenus ? [{type: 'separator'}, ...contextExtraMenus] : []);
 
   return (
-    <LayoutDockerContext.Provider value={layoutDockerObj}>
-      <Box height="100%" width="100%" display={isLayoutVisible ? 'initial' : 'none'} >
-        {useMemo(()=>(<DockLayout
-          style={{
-            height: '100%',
-          }}
-          ref={(obj)=>{
-            if(obj) {
-              layoutDockerObj.layoutObj = obj;
-              getLayoutInstance?.(layoutDockerObj);
-              layoutDockerObj.loadLayout(savedLayout);
-            }
-          }}
-          groups={defaultGroups}
-          onLayoutChange={(l, currentTabId, direction)=>{
-            if(Object.values(LAYOUT_EVENTS).indexOf(direction) > -1) {
-              layoutDockerObj.eventBus.fireEvent(LAYOUT_EVENTS[direction.toUpperCase()], currentTabId);
-              layoutDockerObj.saveLayout(l);
-            } else if(direction && direction != 'update') {
-              layoutDockerObj.eventBus.fireEvent(LAYOUT_EVENTS.CHANGE, currentTabId);
-              layoutDockerObj.saveLayout(l);
-            }
-          }}
-          {...props}
-        />), [])}
-      </Box>
-      <div id="layout-portal"></div>
-      <ContextMenu menuItems={contextMenuItems} position={contextPos} onClose={()=>setContextPos([null, null, null])}
-        label="Layout Context Menu" />
-      {enableToolEvents && <>
-        <UtilityView dockerObj={layoutDockerObj} />
-        <ToolView dockerObj={layoutDockerObj} />
-      </>}
-    </LayoutDockerContext.Provider>
+    <ApplicationStateProvider>
+      <LayoutDockerContext.Provider value={layoutDockerObj}>
+        <Box height="100%" width="100%" display={isLayoutVisible ? 'initial' : 'none'} >
+          {useMemo(()=>(<DockLayout
+            style={{
+              height: '100%',
+            }}
+            ref={(obj)=>{
+              if(obj) {
+                layoutDockerObj.layoutObj = obj;
+                getLayoutInstance?.(layoutDockerObj);
+                layoutDockerObj.loadLayout(savedLayout);
+              }
+            }}
+            loadTab={loadTab}
+            saveTab={saveTab}
+            groups={defaultGroups}
+            onLayoutChange={(l, currentTabId, direction)=>{
+              if(Object.values(LAYOUT_EVENTS).indexOf(direction) > -1) {
+                layoutDockerObj.eventBus.fireEvent(LAYOUT_EVENTS[direction.toUpperCase()], currentTabId);
+                layoutDockerObj.saveLayout(l);
+              } else if(direction && direction != 'update') {
+                layoutDockerObj.eventBus.fireEvent(LAYOUT_EVENTS.CHANGE, currentTabId);
+                layoutDockerObj.saveLayout(l);
+              }
+            }}
+            {...props}
+          />), [])}
+        </Box>
+        <div id="layout-portal"></div>
+        <ContextMenu menuItems={contextMenuItems} position={contextPos} onClose={()=>setContextPos([null, null, null])}
+          label="Layout Context Menu" />
+        {enableToolEvents && <>
+          <UtilityView dockerObj={layoutDockerObj} />
+          <ToolView dockerObj={layoutDockerObj} />
+        </>}
+      </LayoutDockerContext.Provider>
+    </ApplicationStateProvider>
   );
 }
 

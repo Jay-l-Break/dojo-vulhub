@@ -15,6 +15,8 @@ MIMETYPE_APP_HTML = 'text/html'
 MIMETYPE_APP_JS = 'application/javascript'
 MIMETYPE_APP_JSON = 'application/json'
 
+NO_CACHE_CONTROL = 'no-cache, no-store, must-revalidate'
+
 # Preference labels
 PREF_LABEL_KEYBOARD_SHORTCUTS = gettext('Keyboard shortcuts')
 PREF_LABEL_DISPLAY = gettext('Display')
@@ -92,6 +94,9 @@ BINARY_PATHS = {
          "isDefault": False},
         {"version": "170000", "next_major_version": "180000",
          "serverType": gettext("EDB Advanced Server 17"), "binaryPath": None,
+         "isDefault": False},
+        {"version": "180000", "next_major_version": "190000",
+         "serverType": gettext("EDB Advanced Server 18"), "binaryPath": None,
          "isDefault": False}
     ],
     "pg_bin_paths": [
@@ -109,11 +114,20 @@ BINARY_PATHS = {
          "isDefault": False},
         {"version": "170000", "next_major_version": "180000",
          "serverType": gettext("PostgreSQL 17"), "binaryPath": None,
+         "isDefault": False},
+        {"version": "180000", "next_major_version": "190000",
+         "serverType": gettext("PostgreSQL 18"), "binaryPath": None,
          "isDefault": False}
     ]
 }
 
-UTILITIES_ARRAY = ['pg_dump', 'pg_dumpall', 'pg_restore', 'psql']
+UTILITIES_ARRAY = ['pg_dumpall', 'pg_dump', 'pg_restore', 'psql']
+
+BG_PROCESS_ERROR_MSGS = {
+    3221225781: gettext('Unable to find a dll needed by the utility. Ensure '
+                        '.dll files needed by the utility are in the same '
+                        'folder as your executable.')
+}
 
 ENTER_EMAIL_ADDRESS = "Email address: "
 USER_NOT_FOUND = gettext("The specified user ID (%s) could not be found.")
@@ -160,3 +174,6 @@ DATA_TYPE_WITH_LENGTH = [1560, 'bit', 1561, 'bit[]',
                          1015, 'varchar[]', 'character varying[]',
                          'vector', 'vector[]', 'halfvec', 'halfvec[]',
                          'sparsevec', 'sparsevec[]']
+
+RESTRICTION_TYPE_DATABASES = 'databases'
+RESTRICTION_TYPE_SQL = 'sql'

@@ -40,7 +40,7 @@ export default function ExplainStatistics({explainTable}) {
   return (
     <StyledBox p={1}>
       <Grid container spacing={1}>
-        <Grid item lg={6} md={12}>
+        <Grid size={{ lg: 6, md: 12 }}>
           <div className='ExplainStatistics-title'>{gettext('Statistics per Node Type')}</div>
           <Table >
             <thead>
@@ -68,7 +68,7 @@ export default function ExplainStatistics({explainTable}) {
             </tbody>
           </Table>
         </Grid>
-        <Grid item lg={6} md={12}>
+        <Grid size={{ lg: 6, md: 12 }}>
           <div className='ExplainStatistics-title'>{gettext('Statistics per Relation')}</div>
           <Table>
             <thead>

@@ -21,7 +21,7 @@ import json
 
 from sqlalchemy import or_
 
-from config import PG_DEFAULT_DRIVER, ALLOW_SAVE_PASSWORD, SHARED_STORAGE
+from config import PG_DEFAULT_DRIVER, ALLOW_SAVE_PASSWORD
 from werkzeug.user_agent import UserAgent
 from flask import Response, url_for, render_template, session, current_app
 from flask import request
@@ -29,7 +29,7 @@ from flask_babel import gettext
 from pgadmin.tools.sqleditor.utils.query_tool_connection_check \
     import query_tool_connection_check
 from pgadmin.user_login_check import pga_login_required
-from flask_security import current_user
+from flask_security import current_user, permissions_required
 from pgadmin.misc.file_manager import Filemanager
 from pgadmin.tools.sqleditor.command import QueryToolCommand, ObjectRegistry, \
     SQLFilter
@@ -42,17 +42,15 @@ from pgadmin.tools.sqleditor.utils.update_session_grid_transaction import \
 from pgadmin.utils import PgAdminModule
 from pgadmin.utils import get_storage_directory
 from pgadmin.utils.ajax import make_json_response, bad_request, \
-    success_return, internal_server_error, service_unavailable
+    success_return, internal_server_error, service_unavailable, gone
 from pgadmin.utils.driver import get_driver
 from pgadmin.utils.exception import ConnectionLost, SSHTunnelConnectionLost, \
     CryptKeyMissing, ObjectGone
-from pgadmin.browser.utils import underscore_unescape, underscore_escape
+from pgadmin.browser.utils import underscore_escape
 from pgadmin.utils.menu import MenuItem
 from pgadmin.utils.sqlautocomplete.autocomplete import SQLAutoComplete
 from pgadmin.tools.sqleditor.utils.query_tool_preferences import \
     register_query_tool_preferences
-from pgadmin.tools.sqleditor.utils.query_tool_fs_utils import \
-    read_file_generator
 from pgadmin.tools.sqleditor.utils.filter_dialog import FilterDialog
 from pgadmin.tools.sqleditor.utils.query_history import QueryHistory
 from pgadmin.tools.sqleditor.utils.macros import get_macros, \
@@ -67,8 +65,9 @@ from pgadmin.settings import get_setting
 from pgadmin.utils.preferences import Preferences
 from pgadmin.tools.sqleditor.utils.apply_explain_plan_wrapper import \
     get_explain_query_length
+from pgadmin.tools.user_management.PgAdminPermissions import AllPermissionTypes
 from pgadmin.browser.server_groups.servers.utils import \
-    convert_connection_parameter
+    convert_connection_parameter, get_db_disp_restriction
 from pgadmin.misc.workspaces import check_and_delete_adhoc_server
 
 MODULE_NAME = 'sqleditor'
@@ -107,7 +106,6 @@ class SqlEditorModule(PgAdminModule):
             'sqleditor.initialize_sqleditor',
             'sqleditor.initialize_sqleditor_with_did',
             'sqleditor.filter_validate',
-            'sqleditor.filter',
             'sqleditor.panel',
             'sqleditor.close',
             'sqleditor.update_sqleditor_connection',
@@ -127,8 +125,6 @@ class SqlEditorModule(PgAdminModule):
             'sqleditor.auto_commit',
             'sqleditor.auto_rollback',
             'sqleditor.autocomplete',
-            'sqleditor.load_file',
-            'sqleditor.save_file',
             'sqleditor.query_tool_download',
             'sqleditor.connection_status',
             'sqleditor.get_filter_data',
@@ -147,6 +143,7 @@ class SqlEditorModule(PgAdminModule):
             'sqleditor._check_server_connection_status',
             'sqleditor.get_new_connection_role',
             'sqleditor.connect_server',
+            'sqleditor.server_cursor',
         ]
 
     def on_logout(self):
@@ -178,12 +175,6 @@ def index():
     )
 
 
-@blueprint.route("/filter", endpoint='filter')
-@pga_login_required
-def show_filter():
-    return render_template(MODULE_NAME + '/filter.html')
-
-
 @blueprint.route(
     '/initialize/viewdata/<int:trans_id>/<int:cmd_type>/<obj_type>/'
     '<int:sgid>/<int:sid>/<int:did>/<int:obj_id>',
@@ -209,9 +200,28 @@ def initialize_viewdata(trans_id, cmd_type, obj_type, sgid, sid, did, obj_id):
     """
 
     if request.data:
-        filter_sql = json.loads(request.data)
+        _data = json.loads(request.data)
     else:
-        filter_sql = request.args or request.form
+        _data = request.args or request.form
+
+    filter_sql = _data['sql_filter'] if 'sql_filter' in _data else None
+    server_cursor = _data['server_cursor'] if\
+        'server_cursor' in _data and (
+            _data['server_cursor'] == 'true' or _data['server_cursor'] is True
+    ) else False
+    dbname = _data['dbname'] if 'dbname' in _data else None
+
+    kwargs = {
+        'user': _data['user'] if 'user' in _data else None,
+        'role': _data['role'] if 'role' in _data else None,
+        'password': _data['password'] if 'password' in _data else None
+    }
+
+    server = Server.query.filter_by(id=sid).first()
+    if kwargs.get('password', None) is None:
+        kwargs['encpass'] = server.password
+    else:
+        kwargs['encpass'] = None
 
     # Create asynchronous connection using random connection id.
     conn_id = str(secrets.choice(range(1, 9999999)))
@@ -219,11 +229,36 @@ def initialize_viewdata(trans_id, cmd_type, obj_type, sgid, sid, did, obj_id):
         manager = get_driver(PG_DEFAULT_DRIVER).connection_manager(sid)
         # default_conn is same connection which is created when user connect to
         # database from tree
-        default_conn = manager.connection(did=did)
-        conn = manager.connection(did=did, conn_id=conn_id,
+        conn = manager.connection(conn_id=conn_id,
                                   auto_reconnect=False,
                                   use_binary_placeholder=True,
-                                  array_to_string=True)
+                                  array_to_string=True,
+                                  **({"database": dbname} if dbname is not None
+                                     else {"did": did}
+                                     ))
+        status, msg, is_ask_password, user, _, _ = _connect(
+            conn,**kwargs)
+        if not status:
+            current_app.logger.error(msg)
+            if is_ask_password:
+                return make_json_response(
+                    success=0,
+                    status=428,
+                    result={
+                        "server_label": server.name,
+                        "username": user or server.username,
+                        "errmsg": msg,
+                        "prompt_password": True,
+                        "allow_save_password": True
+                        if ALLOW_SAVE_PASSWORD and
+                        session.get('allow_save_password', None)
+                        else False,
+                    }
+                )
+            else:
+                return internal_server_error(
+                    errormsg=str(msg))
+        default_conn = manager.connection(did=did)
     except (ConnectionLost, SSHTunnelConnectionLost):
         raise
     except Exception as e:
@@ -248,8 +283,9 @@ def initialize_viewdata(trans_id, cmd_type, obj_type, sgid, sid, did, obj_id):
         command_obj = ObjectRegistry.get_object(
             obj_type, conn_id=conn_id, sgid=sgid, sid=sid,
             did=did, obj_id=obj_id, cmd_type=cmd_type,
-            sql_filter=filter_sql
+            sql_filter=filter_sql, server_cursor=server_cursor
         )
+
     except ObjectGone:
         raise
     except Exception as e:
@@ -273,6 +309,9 @@ def initialize_viewdata(trans_id, cmd_type, obj_type, sgid, sid, did, obj_id):
             command_obj.set_data_sorting(
                 dict(data_sorting=old_trans_obj._data_sorting), True)
 
+    # Set the value of database name, that will be used later
+    command_obj.dbname = conn.db if conn.db else None
+
     # Use pickle to store the command object which will be used later by the
     # sql grid module.
     sql_grid_data[str(trans_id)] = {
@@ -295,6 +334,7 @@ def initialize_viewdata(trans_id, cmd_type, obj_type, sgid, sid, did, obj_id):
     methods=["POST"],
     endpoint='panel'
 )
+@pga_login_required
 def panel(trans_id):
     """
     This method calls index.html to render the data grid.
@@ -327,38 +367,49 @@ def panel(trans_id):
     params['fgcolor'] = None
 
     s = Server.query.filter_by(id=int(params['sid'])).first()
-    if s.shared and s.user_id != current_user.id:
-        # Import here to avoid circular dependency
-        from pgadmin.browser.server_groups.servers import ServerModule
-        shared_server = ServerModule.get_shared_server(s, params['sgid'])
-        s = ServerModule.get_shared_server_properties(s, shared_server)
+    if s:
+        if s.shared and s.user_id != current_user.id:
+            # Import here to avoid circular dependency
+            from pgadmin.browser.server_groups.servers import ServerModule
+            shared_server = ServerModule.get_shared_server(s, params['sgid'])
+            s = ServerModule.get_shared_server_properties(s, shared_server)
 
-    if s and s.bgcolor:
-        # If background is set to white means we do not have to change
-        # the title background else change it as per user specified
-        # background
-        if s.bgcolor != '#ffffff':
-            params['bgcolor'] = s.bgcolor
-        params['fgcolor'] = s.fgcolor or 'black'
+        if s and s.bgcolor:
+            # If background is set to white means we do not have to change
+            # the title background else change it as per user specified
+            # background
+            if s.bgcolor != '#ffffff':
+                params['bgcolor'] = s.bgcolor
+            params['fgcolor'] = s.fgcolor or 'black'
 
-    params['server_name'] = underscore_escape(s.name)
-    if 'user' not in params:
-        params['user'] = underscore_escape(s.username)
-    if 'role' not in params and s.role:
-        params['role'] = underscore_escape(s.role)
-    params['layout'] = get_setting('SQLEditor/Layout')
-    params['macros'] = get_user_macros()
-    params['is_desktop_mode'] = current_app.PGADMIN_RUNTIME
-    params['title'] = underscore_escape(params['title'])
-    params['selectedNodeInfo'] = underscore_escape(params['selectedNodeInfo'])
-    if 'database_name' in params:
-        params['database_name'] = underscore_escape(params['database_name'])
+        params['server_name'] = underscore_escape(s.name)
+        if 'user' not in params:
+            params['user'] = underscore_escape(s.username)
+        if 'role' not in params and s.role:
+            params['role'] = underscore_escape(s.role)
+        params['layout'] = get_setting('SQLEditor/Layout')
+        params['macros'] = get_user_macros()
+        params['is_desktop_mode'] = current_app.PGADMIN_RUNTIME
+        params['title'] = underscore_escape(params['title'])
+        params['selectedNodeInfo'] = (
+            underscore_escape(params['selectedNodeInfo']))
+        if 'database_name' in params:
+            params['database_name'] = (
+                underscore_escape(params['database_name']))
+        params['server_cursor'] = params[
+            'server_cursor'] if 'server_cursor' in params else False
 
-    return render_template(
-        "sqleditor/index.html",
-        title=underscore_escape(params['title']),
-        params=json.dumps(params),
-    )
+        return render_template(
+            "sqleditor/index.html",
+            title=underscore_escape(params['title']),
+            params=json.dumps(params),
+        )
+    else:
+        params['error'] = 'The server was not found.'
+        return render_template(
+            "sqleditor/index.html",
+            title=None,
+            params=json.dumps(params))
 
 
 @blueprint.route(
@@ -375,6 +426,7 @@ def panel(trans_id):
     '/initialize/sqleditor/<int:trans_id>/<int:sgid>/<int:sid>',
     methods=["POST"], endpoint='initialize_sqleditor'
 )
+@permissions_required(AllPermissionTypes.tools_query_tool)
 @pga_login_required
 def initialize_sqleditor(trans_id, sgid, sid, did=None):
     """
@@ -477,6 +529,8 @@ def _init_sqleditor(trans_id, connect, sgid, sid, did, dbname=None, **kwargs):
         kwargs['auto_commit'] = pref.preference('auto_commit').get()
     if kwargs.get('auto_rollback', None) is None:
         kwargs['auto_rollback'] = pref.preference('auto_rollback').get()
+    if kwargs.get('server_cursor', None) is None:
+        kwargs['server_cursor'] = pref.preference('server_cursor').get()
 
     try:
         conn = manager.connection(conn_id=conn_id,
@@ -536,6 +590,7 @@ def _init_sqleditor(trans_id, connect, sgid, sid, did, dbname=None, **kwargs):
     # Set the value of auto commit and auto rollback specified in Preferences
     command_obj.set_auto_commit(kwargs['auto_commit'])
     command_obj.set_auto_rollback(kwargs['auto_rollback'])
+    command_obj.set_server_cursor(kwargs['server_cursor'])
 
     # Set the value of database name, that will be used later
     command_obj.dbname = dbname if dbname else None
@@ -656,6 +711,7 @@ def close(trans_id):
             # session variable.
             grid_data.pop(str(trans_id), None)
             session['gridData'] = grid_data
+
         except Exception as e:
             current_app.logger.error(e)
             return internal_server_error(errormsg=str(e))
@@ -785,7 +841,9 @@ def check_transaction_status(trans_id, auto_comp=False):
             conn_id=conn_id,
             auto_reconnect=False,
             use_binary_placeholder=True,
-            array_to_string=True
+            array_to_string=True,
+            **({"database": trans_obj.dbname} if hasattr(
+                trans_obj, 'dbname') else {})
         )
     except (ConnectionLost, SSHTunnelConnectionLost, CryptKeyMissing):
         raise
@@ -822,6 +880,12 @@ def start_view_data(trans_id):
                                   info='DATAGRID_TRANSACTION_REQUIRED',
                                   status=404)
 
+    if not status and error_msg and type(error_msg) is Response:
+        return error_msg
+
+    # Check if connect is passed in the request.
+    connect = 'connect' in request.args and request.args['connect'] == '1'
+
     # get the default connection as current connection which is attached to
     # trans id holds the cursor which has query result so we cannot use that
     # connection to execute another query otherwise we'll lose query result.
@@ -829,7 +893,10 @@ def start_view_data(trans_id):
     try:
         manager = get_driver(PG_DEFAULT_DRIVER).connection_manager(
             trans_obj.sid)
-        default_conn = manager.connection(did=trans_obj.did)
+        default_conn = manager.connection(did=trans_obj.did,
+                                          ** ({"database": trans_obj.dbname}
+                                              if hasattr(trans_obj, 'dbname')
+                                              else {}))
     except (ConnectionLost, SSHTunnelConnectionLost) as e:
         raise
     except Exception as e:
@@ -837,20 +904,22 @@ def start_view_data(trans_id):
         return internal_server_error(errormsg=str(e))
 
     # Connect to the Server if not connected.
-    if not default_conn.connected():
-        # This will check if view/edit data tool connection is lost or not,
-        # if lost then it will reconnect
-        status, error_msg, conn, trans_obj, session_obj, response = \
-            query_tool_connection_check(trans_id)
-        # This is required for asking user to enter password
-        # when password is not saved for the server
-        if response is not None:
-            return response
+    if not conn.connected() or not default_conn.connected():
+        if connect:
+            # This will check if view/edit data tool connection is lost or not,
+            # if lost then it will reconnect
+            status, error_msg, conn, trans_obj, session_obj, response = \
+                query_tool_connection_check(trans_id)
+            # This is required for asking user to enter password
+            # when password is not saved for the server
+            if response is not None:
+                return response
 
-        status, msg = default_conn.connect()
+        status, _ = default_conn.connect()
         if not status:
-            return make_json_response(
-                data={'status': status, 'result': "{}".format(msg)}
+            return service_unavailable(
+                gettext("Connection to the server has been lost."),
+                info="CONNECTION_LOST"
             )
 
     if status and conn is not None and \
@@ -887,8 +956,15 @@ def start_view_data(trans_id):
 
         update_session_grid_transaction(trans_id, session_obj)
 
+        if trans_obj.server_cursor:
+            conn.release_async_cursor()
+            conn.execute_void("BEGIN;")
+
         # Execute sql asynchronously
-        status, result = conn.execute_async(sql)
+        status, result = conn.execute_async(
+            sql,
+            server_cursor=trans_obj.server_cursor)
+
     else:
         status = False
         result = error_msg
@@ -925,6 +1001,7 @@ def start_query_tool(trans_id):
     )
 
     connect = 'connect' in request.args and request.args['connect'] == '1'
+
     is_error, errmsg = check_and_upgrade_to_qt(trans_id, connect)
     if is_error:
         return make_json_response(success=0, errormsg=errmsg,
@@ -1041,7 +1118,10 @@ def poll(trans_id):
             rows_affected = conn.rows_affected()
 
             st, result = \
-                conn.async_fetchmany_2darray(data_result_rows_per_page)
+                conn.async_fetchmany_2darray(data_result_rows_per_page + 1
+                                             if trans_obj.server_cursor
+                                             else data_result_rows_per_page
+                                             )
 
             # There may be additional messages even if result is present
             # eg: Function can provide result as well as RAISE messages
@@ -1162,12 +1242,22 @@ def poll(trans_id):
         if trans_obj is not None and hasattr(trans_obj, 'did') else 0
 
     page_size = rows_fetched_to - rows_fetched_from + 1
+
+    # Check the next recordset/page is available or not for the server cursor
+    next_page = 0
+    if (trans_obj.server_cursor and result and len(result) > 0 and
+            len(result) > data_result_rows_per_page):
+        result = result[0:len(result) - 1]
+        next_page = 1
+        rows_fetched_to = rows_fetched_to - 1
+
     pagination = {
         'page_size': page_size,
         'page_count': math.ceil(conn.total_rows / page_size),
         'page_no': math.floor((rows_fetched_from - 1) / page_size) + 1,
         'rows_from': rows_fetched_from,
-        'rows_to': rows_fetched_to
+        'rows_to': rows_fetched_to,
+        'next_page': next_page
     }
 
     return make_json_response(
@@ -1187,6 +1277,7 @@ def poll(trans_id):
             'transaction_status': transaction_status,
             'data_obj': data_obj,
             'pagination': pagination,
+            'server_cursor': trans_obj.server_cursor,
         }
     )
 
@@ -1212,8 +1303,12 @@ def fetch_window(trans_id, from_rownum=0, to_rownum=0):
 
     if status and conn is not None and session_obj is not None:
         # rownums start from 0 but UI will ask from 1
+        # to_rownum: Fetch 1 extra row to check whether next
+        # recordset is available or not, this is required for server cursor.
+
         status, result = conn.async_fetchmany_2darray(
-            records=None, from_rownum=from_rownum - 1, to_rownum=to_rownum - 1)
+            records=None, from_rownum=from_rownum - 1, to_rownum=to_rownum if
+            trans_obj.server_cursor else to_rownum - 1)
         if not status:
             status = 'Error'
         else:
@@ -1230,14 +1325,22 @@ def fetch_window(trans_id, from_rownum=0, to_rownum=0):
         result = error_msg
 
     page_size = to_rownum - from_rownum + 1
+
+    # Check the next recordset/page is available or not for the server cursor
+    next_page = 0
+    if trans_obj.server_cursor and len(result) > 0 and len(result) > page_size:
+        result = result[0:len(result) - 1]
+        next_page = 1
+        rows_fetched_to = rows_fetched_to - 1
+
     pagination = {
         'page_size': page_size,
         'page_count': math.ceil(conn.total_rows / page_size),
         'page_no': math.floor((rows_fetched_from - 1) / page_size) + 1,
         'rows_from': rows_fetched_from,
-        'rows_to': rows_fetched_to
+        'rows_to': rows_fetched_to,
+        'next_page': next_page
     }
-
     return make_json_response(
         data={
             'status': status,
@@ -1395,6 +1498,8 @@ def save(trans_id):
         changed_data = json.loads(request.data)
     else:
         changed_data = request.args or request.form
+    # Check if connect is passed in the request.
+    connect = 'connect' in request.args and request.args['connect'] == '1'
 
     # Check the transaction and connection status
     status, error_msg, conn, trans_obj, session_obj = \
@@ -1420,10 +1525,21 @@ def save(trans_id):
                 }
             )
 
-        is_error, errmsg, conn = _check_and_connect(trans_obj)
+        if connect:
+            # This will check if view/edit data tool connection is lost or not,
+            # if lost then it will reconnect
+            status, error_msg, conn, trans_obj, session_obj, response = \
+                query_tool_connection_check(trans_id)
+            # This is required for asking user to enter password
+            # when password is not saved for the server
+            if response is not None:
+                return response
+
+        is_error, _, conn = _check_and_connect(trans_obj)
         if is_error:
-            return make_json_response(
-                data={'status': status, 'result': "{}".format(errmsg)}
+            return service_unavailable(
+                gettext("Connection to the server has been lost."),
+                info="CONNECTION_LOST"
             )
 
         status, res, query_results, _rowid = trans_obj.save(
@@ -1802,9 +1918,57 @@ def check_and_upgrade_to_qt(trans_id, connect):
                 'conn_id': data.conn_id
             }
             is_error, errmsg, _, _ = _init_sqleditor(
-                trans_id, connect, data.sgid, data.sid, data.did, **kwargs)
+                trans_id, connect, data.sgid, data.sid, data.did,
+                **kwargs)
 
     return is_error, errmsg
+
+
+def set_pref_options(trans_id, operation):
+    if request.data:
+        _data = json.loads(request.data)
+    else:
+        _data = request.args or request.form
+
+    connect = 'connect' in request.args and request.args['connect'] == '1'
+
+    is_error, errmsg = check_and_upgrade_to_qt(trans_id, connect)
+    if is_error:
+        return make_json_response(success=0, errormsg=errmsg,
+                                  info=ERROR_MSG_FAIL_TO_PROMOTE_QT,
+                                  status=404)
+
+    # Check the transaction and connection status
+    status, error_msg, conn, trans_obj, session_obj = \
+        check_transaction_status(trans_id)
+
+    if error_msg == ERROR_MSG_TRANS_ID_NOT_FOUND:
+        return make_json_response(success=0, errormsg=error_msg,
+                                  info='DATAGRID_TRANSACTION_REQUIRED',
+                                  status=404)
+
+    if (status and conn is not None and
+            trans_obj is not None and session_obj is not None):
+
+        res = None
+
+        if operation == 'auto_commit':
+            # Call the set_auto_commit method of transaction object
+            trans_obj.set_auto_commit(_data)
+        elif operation == 'auto_rollback':
+            trans_obj.set_auto_rollback(_data)
+        elif operation == 'server_cursor':
+            trans_obj.set_server_cursor(_data)
+
+        # As we changed the transaction object we need to
+        # restore it and update the session variable.
+        session_obj['command_obj'] = pickle.dumps(trans_obj, -1)
+        update_session_grid_transaction(trans_id, session_obj)
+    else:
+        status = False
+        res = error_msg
+
+    return make_json_response(data={'status': status, 'result': res})
 
 
 @blueprint.route(
@@ -1819,45 +1983,7 @@ def set_auto_commit(trans_id):
     Args:
         trans_id: unique transaction id
     """
-    if request.data:
-        auto_commit = json.loads(request.data)
-    else:
-        auto_commit = request.args or request.form
-
-    connect = 'connect' in request.args and request.args['connect'] == '1'
-
-    is_error, errmsg = check_and_upgrade_to_qt(trans_id, connect)
-    if is_error:
-        return make_json_response(success=0, errormsg=errmsg,
-                                  info=ERROR_MSG_FAIL_TO_PROMOTE_QT,
-                                  status=404)
-
-    # Check the transaction and connection status
-    status, error_msg, conn, trans_obj, session_obj = \
-        check_transaction_status(trans_id)
-
-    if error_msg == ERROR_MSG_TRANS_ID_NOT_FOUND:
-        return make_json_response(success=0, errormsg=error_msg,
-                                  info='DATAGRID_TRANSACTION_REQUIRED',
-                                  status=404)
-
-    if status and conn is not None and \
-            trans_obj is not None and session_obj is not None:
-
-        res = None
-
-        # Call the set_auto_commit method of transaction object
-        trans_obj.set_auto_commit(auto_commit)
-
-        # As we changed the transaction object we need to
-        # restore it and update the session variable.
-        session_obj['command_obj'] = pickle.dumps(trans_obj, -1)
-        update_session_grid_transaction(trans_id, session_obj)
-    else:
-        status = False
-        res = error_msg
-
-    return make_json_response(data={'status': status, 'result': res})
+    return set_pref_options(trans_id, 'auto_commit')
 
 
 @blueprint.route(
@@ -1867,50 +1993,27 @@ def set_auto_commit(trans_id):
 @pga_login_required
 def set_auto_rollback(trans_id):
     """
-    This method is used to set the value for auto commit .
+    This method is used to set the value for auto rollback .
 
     Args:
         trans_id: unique transaction id
     """
-    if request.data:
-        auto_rollback = json.loads(request.data)
-    else:
-        auto_rollback = request.args or request.form
+    return set_pref_options(trans_id, 'auto_rollback')
 
-    connect = 'connect' in request.args and request.args['connect'] == '1'
 
-    is_error, errmsg = check_and_upgrade_to_qt(trans_id, connect)
-    if is_error:
-        return make_json_response(success=0, errormsg=errmsg,
-                                  info=ERROR_MSG_FAIL_TO_PROMOTE_QT,
-                                  status=404)
+@blueprint.route(
+    '/server_cursor/<int:trans_id>',
+    methods=["PUT", "POST"], endpoint='server_cursor'
+)
+@pga_login_required
+def set_server_cursor(trans_id):
+    """
+    This method is used to set the value for server cursor.
 
-    # Check the transaction and connection status
-    status, error_msg, conn, trans_obj, session_obj = \
-        check_transaction_status(trans_id)
-
-    if error_msg == ERROR_MSG_TRANS_ID_NOT_FOUND:
-        return make_json_response(success=0, errormsg=error_msg,
-                                  info='DATAGRID_TRANSACTION_REQUIRED',
-                                  status=404)
-
-    if status and conn is not None and \
-            trans_obj is not None and session_obj is not None:
-
-        res = None
-
-        # Call the set_auto_rollback method of transaction object
-        trans_obj.set_auto_rollback(auto_rollback)
-
-        # As we changed the transaction object we need to
-        # restore it and update the session variable.
-        session_obj['command_obj'] = pickle.dumps(trans_obj, -1)
-        update_session_grid_transaction(trans_id, session_obj)
-    else:
-        status = False
-        res = error_msg
-
-    return make_json_response(data={'status': status, 'result': res})
+    Args:
+        trans_id: unique transaction id
+    """
+    return set_pref_options(trans_id, 'server_cursor')
 
 
 @blueprint.route(
@@ -1976,151 +2079,6 @@ def auto_complete(trans_id):
     return make_json_response(data={'status': status, 'result': res})
 
 
-@blueprint.route("/sqleditor.js")
-@pga_login_required
-def script():
-    """render the required javascript"""
-    return Response(
-        response=render_template(
-            "sqleditor/js/sqleditor.js",
-            tab_size=blueprint.tab_size.get(),
-            use_spaces=blueprint.use_spaces.get(),
-            _=gettext
-        ),
-        status=200,
-        mimetype=MIMETYPE_APP_JS
-    )
-
-
-@blueprint.route('/load_file/', methods=["PUT", "POST"], endpoint='load_file')
-@pga_login_required
-def load_file():
-    """
-    This function gets name of file from request data
-    reads the data and sends back in response
-    """
-    if request.data:
-        file_data = json.loads(request.data)
-
-    file_path = unquote(file_data['file_name'])
-
-    # get the current storage from request if available
-    # or get it from last_storage preference.
-    if 'storage' in file_data:
-        storage_folder = file_data['storage']
-    else:
-        storage_folder = Preferences.module('file_manager').preference(
-            'last_storage').get()
-
-    # retrieve storage directory path
-    storage_manager_path = get_storage_directory(
-        shared_storage=storage_folder)
-
-    try:
-        Filemanager.check_access_permission(storage_manager_path, file_path)
-    except Exception as e:
-        return internal_server_error(errormsg=str(e))
-
-    if storage_manager_path:
-        # generate full path of file
-        file_path = os.path.join(
-            storage_manager_path,
-            file_path.lstrip('/').lstrip('\\')
-        )
-
-    (status, err_msg, is_binary,
-     is_startswith_bom, enc) = Filemanager.check_file_for_bom_and_binary(
-        file_path
-    )
-
-    if not status:
-        return internal_server_error(
-            errormsg=gettext(err_msg)
-        )
-
-    if is_binary:
-        return internal_server_error(
-            errormsg=gettext("File type not supported")
-        )
-
-    return Response(read_file_generator(file_path, enc), mimetype='text/plain')
-
-
-@blueprint.route('/save_file/', methods=["PUT", "POST"], endpoint='save_file')
-@pga_login_required
-def save_file():
-    """
-    This function retrieves file_name and data from request.
-    and then save the data to the file
-    """
-    if request.data:
-        file_data = json.loads(request.data)
-
-    # retrieve storage directory path
-    last_storage = Preferences.module('file_manager').preference(
-        'last_storage').get()
-    if last_storage != MY_STORAGE:
-        selected_dir_list = [sdir for sdir in SHARED_STORAGE if
-                             sdir['name'] == last_storage]
-        selected_dir = selected_dir_list[0] if len(
-            selected_dir_list) == 1 else None
-
-        if selected_dir and selected_dir['restricted_access'] and \
-                not current_user.has_role("Administrator"):
-            return make_json_response(success=0,
-                                      errormsg=ACCESS_DENIED_MESSAGE,
-                                      info='ACCESS_DENIED',
-                                      status=403)
-        storage_manager_path = get_storage_directory(
-            shared_storage=last_storage)
-    else:
-        storage_manager_path = get_storage_directory()
-
-    # generate full path of file
-    file_path = unquote(file_data['file_name'])
-
-    try:
-        Filemanager.check_access_permission(storage_manager_path, file_path)
-    except Exception as e:
-        return internal_server_error(errormsg=str(e))
-
-    if storage_manager_path is not None:
-        file_path = os.path.join(
-            storage_manager_path,
-            file_path.lstrip('/').lstrip('\\')
-        )
-
-    # Get value for encoding if file is already loaded to SQL editor
-    def get_file_encoding_of_loaded_file(file_name):
-        encoding = 'utf-8'
-        for ele in Filemanager.loaded_file_encoding_list:
-            if file_name in ele:
-                encoding = ele[file_name]
-        return encoding
-
-    enc = get_file_encoding_of_loaded_file(os.path.basename(file_path))
-
-    file_content = file_data['file_content'].encode(enc)
-    error_str = gettext("Error: {0}")
-
-    # write to file
-    try:
-        with open(file_path, 'wb+') as output_file:
-            output_file.write(file_content)
-    except IOError as e:
-        err_msg = error_str.format(e.strerror)
-        return internal_server_error(errormsg=err_msg)
-    except Exception as e:
-        err_msg = error_str.format(e.strerror)
-        return internal_server_error(errormsg=err_msg)
-
-    return make_json_response(
-        data={
-            'status': True,
-        }
-    )
-
-
 @blueprint.route(
     '/query_tool/download/<int:trans_id>',
     methods=["POST"],
@@ -2162,11 +2120,17 @@ def start_query_download_tool(trans_id):
         if not sql:
             sql = trans_obj.get_sql(sync_conn)
         if sql and query_commited:
+            if trans_obj.server_cursor:
+                sync_conn.release_async_cursor()
+                sync_conn.execute_void("BEGIN;")
             # Re-execute the query to ensure the latest data is included
-            sync_conn.execute_async(sql)
+            sync_conn.execute_async(sql, server_cursor=trans_obj.server_cursor)
         # This returns generator of records.
         status, gen, conn_obj = \
             sync_conn.execute_on_server_as_csv(records=10)
+
+        if trans_obj.server_cursor and query_commited:
+            sync_conn.execute_void("COMMIT;")
 
         if not status:
             return make_json_response(
@@ -2426,15 +2390,8 @@ def get_new_connection_database(sgid, sid=None):
             if sid:
                 template_path = 'databases/sql/#{0}#'.format(manager.version)
                 last_system_oid = 0
-                server_node_res = manager
 
-                db_disp_res = None
-                params = None
-                if server_node_res and server_node_res.db_res:
-                    db_disp_res = ", ".join(
-                        ['%s'] * len(server_node_res.db_res.split(','))
-                    )
-                    params = tuple(server_node_res.db_res.split(','))
+                db_disp_res, params = get_db_disp_restriction(manager)
                 sql = render_template(
                     "/".join([template_path, _NODES_SQL]),
                     last_system_oid=last_system_oid,

@@ -13,7 +13,7 @@ import pgadmin.browser.server_groups as sg
 from flask import render_template, request, make_response, jsonify, \
     current_app, url_for, session
 from flask_babel import gettext
-from flask_security import current_user
+from flask_security import current_user, permissions_required
 from pgadmin.user_login_check import pga_login_required
 from psycopg.conninfo import make_conninfo, conninfo_to_dict
 
@@ -21,27 +21,29 @@ from pgadmin.browser.server_groups.servers.types import ServerType
 from pgadmin.browser.utils import PGChildNodeView
 from pgadmin.utils.ajax import make_json_response, bad_request, forbidden, \
     make_response as ajax_response, internal_server_error, unauthorized, gone
-from pgadmin.utils.crypto import encrypt, decrypt, pqencryptpassword
+from pgadmin.utils.crypto import encrypt, decrypt
 from pgadmin.utils.menu import MenuItem
 from pgadmin.tools.sqleditor.utils.query_history import QueryHistory
+from pgadmin.tools.user_management.PgAdminPermissions import AllPermissionTypes
 
 import config
 from config import PG_DEFAULT_DRIVER
 from pgadmin.model import db, Server, ServerGroup, User, SharedServer
 from pgadmin.utils.driver import get_driver
 from pgadmin.utils.master_password import get_crypt_key
-from pgadmin.utils.exception import CryptKeyMissing
+from pgadmin.utils.exception import CryptKeyMissing, ConnectionLost
 from pgadmin.tools.schema_diff.node_registry import SchemaDiffRegistry
 from pgadmin.browser.server_groups.servers.utils import \
     (is_valid_ipaddress, get_replication_type, convert_connection_parameter,
-     check_ssl_fields)
+     check_ssl_fields, get_db_restriction)
 from pgadmin.utils.constants import UNAUTH_REQ, MIMETYPE_APP_JS, \
-    SERVER_CONNECTION_CLOSED
+    SERVER_CONNECTION_CLOSED, RESTRICTION_TYPE_SQL
 from sqlalchemy import or_
 from sqlalchemy.orm.attributes import flag_modified
 from pgadmin.utils.preferences import Preferences
 from .... import socketio as sio
 from pgadmin.utils import get_complete_file_path
+from pgadmin.settings.utils import with_object_filters
 
 
 def has_any(data, keys):
@@ -165,6 +167,7 @@ class ServerModule(sg.ServerGroupPluginModule):
         server.tunnel_password = sharedserver.tunnel_password
         server.save_password = sharedserver.save_password
         server.tunnel_identity_file = sharedserver.tunnel_identity_file
+        server.tunnel_prompt_password = sharedserver.tunnel_prompt_password
         if hasattr(server, 'connection_params') and \
             hasattr(sharedserver, 'connection_params') and \
             'passfile' in server.connection_params and \
@@ -219,8 +222,25 @@ class ServerModule(sg.ServerGroupPluginModule):
 
         return servers
 
+    def has_tag(self, server, object_filters):
+        try:
+            # No tags filter, show all
+            if len(object_filters['tags']) == 0:
+                return True
+
+            # No tags on server, don't show
+            if server.tags is None or len(server.tags) == 0:
+                return False
+
+            # Check if any of the tag exists
+            return any([t['text'] in object_filters['tags']
+                        for t in server.tags])
+        except Exception as _:
+            return True
+
+    @with_object_filters
     @pga_login_required
-    def get_nodes(self, gid):
+    def get_nodes(self, gid, object_filters):
         """Return a JSON document listing the server groups for the user"""
 
         hide_shared_server = get_preferences()
@@ -240,6 +260,10 @@ class ServerModule(sg.ServerGroupPluginModule):
             wal_paused = None
             server_type = 'pg'
             user_info = None
+
+            if not self.has_tag(server, object_filters):
+                continue
+
             try:
                 manager = driver.connection_manager(server.id)
                 conn = manager.connection()
@@ -390,6 +414,7 @@ class ServerModule(sg.ServerGroupPluginModule):
                 tunnel_authentication=0,
                 tunnel_identity_file=None,
                 tunnel_keep_alive=0,
+                tunnel_prompt_password=0,
                 shared=True,
                 connection_params=data.connection_params,
                 prepare_threshold=data.prepare_threshold
@@ -626,12 +651,18 @@ class ServerNode(PGChildNodeView):
         in_recovery = None
         wal_paused = None
         if connected:
-            status, result, in_recovery, wal_paused =\
-                recovery_state(conn, manager.version)
-            if not status:
+            try:
+                status, result, in_recovery, wal_paused =\
+                    recovery_state(conn, manager.version)
+
+                if not status:
+                    connected = False
+                    manager.release()
+                    errmsg = "{0} : {1}".format(server.name, result)
+
+            except ConnectionLost:
                 connected = False
                 manager.release()
-                errmsg = "{0} : {1}".format(server.name, result)
 
         return make_json_response(
             result=self.blueprint.generate_browser_node(
@@ -718,6 +749,7 @@ class ServerNode(PGChildNodeView):
         return make_json_response(success=1,
                                   info=gettext("Server deleted"))
 
+    @permissions_required(AllPermissionTypes.object_register_server)
     @pga_login_required
     def update(self, gid, sid):
         """Update the server settings"""
@@ -742,10 +774,13 @@ class ServerNode(PGChildNodeView):
             'port': 'port',
             'db': 'maintenance_db',
             'username': 'username',
+            'password': 'password',
+            'save_password': 'save_password',
             'gid': 'servergroup_id',
             'comment': 'comment',
             'role': 'role',
             'db_res': 'db_res',
+            'db_res_type': 'db_res_type',
             'passexec_cmd': 'passexec_cmd',
             'passexec_expiration': 'passexec_expiration',
             'bgcolor': 'bgcolor',
@@ -757,6 +792,7 @@ class ServerNode(PGChildNodeView):
             'tunnel_username': 'tunnel_username',
             'tunnel_authentication': 'tunnel_authentication',
             'tunnel_identity_file': 'tunnel_identity_file',
+            'tunnel_prompt_password': 'tunnel_prompt_password',
             'tunnel_keep_alive': 'tunnel_keep_alive',
             'shared': 'shared',
             'shared_username': 'shared_username',
@@ -776,12 +812,11 @@ class ServerNode(PGChildNodeView):
             'role': gettext('Role')
         }
 
-        idx = 0
         data = request.form if request.form else json.loads(
             request.data
         )
 
-        if 'db_res' in data:
+        if 'db_res' in data and isinstance(data['db_res'], list):
             data['db_res'] = ','.join(data['db_res'])
 
         # Update connection parameter if any.
@@ -875,9 +910,16 @@ class ServerNode(PGChildNodeView):
                               sharedserver):
 
         idx = 0
+
+        crypt_key_present, crypt_key = get_crypt_key()
+        if not crypt_key_present:
+            raise CryptKeyMissing
+
         for arg in config_param_map:
             if arg in data:
                 value = data[arg]
+                if arg == 'password':
+                    value = encrypt(data[arg], crypt_key)
                 # sqlite3 do not have boolean type so we need to convert
                 # it manually to integer
                 if 'shared' in data and not data['shared']:
@@ -909,7 +951,7 @@ class ServerNode(PGChildNodeView):
                     )
 
     @pga_login_required
-    def list(self, gid):
+    def list(self, gid, object_filters):
         """
         Return list of attributes of all servers.
         """
@@ -948,7 +990,7 @@ class ServerNode(PGChildNodeView):
                 'connected': connected,
                 'version': manager.ver,
                 'server_type': manager.server_type if connected else 'pg',
-                'db_res': server.db_res.split(',') if server.db_res else None
+                'db_res': get_db_restriction(server.db_res_type, server.db_res)
             })
 
         return ajax_response(
@@ -1018,6 +1060,8 @@ class ServerNode(PGChildNodeView):
             'host': server.host,
             'port': server.port,
             'db': server.maintenance_db,
+            'password': server.password,
+            'save_password': server.save_password,
             'shared': server.shared if config.SERVER_MODE else None,
             'shared_username': server.shared_username
             if config.SERVER_MODE else None,
@@ -1031,7 +1075,8 @@ class ServerNode(PGChildNodeView):
             'server_type': manager.server_type if connected else 'pg',
             'bgcolor': server.bgcolor,
             'fgcolor': server.fgcolor,
-            'db_res': server.db_res.split(',') if server.db_res else None,
+            'db_res': get_db_restriction(server.db_res_type, server.db_res),
+            'db_res_type': server.db_res_type,
             'passexec_cmd':
                 server.passexec_cmd if server.passexec_cmd else None,
             'passexec_expiration':
@@ -1044,6 +1089,8 @@ class ServerNode(PGChildNodeView):
             'tunnel_username': tunnel_username,
             'tunnel_identity_file': server.tunnel_identity_file
             if server.tunnel_identity_file else None,
+            'tunnel_prompt_password': server.tunnel_prompt_password
+            if server.tunnel_identity_file else 0,
             'tunnel_authentication': tunnel_authentication,
             'tunnel_keep_alive': tunnel_keep_alive,
             'kerberos_conn': bool(server.kerberos_conn),
@@ -1080,6 +1127,7 @@ class ServerNode(PGChildNodeView):
         display_conn_string = make_conninfo(**con_info_ord)
         return display_conn_string
 
+    @permissions_required(AllPermissionTypes.object_register_server)
     @pga_login_required
     def create(self, gid):
         """Add a server node to the settings database"""
@@ -1137,6 +1185,12 @@ class ServerNode(PGChildNodeView):
             data['connection_params'] = connection_params
 
         server = None
+        db_restriction = None
+        if 'db_res' in data and isinstance(data['db_res'], list):
+            db_restriction = ','.join(data['db_res'])
+        elif 'db_res' in data and 'db_res_type' in data and \
+                data['db_res_type'] == RESTRICTION_TYPE_SQL:
+            db_restriction = data['db_res']
 
         try:
             server = Server(
@@ -1151,8 +1205,8 @@ class ServerNode(PGChildNodeView):
                 config.ALLOW_SAVE_PASSWORD else 0,
                 comment=data.get('comment', None),
                 role=data.get('role', None),
-                db_res=','.join(data['db_res']) if 'db_res' in data and
-                isinstance(data['db_res'], list) else None,
+                db_res=db_restriction,
+                db_res_type=data.get('db_res_type', None),
                 bgcolor=data.get('bgcolor', None),
                 fgcolor=data.get('fgcolor', None),
                 service=data.get('service', None),
@@ -1163,6 +1217,8 @@ class ServerNode(PGChildNodeView):
                 tunnel_authentication=1 if data.get('tunnel_authentication',
                                                     False) else 0,
                 tunnel_identity_file=data.get('tunnel_identity_file', None),
+                tunnel_prompt_password=1 if data.get('tunnel_prompt_password',
+                                                     True) else 0,
                 tunnel_keep_alive=data.get('tunnel_keep_alive', 0),
                 shared=data.get('shared', None),
                 shared_username=data.get('shared_username', None),
@@ -1370,6 +1426,19 @@ class ServerNode(PGChildNodeView):
             }
         )
 
+    def is_prompt_tunnel_password(self, server):
+        """
+        This function will check whether to prompt tunnel password or not.
+        """
+        prompt_tunnel_password = True
+        # In case of identity file check the value of tunnel_prompt_password.
+        if server.tunnel_password is not None or \
+            (server.tunnel_identity_file is not None and
+             server.tunnel_prompt_password != 1):
+            prompt_tunnel_password = False
+
+        return prompt_tunnel_password
+
     def connect(self, gid, sid, is_qt=False, server=None):
         """
         Connect the Server and return the connection object.
@@ -1453,11 +1522,12 @@ class ServerNode(PGChildNodeView):
 
         # If server using SSH Tunnel
         if server.use_ssh_tunnel:
-            if 'tunnel_password' not in data:
-                if server.tunnel_password is None:
-                    prompt_tunnel_password = True
-                else:
-                    tunnel_password = server.tunnel_password
+            if 'tunnel_password' not in data and \
+                    server.tunnel_password is None:
+                prompt_tunnel_password = self.is_prompt_tunnel_password(server)
+            elif 'tunnel_password' not in data and \
+                    server.tunnel_password is not None:
+                tunnel_password = server.tunnel_password
             else:
                 tunnel_password = data['tunnel_password'] \
                     if 'tunnel_password' in data else ''
@@ -1513,6 +1583,10 @@ class ServerNode(PGChildNodeView):
             return self.get_response_for_password(
                 server, 428, prompt_password, prompt_tunnel_password)
 
+        # Check whether to prompt for the tunnel password in case if
+        # password is saved in server object or in data.
+        prompt_tunnel_password = self.is_prompt_tunnel_password(server)
+
         try:
             status, errmsg = conn.connect(
                 password=password,
@@ -1522,7 +1596,7 @@ class ServerNode(PGChildNodeView):
             )
         except Exception as e:
             return self.get_response_for_password(
-                server, 401, True, True,
+                server, 401, not server.save_password, prompt_tunnel_password,
                 getattr(e, 'message', str(e)))
 
         if not status:
@@ -1534,7 +1608,8 @@ class ServerNode(PGChildNodeView):
                 return internal_server_error(errmsg)
 
             return self.get_response_for_password(
-                server, 401, True, True, errmsg)
+                server, 401, not server.save_password,
+                prompt_tunnel_password, errmsg)
         else:
             if save_password and config.ALLOW_SAVE_PASSWORD:
                 try:
@@ -1806,16 +1881,11 @@ class ServerNode(PGChildNodeView):
                     return unauthorized(gettext("Incorrect password."))
 
             # Hash new password before saving it.
-            if manager.sversion >= 100000:
-                password = conn.pq_encrypt_password_conn(data['newPassword'],
-                                                         manager.user)
-                if password is None:
-                    # Unable to encrypt the password so used the
-                    # old method of encryption
-                    password = pqencryptpassword(data['newPassword'],
-                                                 manager.user)
-            else:
-                password = pqencryptpassword(data['newPassword'], manager.user)
+            password = conn.pq_encrypt_password_conn(data['newPassword'],
+                                                     manager.user)
+            if password is None:
+                return internal_server_error(errormsg="Unable to"
+                                                      " change the password.")
 
             SQL = render_template(
                 "/servers/sql/#{0}#/change_password.sql".format(

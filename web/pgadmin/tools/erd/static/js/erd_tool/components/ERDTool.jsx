@@ -37,7 +37,12 @@ import pgAdmin from 'sources/pgadmin';
 import { styled } from '@mui/material/styles';
 import BeforeUnload from './BeforeUnload';
 import { isMac } from '../../../../../../static/js/keyboard_shortcuts';
-import { downloadUrlData } from '../../../../../../static/js/utils';
+import DownloadUtils from '../../../../../../static/js/DownloadUtils';
+import { useApplicationState } from '../../../../../../settings/static/ApplicationStateProvider';
+import { connectServerModal, connectServer } from '../../../../../sqleditor/static/js/components/connectServer';
+import { useEffect } from 'react';
+import { FileManagerUtils } from '../../../../../../misc/file_manager/static/js/components/FileManager';
+import SearchNode from './SearchNode';
 
 /* Custom react-diagram action for keyboard events */
 export class KeyboardShortcutAction extends Action {
@@ -99,8 +104,36 @@ const StyledBox = styled(Box)(({theme})=>({
   '& .ERDTool-html2canvasReset': {
     backgroundImage: 'none !important',
     overflow: 'auto !important',
+    textRendering: 'geometricPrecision',
+
+    '& .TableNode-tableToolbar': {
+      visibility: 'hidden',
+    },
+
+    '& .TableNode-tableContent': {
+      borderTopLeftRadius: theme.shape.borderRadius,
+      borderTopRightRadius: theme.shape.borderRadius,
+    },
   }
 }));
+
+
+function GetToolContent ({transId, restoreToolContent}) {
+  const {getToolContent} = useApplicationState();
+  useEffect(() => {
+    async function fetchData() {
+      const response = await getToolContent(transId);
+      restoreToolContent(response);
+    }
+    fetchData();
+  }, [transId]);
+  return null;
+}
+
+GetToolContent.propTypes = {
+  transId: PropTypes.number,
+  restoreToolContent: PropTypes.func,
+};
 
 /* The main body container for the ERD */
 export default class ERDTool extends React.Component {
@@ -129,6 +162,7 @@ export default class ERDTool extends React.Component {
       database: null,
       fill_color: null,
       text_color: null,
+      toolContent: null,
     };
     this.diagram = new ERDCore();
     /* Flag for checking if user has opted for save before close */
@@ -140,14 +174,14 @@ export default class ERDTool extends React.Component {
     this.keyboardActionObj = null;
     this.erdDialogs = new ERDDialogs(this.context);
     this.apiObj = getApiInstance();
-    this.preferencesStore = usePreferences.getState();
-
+    this.fmUtilsObj = new FileManagerUtils(this.apiObj, {modal: this.context});
+    this.restore = props.params.restore == 'true';
     this.eventBus = new EventBus();
 
     _.bindAll(this, ['onLoadDiagram', 'onSaveDiagram', 'onSQLClick',
-      'onImageClick', 'onAddNewNode', 'onEditTable', 'onCloneNode', 'onDeleteNode', 'onNoteClick',
+      'onImageClick', 'onSearchNode', 'onAddNewNode', 'onEditTable', 'onCloneNode', 'onDeleteNode', 'onNoteClick',
       'onNoteClose', 'onOneToOneClick', 'onOneToManyClick', 'onManyToManyClick', 'onAutoDistribute', 'onDetailsToggle',
-      'onChangeColors', 'onDropNode', 'onNotationChange', 'closePanel'
+      'onChangeColors', 'onDropNode', 'onNotationChange', 'closePanel', 'scrollToNode'
     ]);
 
     this.diagram.zoomToFit = this.diagram.zoomToFit.bind(this.diagram);
@@ -193,11 +227,11 @@ export default class ERDTool extends React.Component {
       },
       'linksUpdated': () => {
         this.setState({dirty: true});
-        this.eventBus.fireEvent(ERD_EVENTS.DIRTY, true);
+        this.eventBus.fireEvent(ERD_EVENTS.DIRTY, true, this.serializeFile(), this.state.current_file);
       },
       'nodesUpdated': ()=>{
         this.setState({dirty: true});
-        this.eventBus.fireEvent(ERD_EVENTS.DIRTY, true);
+        this.eventBus.fireEvent(ERD_EVENTS.DIRTY, true, this.serializeFile(), this.state.current_file);
       },
       'showNote': (event)=>{
         this.showNote(event.node);
@@ -216,6 +250,7 @@ export default class ERDTool extends React.Component {
     this.eventBus.registerListener(ERD_EVENTS.SAVE_DIAGRAM, this.onSaveDiagram);
     this.eventBus.registerListener(ERD_EVENTS.SHOW_SQL, this.onSQLClick);
     this.eventBus.registerListener(ERD_EVENTS.DOWNLOAD_IMAGE, this.onImageClick);
+    this.eventBus.registerListener(ERD_EVENTS.SEARCH_NODE, this.onSearchNode);
     this.eventBus.registerListener(ERD_EVENTS.ADD_NODE, this.onAddNewNode);
     this.eventBus.registerListener(ERD_EVENTS.EDIT_NODE, this.onEditTable);
     this.eventBus.registerListener(ERD_EVENTS.CLONE_NODE, this.onCloneNode);
@@ -251,6 +286,9 @@ export default class ERDTool extends React.Component {
       }],
       [this.state.preferences.download_image, ()=>{
         this.eventBus.fireEvent(ERD_EVENTS.DOWNLOAD_IMAGE);
+      }],
+      [this.state.preferences.search_table, ()=>{
+        this.eventBus.fireEvent(ERD_EVENTS.SEARCH_NODE);
       }],
       [this.state.preferences.add_table, ()=>{
         this.eventBus.fireEvent(ERD_EVENTS.ADD_NODE);
@@ -304,17 +342,25 @@ export default class ERDTool extends React.Component {
     this.setLoading(gettext('Preparing...'));
     this.registerEvents();
     this.diagramContainerRef.current?.focus();
-    const erdPref = this.preferencesStore.getPreferencesForModule('erd');
+    const erdPref = usePreferences.getState().getPreferencesForModule('erd');
     this.setState({
       preferences: erdPref,
-      is_new_tab: (this.preferencesStore.getPreferencesForModule('browser').new_browser_tab_open || '')
+      is_new_tab: (usePreferences.getState().getPreferencesForModule('browser').new_browser_tab_open || '')
         .includes('erd_tool'),
-      is_close_tab_warning: this.preferencesStore.getPreferencesForModule('browser').confirm_on_refresh_close,
+      is_close_tab_warning: usePreferences.getState().getPreferencesForModule('browser').confirm_on_refresh_close,
       cardinality_notation: erdPref.cardinality_notation,
     }, ()=>{
       this.registerKeyboardShortcuts();
-      this.setTitle(this.state.current_file);
+      if(this.state.current_file)this.setTitle(this.state.current_file);
     });
+
+    usePreferences.subscribe((state)=>{
+      this.setState({
+        preferences: state.getPreferencesForModule('erd'),
+        is_close_tab_warning: state.getPreferencesForModule('browser').confirm_on_refresh_close,
+      });
+    });
+
     this.registerModelEvents();
     this.realignGrid({
       backgroundSize: '45px 45px',
@@ -346,16 +392,38 @@ export default class ERDTool extends React.Component {
         .catch((err)=>console.error(err));
     });
 
-    let done = await this.initConnection();
-    if(!done) return;
+    const connected = await this.initConnection();
+    if (!connected && !this.restore) return;
 
-    done = await this.loadPrequisiteData();
-    if(!done) return;
+    if(connected){
+      const loaded = await this.loadPrequisiteData();
+      if (!loaded && !this.restore) return;
+    }
 
-    if(this.props.params.gen) {
+    if(!this.restore && this.props.params.gen) {
       await this.loadTablesData();
     }
   }
+
+
+  restoreToolContent = async (toolContent) => {
+    if(toolContent){
+      if(toolContent?.modifiedExternally){
+        toolContent = await this.fmUtilsObj.warnFileReload(toolContent?.fileName, toolContent?.data, '');
+      }
+
+      if(toolContent.loadFile){
+        this.openFile(toolContent.fileName);
+      }else{
+        this.diagram.deserialize(toolContent.data);
+        this.diagram.clearSelection();
+        this.registerModelEvents();
+        if(toolContent.fileName)this.setState({current_file: toolContent.fileName});
+        this.setState({dirty: true});
+        this.eventBus.fireEvent(ERD_EVENTS.DIRTY, true, toolContent.data);
+      }
+    }
+  };
 
   componentDidUpdate() {
     if(this.state.dirty) {
@@ -399,7 +467,7 @@ export default class ERDTool extends React.Component {
         this.erdDialogs.showTableDialog({
           title, attributes, isNew, tableNodes: this.diagram.getModel().getNodesDict(),
           colTypes: this.diagram.getCache('colTypes'), schemas: this.diagram.getCache('schemas'),
-          serverInfo, callback
+          geometryTypes: this.diagram.getCache('geometryTypes'),serverInfo, callback
         });
       };
     } else if(dialogName === 'onetomany_dialog' || dialogName === 'manytomany_dialog' || dialogName === 'onetoone_dialog') {
@@ -425,12 +493,69 @@ export default class ERDTool extends React.Component {
     }
   }
 
+  scrollToNode(node) {
+    const engine = this.diagram.getEngine();
+    const model = engine.getModel();
+    const container = this.canvasEle;
+    if (!node || !container) return;
+
+    const { x, y } = node.getPosition();
+    const zoom = model.getZoomLevel() / 100;
+    const offsetX = model.getOffsetX();
+    const offsetY = model.getOffsetY();
+
+    const viewportWidth = container.clientWidth;
+    const viewportHeight = container.clientHeight;
+
+    const nodeWidth = node.width; // Approximate width of a table node
+    const nodeHeight = node.height; // Approximate height of a table node
+
+    // Node screen bounds
+    const nodeLeft = x * zoom + offsetX;
+    const nodeRight = nodeLeft + nodeWidth * zoom;
+    const nodeTop = y * zoom + offsetY;
+    const nodeBottom = nodeTop + nodeHeight * zoom;
+
+    let newOffsetX = offsetX;
+    let newOffsetY = offsetY;
+
+    // Check horizontal visibility
+    if (nodeLeft < 0) {
+      newOffsetX += -nodeLeft + 20; // 20px padding
+    } else if (nodeRight > viewportWidth) {
+      newOffsetX -= nodeRight - viewportWidth + 20;
+    }
+
+    // Check vertical visibility
+    if (nodeHeight * zoom >= viewportHeight) {
+    // Node taller than viewport: snap top of node to top of viewport
+      newOffsetY = offsetY + viewportHeight / 2 - (nodeHeight * zoom) / 2;
+      newOffsetY = offsetY - (nodeTop - 20); // aligns top
+    } else {
+    // Node fits in viewport: ensure fully visible
+      if (nodeTop < 0) {
+        newOffsetY += -nodeTop + 20;
+      } else if (nodeBottom > viewportHeight) {
+        newOffsetY -= nodeBottom - viewportHeight + 20;
+      }
+    }
+
+    // Update offset only if needed
+    if (newOffsetX !== offsetX || newOffsetY !== offsetY) {
+      model.setOffset(newOffsetX, newOffsetY);
+    }
+
+    this.diagram.repaint();
+    node.setSelected(true);
+    node.fireEvent({}, 'highlightFlash');
+  };
+
+
   addEditTable(node) {
     let dialog = this.getDialog('table_dialog');
     if(node) {
-      let [schema, table] = node.getSchemaTableName();
       let oldData = node.getData();
-      dialog(gettext('Table: %s (%s)', _.escape(table),_.escape(schema)), oldData, false, (newData)=>{
+      dialog(gettext('Table: %s', node.getDisplayName()), oldData, false, (newData)=>{
         if(this.diagram.anyDuplicateNodeName(newData, oldData)) {
           return gettext('Table name already exists');
         }
@@ -495,6 +620,12 @@ export default class ERDTool extends React.Component {
     if(selected.length == 1) {
       this.addEditTable(selected[0]);
     }
+  }
+
+  onSearchNode() {
+    this.context.showModal(gettext('Search'), (closeModal)=>(
+      <SearchNode tableNodes={this.diagram.getModel().getNodesDict()} onClose={closeModal} scrollToNode={this.scrollToNode} />
+    ), {id: 'id-erd-search-node', showTitle: false, disableRestoreFocus: true});
   }
 
   onAddNewNode() {
@@ -576,32 +707,32 @@ export default class ERDTool extends React.Component {
     this.props.pgAdmin.Tools.FileManager.show(params, this.openFile.bind(this), null, this.context);
   }
 
-  openFile(fileName) {
+  async openFile(fileName){
     this.setLoading(gettext('Loading project...'));
-    this.apiObj.post(url_for('sqleditor.load_file'), {
-      'file_name': decodeURI(fileName),
-    }).then((res)=>{
+    const fileData = await this.fmUtilsObj.loadFile(fileName);
+    const toolContent = JSON.parse(fileData.data);
+    if (fileData.success) {
       this.setState({
         current_file: fileName,
         dirty: false,
       });
-      this.eventBus.fireEvent(ERD_EVENTS.DIRTY, false);
+      this.eventBus.fireEvent(ERD_EVENTS.DIRTY, false, toolContent, fileName);
       this.setTitle(fileName);
-      this.diagram.deserialize(res.data);
+      this.diagram.deserialize(toolContent);
       this.diagram.clearSelection();
       this.registerModelEvents();
-    }).catch((err)=>{
-      this.handleAxiosCatch(err);
-    }).then(()=>{
-      this.setLoading(null);
-    });
+    } else {
+      console.error('Failed to load file:', fileData.error);
+      pgAdmin.Browser.notifier.error(fileData.error);
+    }
+    this.setLoading(null);
   }
 
   onSaveDiagram(isSaveAs=false, closeOnSave=false) {
     this.closeOnSave = closeOnSave;
     if(this.state.current_file && !isSaveAs) {
       this.saveFile(this.state.current_file);
-    } else if (this.diagram.getNodesData().length > 0){ {
+    } else if (this.diagram.getNodesData().length > 0){
       let params = {
         'supported_types': ['*','pgerd'],
         'dialog_type': 'create_file',
@@ -610,14 +741,14 @@ export default class ERDTool extends React.Component {
       };
       this.props.pgAdmin.Tools.FileManager.show(params, this.saveFile.bind(this), null, this.context);
     }
-    }
   }
 
   saveFile(fileName) {
     this.setLoading(gettext('Saving...'));
-    this.apiObj.post(url_for('sqleditor.save_file'), {
+    const serialFile = this.diagram.serialize(this.props.pgAdmin.Browser.utils.app_version_int);
+    this.apiObj.post(url_for('file_manager.save_file'), {
       'file_name': decodeURI(fileName),
-      'file_content': JSON.stringify(this.diagram.serialize(this.props.pgAdmin.Browser.utils.app_version_int)),
+      'file_content': JSON.stringify(serialFile, null, this.state.preferences.format_pgerd ? 4 : null),
     }).then(()=>{
       this.props.pgAdmin.Browser.notifier.success(gettext('Project saved successfully.'));
       this.setState({
@@ -649,6 +780,10 @@ export default class ERDTool extends React.Component {
     if (this.state.is_new_tab) {
       window.document.title = title;
     } else {
+      this.props.panelDocker.setInternalAttrs(this.props.panelId, {
+        isDirty: dirty,
+        fileName: this.state.current_file
+      });
       setPanelTitle(this.props.panelDocker, this.props.panelId, title);
     }
   }
@@ -684,7 +819,7 @@ export default class ERDTool extends React.Component {
 
         let sqlId = `erd${this.props.params.trans_id}`;
         localStorage.setItem(sqlId, sqlScript);
-        showERDSqlTool(parentData, sqlId, this.props.params.title, this.props.pgWindow.pgAdmin.Tools.SQLEditor);
+        showERDSqlTool(parentData, sqlId, this.props.params.connectionTitle, this.props.pgWindow.pgAdmin.Tools.SQLEditor);
       })
       .catch((error)=>{
         this.handleAxiosCatch(error);
@@ -759,9 +894,9 @@ export default class ERDTool extends React.Component {
         height = 32766;
         isCut = true;
       }
-      toPng(this.canvasEle, {width, height})
+      toPng(this.canvasEle, {width, height, pixelRatio: this.state.preferences.image_pixel_ratio || 1})
         .then((dataUrl)=>{
-          downloadUrlData(dataUrl, `${this.getCurrentProjectName()}.png`);
+          DownloadUtils.downloadBase64UrlData(dataUrl, `${this.getCurrentProjectName()}.png`);
         }).catch((err)=>{
           console.error(err);
           let msg = gettext('Unknown error. Check console logs');
@@ -830,6 +965,10 @@ export default class ERDTool extends React.Component {
     updated && this.diagram.fireEvent({}, 'nodesUpdated', true);
   }
 
+  serializeFile(){
+    return this.diagram.serialize(this.props.pgAdmin.Browser.utils.app_version_int);
+  }
+
   async initConnection() {
     this.setLoading(gettext('Initializing connection...'));
     this.setState({conn_status: CONNECT_STATUS.CONNECTING});
@@ -842,7 +981,12 @@ export default class ERDTool extends React.Component {
     });
 
     try {
-      let response = await this.apiObj.post(initUrl);
+      let response = await this.apiObj.post(
+        initUrl,
+        {server_name: this.props.params.server_name,
+          server_type : this.props.params.server_type,
+          user: this.props.params.user,
+          db_name: this.props.params.db_name});
       this.setState({
         conn_status: CONNECT_STATUS.CONNECTED,
         server_version: response.data.data.serverVersion,
@@ -851,7 +995,15 @@ export default class ERDTool extends React.Component {
       return true;
     } catch (error) {
       this.setState({conn_status: CONNECT_STATUS.FAILED});
-      this.handleAxiosCatch(error);
+      connectServerModal(this.context, error.response?.data?.result, async (passwordData)=>{
+        await connectServer(this.apiObj, this.context, this.props.params.sid, this.props.params.sid, passwordData, async ()=>{
+          await this.initConnection();
+          await this.loadPrequisiteData();
+        });
+      }, ()=>{
+        this.setState({conn_status: CONNECT_STATUS.FAILED});
+      });
+
       return false;
     } finally {
       this.setLoading(null);
@@ -875,6 +1027,7 @@ export default class ERDTool extends React.Component {
       let data = response.data.data;
       this.diagram.setCache('colTypes', data['col_types']);
       this.diagram.setCache('schemas', data['schemas']);
+      this.diagram.setCache('geometryTypes', data['geometry_types']);
       return true;
     } catch (error) {
       this.handleAxiosCatch(error);
@@ -909,14 +1062,18 @@ export default class ERDTool extends React.Component {
     }
     setTimeout(()=>{
       this.onAutoDistribute();
+      this.eventBus.fireEvent(ERD_EVENTS.DIRTY, true, this.serializeFile());
     }, 250);
   }
 
+
   render() {
     this.erdDialogs.modal = this.context;
+    this.fmUtilsObj.setModalObj(this.context);
 
     return (
       <StyledBox ref={this.containerRef} height="100%" display="flex" flexDirection="column">
+        { this.restore && <GetToolContent transId={this.props.params.trans_id} restoreToolContent={this.restoreToolContent} /> }
         <BeforeUnload
           onInit={({forceClose})=>{this.forceClose = forceClose;}}
           enabled={this.state.is_close_tab_warning}
@@ -925,10 +1082,10 @@ export default class ERDTool extends React.Component {
           closePanel={this.closePanel}
         />
         <ConnectionBar status={this.state.conn_status} bgcolor={this.props.params.bgcolor}
-          fgcolor={this.props.params.fgcolor} title={_.unescape(this.props.params.title)}/>
+          fgcolor={this.props.params.fgcolor} title={_.unescape(this.props.params.connectionTitle)}/>
         <MainToolBar preferences={this.state.preferences} eventBus={this.eventBus}
           fillColor={this.state.fill_color} textColor={this.state.text_color}
-          notation={this.state.cardinality_notation} onNotationChange={this.onNotationChange}
+          notation={this.state.cardinality_notation} onNotationChange={this.onNotationChange} connectionInfo={this.props.params}
         />
         <FloatingNote open={this.state.note_open} onClose={this.onNoteClose}
           anchorEl={this.noteRefEle} noteNode={this.state.note_node} appendTo={this.diagramContainerRef.current} rows={8}/>
@@ -954,10 +1111,15 @@ ERDTool.propTypes = {
     scid: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     tid: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     server_type: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
+    connectionTitle: PropTypes.string.isRequired,
     bgcolor: PropTypes.string,
     fgcolor: PropTypes.string,
     gen: PropTypes.bool.isRequired,
+    sql_id: PropTypes.string,
+    server_name: PropTypes.string,
+    user: PropTypes.string,
+    db_name: PropTypes.string,
+    restore: PropTypes.string,
   }),
   pgWindow: PropTypes.object.isRequired,
   pgAdmin: PropTypes.object.isRequired,

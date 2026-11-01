@@ -10,7 +10,7 @@ import _ from 'lodash';
 import { styled } from '@mui/material/styles';
 import React, { useContext, useEffect, useRef, useState }  from 'react';
 import QueryToolDataGrid, { GRID_ROW_SELECT_KEY } from '../QueryToolDataGrid';
-import {CONNECTION_STATUS, PANELS, QUERY_TOOL_EVENTS} from '../QueryToolConstants';
+import {CONNECTION_STATUS, PANELS, QUERY_TOOL_EVENTS, MODAL_DIALOGS} from '../QueryToolConstants';
 import url_for from 'sources/url_for';
 import getApiInstance, { parseApiError } from '../../../../../../static/js/api_instance';
 import { QueryToolContext, QueryToolEventsContext } from '../QueryToolComponent';
@@ -22,7 +22,7 @@ import { LayoutDockerContext } from '../../../../../../static/js/helpers/Layout'
 import { GeometryViewer } from './GeometryViewer';
 import Explain from '../../../../../../static/js/Explain';
 import { QuerySources } from './QueryHistory';
-import { downloadFile } from '../../../../../../static/js/utils';
+import DownloadUtils from '../../../../../../static/js/DownloadUtils';
 import CopyData from '../QueryToolDataGrid/CopyData';
 import moment from 'moment';
 import ConfirmSaveContent from '../../../../../../static/js/Dialogs/ConfirmSaveContent';
@@ -30,8 +30,7 @@ import EmptyPanelMessage from '../../../../../../static/js/components/EmptyPanel
 import { GraphVisualiser } from './GraphVisualiser';
 import { usePgAdmin } from '../../../../../../static/js/PgAdminProvider';
 import pgAdmin from 'sources/pgadmin';
-import ConnectServerContent from '../../../../../../static/js/Dialogs/ConnectServerContent';
-import { MODAL_DIALOGS } from '../QueryToolConstants';
+import { connectServer, connectServerModal } from '../connectServer';
 
 const StyledBox = styled(Box)(({theme}) => ({
   display: 'flex',
@@ -51,6 +50,7 @@ export class ResultSetUtils {
     this.historyQuerySource = null;
     this.hasQueryCommitted = false;
     this.queryToolCtx = queryToolCtx;
+    this.setLoaderText = null;
   }
 
   static generateURLReconnectionFlag(baseUrl, transId, shouldReconnect) {
@@ -190,47 +190,6 @@ export class ResultSetUtils {
       );
     }
   }
-  connectServerModal (modalData, connectCallback, cancelCallback) {
-    this.queryToolCtx.modal.showModal(gettext('Connect to server'), (closeModal)=>{
-      return (
-        <ConnectServerContent
-          closeModal={()=>{
-            cancelCallback?.();
-            closeModal();
-          }}
-          data={modalData}
-          onOK={(formData)=>{
-            connectCallback(Object.fromEntries(formData));
-            closeModal();
-          }}
-        />
-      );
-    }, {
-      onClose: cancelCallback,
-    });
-  };
-  async connectServer (sid, user, formData, connectCallback) {
-    try {
-      let {data: respData} = await this.api({
-        method: 'POST',
-        url: url_for('sqleditor.connect_server', {
-          'sid': sid,
-          ...(user ? {
-            'usr': user,
-          }:{}),
-        }),
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        data: formData
-      });
-      connectCallback?.(respData.data);
-    } catch (error) {
-      this.connectServerModal(error.response?.data?.result, async (data)=>{
-        this.connectServer(sid, user, data, connectCallback);
-      }, ()=>{
-        /*This is intentional (SonarQube)*/
-      });
-    }
-  };
 
   async startExecution(query, explainObject, macroSQL, onIncorrectSQL, flags={
     isQueryTool: true, external: false, reconnect: false, executeCursor: false, refreshData: false,
@@ -294,8 +253,8 @@ export class ResultSetUtils {
       }
     } catch(e) {
       if(e?.response?.status == 428){
-        this.connectServerModal(e.response?.data?.result, async (passwordData)=>{
-          await this.connectServer(this.queryToolCtx.params.sid, this.queryToolCtx.params.user, passwordData, async ()=>{
+        connectServerModal(this.queryToolCtx.modal, e.response?.data?.result, async (passwordData)=>{
+          await connectServer(this.api, this.queryToolCtx.modal, this.queryToolCtx.params.sid, this.queryToolCtx.params.user, passwordData, async ()=>{
             await this.eventBus.fireEvent(QUERY_TOOL_EVENTS.REINIT_QT_CONNECTION, '', explainObject, macroSQL, flags.executeCursor, true);
           });
         }, ()=>{
@@ -304,7 +263,7 @@ export class ResultSetUtils {
       }else if (e?.response?.data.info == 'CRYPTKEY_MISSING'){
         let pgBrowser = window.pgAdmin.Browser;
         pgBrowser.set_master_password('', async (passwordData)=>{
-          await this.connectServer(this.queryToolCtx.params.sid, this.queryToolCtx.params.user, passwordData, async ()=>{
+          await connectServer(this.api, this.queryToolCtx.modal, this.queryToolCtx.params.sid, this.queryToolCtx.params.user, passwordData, async ()=>{
             await this.eventBus.fireEvent(QUERY_TOOL_EVENTS.REINIT_QT_CONNECTION, '', explainObject, macroSQL, flags.executeCursor, true);
           });
         }, ()=> {
@@ -445,42 +404,87 @@ export class ResultSetUtils {
     );
   }
 
-  saveData(reqData) {
+  saveData(reqData, shouldReconnect) {
+    // Generate the URL with the optional `connect=1` parameter.
+    const url = ResultSetUtils.generateURLReconnectionFlag('sqleditor.save', this.transId, shouldReconnect);
+
     return this.api.post(
-      url_for('sqleditor.save', {
-        'trans_id': this.transId
-      }),
+      url,
       JSON.stringify(reqData)
-    ).then(response => {
+    ).then((response) => {
       if (response.data?.data?.status) {
         // Set the commit flag to true if the save was successful
         this.hasQueryCommitted = true;
       }
       return response;
-    }).catch((error) => {
-      // Set the commit flag to false if there was an error
-      this.hasQueryCommitted = false;
-      throw error;
-    });
+    })
+      .catch(async (error) => {
+        if (error.response?.status === 428) {
+          // Handle 428: Show password dialog.
+          return new Promise((resolve, reject) => {
+            connectServerModal(
+              this.queryToolCtx.modal,
+              error.response?.data?.result,
+              async (formData) => {
+                try {
+                  await connectServer(
+                    this.api,
+                    this.queryToolCtx.modal,
+                    this.queryToolCtx.params.sid,
+                    this.queryToolCtx.params.user,
+                    formData,
+                    async () => {
+                      let retryRespData = await this.saveData(reqData);
+                      // Set the commit flag to true if the save was successful
+                      this.hasQueryCommitted = true;
+                      pgAdmin.Browser.notifier.success(gettext('Server Connected.'));
+                      resolve(retryRespData);
+                    }
+                  );
+
+                } catch (retryError) {
+                  reject(retryError);
+                }
+              },
+              () => this.setLoaderText(null)
+            );
+          });
+        } else if (error.response?.status === 503) {
+          // Handle 503: Fire HANDLE_API_ERROR and wait for connectionLostCallback.
+          return new Promise((resolve, reject) => {
+            this.eventBus.fireEvent(QUERY_TOOL_EVENTS.HANDLE_API_ERROR, error, {
+              connectionLostCallback: async () => {
+                try {
+                  // Retry saveData with connect=1
+                  let retryRespData = await this.saveData(reqData, true);
+                  resolve(retryRespData);
+                } catch (retryError) {
+                  reject(retryError);
+                }
+              },
+              checkTransaction: true,
+              cancelCallback: () => this.setLoaderText(null)
+            },
+            );
+          });
+        } else {
+          // Set the commit flag to false if there was an error
+          this.hasQueryCommitted = false;
+          throw error;
+        }
+      });
   }
 
-  async saveResultsToFile(fileName) {
+  async saveResultsToFile(fileName, onProgress) {
     try {
-      let {data: respData} = await this.api.post(
-        url_for('sqleditor.query_tool_download', {
+      await DownloadUtils.downloadFileStream({
+        url: url_for('sqleditor.query_tool_download', {
           'trans_id': this.transId,
         }),
-        {filename: fileName, query_commited: this.hasQueryCommitted}
-      );
-
-      if(!_.isUndefined(respData.data)) {
-        if(!respData.status) {
-          this.eventBus.fireEvent(QUERY_TOOL_EVENTS.SET_MESSAGE, respData.data.result);
-        }
-      } else {
-        this.hasQueryCommitted = false;
-        downloadFile(respData, fileName, 'text/csv');
-      }
+        options: {
+          method: 'POST',
+          body: JSON.stringify({filename: fileName, query_commited: this.hasQueryCommitted})
+        }}, fileName, 'text/csv', onProgress);
       this.eventBus.fireEvent(QUERY_TOOL_EVENTS.TRIGGER_SAVE_RESULTS_END);
     } catch (error) {
       this.eventBus.fireEvent(QUERY_TOOL_EVENTS.TRIGGER_SAVE_RESULTS_END);
@@ -665,8 +669,9 @@ export class ResultSetUtils {
     return columnVal;
   }
 
-  processRows(result, columns, fromClipboard=false, pasteSerials=false) {
+  processRows(result, columns, options={}) {
     let retVal = [];
+    let {fromClipboard=false, pasteSerials=false, isNewRow=false} = options;
     if(!_.isArray(result) || !_.size(result)) {
       return retVal;
     }
@@ -681,8 +686,9 @@ export class ResultSetUtils {
       // Convert 2darray to dict.
       let rowObj = {};
       for(const col of columns) {
-        // if column data is undefined and there is not default value then set it to null.
-        let columnVal = rec[col.pos] ?? (col.has_default_val ? undefined : null);
+        // if column data is not present for existing rows then use null
+        // for new rows, it should be undefined if there is default value.
+        let columnVal = rec[col.pos] ?? ((col.has_default_val && isNewRow) ? undefined : null);
         /* If the source is clipboard, then it needs some extra handling */
         if(fromClipboard) {
           columnVal = this.processClipboardVal(columnVal, col, copiedRowsObjects[recIdx]?.[col.key], pasteSerials);
@@ -719,6 +725,10 @@ export class ResultSetUtils {
 
     let retMsg, tabMsg;
     retMsg = tabMsg = gettext('Query returned successfully in %s.', this.queryRunTime());
+
+    if (httpMessage.data.data?.server_cursor) {
+      this.eventBus.fireEvent(QUERY_TOOL_EVENTS.SERVER_CURSOR, httpMessage.data.data?.server_cursor);
+    }
     if(this.hasResultsToDisplay(httpMessage.data.data)) {
       let msg1 = gettext('Successfully run. Total query runtime: %s.', this.queryRunTime());
       let msg2 = gettext('%s rows affected.', httpMessage.data.data?.rows_affected);
@@ -834,7 +844,6 @@ export function ResultSet() {
   // NONE - no select, PAGE - show select all, ALL - select all.
   const [allRowsSelect, setAllRowsSelect] = useState('NONE');
   const modalId = MODAL_DIALOGS.QT_CONFIRMATIONS;
-
   // We'll use this track if any changes were saved.
   // It will help to decide whether results refresh is required or not on page change.
   const pageDataDirty = useRef(false);
@@ -861,6 +870,8 @@ export function ResultSet() {
 
   rsu.current.setEventBus(eventBus);
   rsu.current.setQtPref(queryToolCtx.preferences?.sqleditor);
+  // To use setLoaderText to the ResultSetUtils.
+  rsu.current.setLoaderText = setLoaderText;
 
   const isDataChanged = ()=>{
     return Boolean(_.size(dataChangeStore.updated) || _.size(dataChangeStore.added) || _.size(dataChangeStore.deleted));
@@ -997,7 +1008,9 @@ export function ResultSet() {
         fileName = queryToolCtx.params.node_name + extension;
       }
       setLoaderText(gettext('Downloading results...'));
-      await rsu.current.saveResultsToFile(fileName);
+      await rsu.current.saveResultsToFile(fileName, (p)=>{
+        setLoaderText(gettext('Downloading results(%s)...', p));
+      });
       setLoaderText('');
     });
 
@@ -1368,7 +1381,7 @@ export function ResultSet() {
   }, [selectedRows, queryData, dataChangeStore, rows, allRowsSelect]);
 
   useEffect(()=>{
-    const triggerAddRows = (_rows, fromClipboard, pasteSerials)=>{
+    const triggerAddRows = (_rows, options)=>{
       let insPosn = 0;
       if(selectedRows.size > 0) {
         let selectedRowsSorted = Array.from(selectedRows);
@@ -1385,7 +1398,7 @@ export function ResultSet() {
           return x;
         });
       }
-      let newRows = rsu.current.processRows(_rows, columns, fromClipboard, pasteSerials);
+      let newRows = rsu.current.processRows(_rows, columns, options);
       setRows((prev)=>[
         ...prev.slice(0, insPosn),
         ...newRows,
@@ -1526,6 +1539,7 @@ export function ResultSet() {
                 queryToolCtx.preferences.sqleditor.column_data_max_width :
                 queryToolCtx.preferences?.sqleditor?.column_data_auto_resize
             }
+            maxColumnDataDisplayLength={queryToolCtx.preferences?.sqleditor?.max_column_data_display_length}
             key={rowsResetKey}
             rowKeyGetter={rowKeyGetter}
             onRowsChange={onRowsChange}

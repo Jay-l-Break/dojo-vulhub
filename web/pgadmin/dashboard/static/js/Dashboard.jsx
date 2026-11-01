@@ -6,7 +6,7 @@
 // This software is released under the PostgreSQL Licence
 //
 //////////////////////////////////////////////////////////////
-import React, { useEffect, useMemo, useState, Fragment } from 'react';
+import { useEffect, useMemo, useState, Fragment } from 'react';
 import { styled } from '@mui/material/styles';
 import gettext from 'sources/gettext';
 import PropTypes from 'prop-types';
@@ -40,7 +40,7 @@ import Replication from './Replication';
 import { getExpandCell } from '../../../static/js/components/PgReactTableStyled';
 import CodeMirror from '../../../static/js/components/ReactCodeMirror';
 import GetAppRoundedIcon from '@mui/icons-material/GetAppRounded';
-import { downloadFile } from '../../../static/js/utils';
+import DownloadUtils from '../../../static/js/DownloadUtils';
 import RefreshButton from './components/RefreshButtons';
 
 function parseData(data) {
@@ -451,7 +451,7 @@ function Dashboard({
     let fileName = 'data-' + new Date().getTime() + extension;
 
     try {
-      downloadFile(respData, fileName, `text/${type}`);
+      DownloadUtils.downloadTextData(respData, fileName, `text/${type}`);
     } catch {
       setSsMsg(gettext('Failed to download the logs.'));
     }
@@ -1064,7 +1064,7 @@ function Dashboard({
                 {!_.isUndefined(preferences) && preferences.show_activity && (
                   <Fragment>
                     <CustomRefresh refresh={refresh} setRefresh={setRefresh}/>
-                    <SectionContainer title={gettext('Sessions')} style={{height: 'auto', minHeight: '200px', maxHeight:'400px', paddingBottom: '20px'}}>
+                    <SectionContainer title={gettext('Sessions')}>
                       <PgTable
                         caveTable={false}
                         tableNoBorder={false}
@@ -1074,7 +1074,7 @@ function Dashboard({
                         schema={activeQSchemaObj}
                       ></PgTable>
                     </SectionContainer>
-                    <SectionContainer title={gettext('Locks')} style={{height: 'auto', minHeight: '200px',  maxHeight:'400px', paddingBottom: '20px'}}>
+                    <SectionContainer title={gettext('Locks')}>
                       <PgTable
                         caveTable={false}
                         tableNoBorder={false}
@@ -1082,7 +1082,7 @@ function Dashboard({
                         data={(dashData?.[0]?.['locks']) || []}
                       ></PgTable>
                     </SectionContainer>
-                    <SectionContainer title={gettext('Prepared Transactions')} style={{height: 'auto', minHeight: '200px',  maxHeight:'400px', paddingBottom: '20px'}}>
+                    <SectionContainer title={gettext('Prepared Transactions')}>
                       <PgTable
                         caveTable={false}
                         tableNoBorder={false}

@@ -8,7 +8,6 @@
 //////////////////////////////////////////////////////////////
 
 import _ from 'lodash';
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 import gettext from 'sources/gettext';
@@ -24,7 +23,7 @@ import FunctionArguments from './debugger_ui';
 import ModalProvider from '../../../../static/js/helpers/ModalProvider';
 import DebuggerComponent from './components/DebuggerComponent';
 import Theme from '../../../../static/js/Theme';
-import { BROWSER_PANELS } from '../../../../browser/static/js/constants';
+import { AllPermissionTypes, BROWSER_PANELS } from '../../../../browser/static/js/constants';
 import { NotifierProvider } from '../../../../static/js/helpers/Notifier';
 import usePreferences, { listenPreferenceBroadcast } from '../../../../preferences/static/js/store';
 import pgAdmin from 'sources/pgadmin';
@@ -66,6 +65,7 @@ export default class DebuggerModule {
           object: 'function',
         },
         enable: 'canDebug',
+        permission: AllPermissionTypes.TOOLS_DEBUGGER,
       }, {
         name: 'global_debugger',
         node: 'function',
@@ -80,6 +80,7 @@ export default class DebuggerModule {
           debug_type: 'indirect',
         },
         enable: 'canDebug',
+        permission: AllPermissionTypes.TOOLS_DEBUGGER,
       }, {
         name: 'procedure_direct_debugger',
         node: 'procedure',
@@ -93,6 +94,7 @@ export default class DebuggerModule {
           object: 'procedure',
         },
         enable: 'canDebug',
+        permission: AllPermissionTypes.TOOLS_DEBUGGER,
       }, {
         name: 'procedure_indirect_debugger',
         node: 'procedure',
@@ -107,6 +109,7 @@ export default class DebuggerModule {
           debug_type: 'indirect',
         },
         enable: 'canDebug',
+        permission: AllPermissionTypes.TOOLS_DEBUGGER,
       }, {
         name: 'trigger_function_indirect_debugger',
         node: 'trigger_function',
@@ -121,6 +124,7 @@ export default class DebuggerModule {
           debug_type: 'indirect',
         },
         enable: 'canDebug',
+        permission: AllPermissionTypes.TOOLS_DEBUGGER,
       }, {
         name: 'trigger_indirect_debugger',
         node: 'trigger',
@@ -135,6 +139,7 @@ export default class DebuggerModule {
           debug_type: 'indirect',
         },
         enable: 'canDebug',
+        permission: AllPermissionTypes.TOOLS_DEBUGGER,
       }, {
         name: 'package_function_direct_debugger',
         node: 'edbfunc',
@@ -148,6 +153,7 @@ export default class DebuggerModule {
           object: 'edbfunc',
         },
         enable: 'canDebug',
+        permission: AllPermissionTypes.TOOLS_DEBUGGER,
       }, {
         name: 'package_function_global_debugger',
         node: 'edbfunc',
@@ -162,6 +168,7 @@ export default class DebuggerModule {
           debug_type: 'indirect',
         },
         enable: 'canDebug',
+        permission: AllPermissionTypes.TOOLS_DEBUGGER,
       }, {
         name: 'package_procedure_direct_debugger',
         node: 'edbproc',
@@ -175,6 +182,7 @@ export default class DebuggerModule {
           object: 'edbproc',
         },
         enable: 'canDebug',
+        permission: AllPermissionTypes.TOOLS_DEBUGGER,
       }, {
         name: 'package_procedure_global_debugger',
         node: 'edbproc',
@@ -189,6 +197,7 @@ export default class DebuggerModule {
           debug_type: 'indirect',
         },
         enable: 'canDebug',
+        permission: AllPermissionTypes.TOOLS_DEBUGGER,
       }
     ]);
   }

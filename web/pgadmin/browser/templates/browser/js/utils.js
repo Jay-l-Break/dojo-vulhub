@@ -63,9 +63,6 @@ define('pgadmin.browser.utils',
 
   pgAdmin['fixed_binary_paths'] = {{ current_app.config.get('FIXED_BINARY_PATHS') }};
 
-  /* GET the pgadmin server's locale */
-  pgAdmin['pgadmin_server_locale'] =  '{{pgadmin_server_locale}}';
-
    /* Server Heartbeat Timeout */
   pgAdmin['heartbeat_timeout'] =  '{{heartbeat_timeout}}';
 
@@ -88,13 +85,6 @@ define('pgadmin.browser.utils',
     layout: {{ layout|tojson }},
     theme: '{{ theme }}',
     pg_help_path: '{{ pg_help_path }}',
-    tabSize: '{{ editor_tab_size }}',
-    wrapCode: '{{ editor_wrap_code }}' == 'True',
-    useSpaces: '{{ editor_use_spaces }}',
-    insertPairBrackets: '{{ editor_insert_pair_brackets }}' == 'True',
-    braceMatching: '{{ editor_brace_matching }}' == 'True',
-    highlightSelectionMatches: '{{editor_highlight_selection_matches}}' == 'True',
-    is_indent_with_tabs: '{{ editor_indent_with_tabs }}' == 'True',
     app_name: '{{ app_name }}',
     app_version_int: '{{ app_version_int}}',
     pg_libpq_version: {{pg_libpq_version|e}},

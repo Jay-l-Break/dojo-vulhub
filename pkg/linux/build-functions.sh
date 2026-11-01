@@ -22,7 +22,13 @@ _setup_env() {
     # Setting up the correct Python version for Ubuntu 18 and EL-8, which have
     # new Python versions installed parallel to the old ones.
     OS_VERSION=$(grep "^VERSION_ID=" /etc/os-release | awk -F "=" '{ print $2 }' | sed 's/"//g' | awk -F "." '{ print $1 }')
-    SYSTEM_PYTHON_PATH='/usr/bin/python3'
+    if [ -n "$VIRTUAL_ENV" ]; then
+        SYSTEM_PYTHON_PATH="$VIRTUAL_ENV/bin/python3"
+        echo "Detected virtual environment: $VIRTUAL_ENV"
+    else
+        SYSTEM_PYTHON_PATH='/usr/bin/python3'
+        echo "Not in a virtual environment, using system Python path."
+    fi
     PYTHON_BINARY=$("${SYSTEM_PYTHON_PATH}" -c "import sys; print('python%d.%.d' % (sys.version_info.major, sys.version_info.minor))")
     PYTHON_BINARY_WITHOUT_DOTS='python3'
     if [ "$2" == 'redhat' ] && [ "${OS_VERSION}" == "8" ]; then
@@ -63,17 +69,16 @@ _create_python_virtualenv() {
     cd "usr/${APP_NAME}" || exit
 
     # Create the blank venv
-    "${SYSTEM_PYTHON_PATH}" -m venv venv
+    "${SYSTEM_PYTHON_PATH}" -m venv --system-site-packages venv
     # shellcheck disable=SC1091
     . venv/bin/activate
 
     # Make sure we have the wheel package present, as well as the latest pip
     pip3 install --upgrade pip
-    pip3 install setuptools
     pip3 install wheel
 
     # Install the requirements
-    pip3 install --no-cache-dir --no-binary psycopg -r "${SOURCEDIR}/requirements.txt"
+    pip3 install --force-reinstall --no-cache-dir --no-binary psycopg -r "${SOURCEDIR}/requirements.txt"
 
     # Fixup the paths in the venv activation scripts
     sed -i 's/VIRTUAL_ENV=.*/VIRTUAL_ENV="\/usr\/pgadmin4\/venv"/g' venv/bin/activate
@@ -176,8 +181,7 @@ _build_runtime() {
     # Install the runtime node_modules
     pushd "${BUNDLEDIR}/resources/app" > /dev/null || exit
         yarn set version berry
-        yarn set version 3
-        yarn plugin import workspace-tools
+        yarn set version 4
         yarn workspaces focus --production
 
         # remove the yarn cache
@@ -205,9 +209,10 @@ _build_docs() {
     cd "${SERVERROOT}" && mkdir -p "usr/${APP_NAME}/share/docs/en_US/html"
     cd "${SOURCEDIR}/docs/en_US" || exit
     python3 build_code_snippet.py
-    SYS_PYTHONPATH=$("${SYSTEM_PYTHON_PATH}" -c "import sys; print(':'.join([p for p in sys.path if p]))")
+
+    SYS_PYTHON_PACKS=$("${SYSTEM_PYTHON_PATH}" -c "import sys; print(':'.join([p for p in sys.path if p]))")
     # shellcheck disable=SC2153
-    PYTHONPATH=$PYTHONPATH:${SYS_PYTHONPATH} python3 -msphinx . "${SERVERROOT}/usr/${APP_NAME}/share/docs/en_US/html"
+    PYTHONPATH=$PYTHONPATH:${SYS_PYTHON_PACKS} python3 -msphinx . "${SERVERROOT}/usr/${APP_NAME}/share/docs/en_US/html"
 }
 
 _copy_code() {
@@ -224,7 +229,7 @@ _copy_code() {
 
     pushd "${SOURCEDIR}/web" > /dev/null || exit
         yarn set version berry
-        yarn set version 3
+        yarn set version 4
         yarn install
         yarn run bundle
     popd > /dev/null || exit
@@ -241,7 +246,6 @@ _copy_code() {
 
     # License files
     cp "${SOURCEDIR}/LICENSE" "${SERVERROOT}/usr/${APP_NAME}/"
-    cp "${SOURCEDIR}/DEPENDENCIES" "${SERVERROOT}/usr/${APP_NAME}/"
 
     # Web setup script
     mkdir -p "${WEBROOT}/usr/${APP_NAME}/bin/"

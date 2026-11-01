@@ -6,7 +6,7 @@
 // This software is released under the PostgreSQL Licence
 //
 //////////////////////////////////////////////////////////////
-import { app, BrowserWindow, dialog, ipcMain, Menu, shell, screen } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, Menu, shell, screen, autoUpdater } from 'electron';
 import axios from 'axios';
 import Store from 'electron-store';
 import fs from 'fs';
@@ -16,7 +16,8 @@ import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
 import { setupMenu } from './menu.js';
 import contextMenu from 'electron-context-menu';
-import { CancelError, download } from 'electron-dl';
+import { setupDownloader } from './downloader.js';
+import { setupAutoUpdater, updateConfigAndMenus } from './autoUpdaterHandler.js';
 
 const configStore = new Store({
   defaults: {
@@ -35,8 +36,12 @@ let configureWindow = null,
   viewLogWindow = null;
 
 let serverPort = 5050;
+let UUID = crypto.randomUUID();
+
 let appStartTime = (new Date()).getTime();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+let baseUrl = `http://127.0.0.1:${serverPort}`;
 
 let docsURLSubStrings = ['www.enterprisedb.com', 'www.postgresql.org', 'www.pgadmin.org', 'help/help'];
 
@@ -44,6 +49,40 @@ process.env['ELECTRON_ENABLE_SECURITY_WARNINGS'] = false;
 
 // Paths to the rest of the app
 let [pythonPath, pgadminFile] = misc.getAppPaths(__dirname);
+
+const menuCallbacks = {
+  'check_for_updates': ()=>{
+    pgAdminMainScreen.webContents.send('notifyAppAutoUpdate', {check_version_update: true});
+  },
+  'restart_to_update': ()=>{
+    forceQuitAndInstallUpdate();
+  },
+  'view_logs': ()=>{
+    if(viewLogWindow === null || viewLogWindow?.isDestroyed()) {
+      viewLogWindow = new BrowserWindow({
+        show: false,
+        width: 800,
+        height: 460,
+        position: 'center',
+        resizable: false,
+        parent: pgAdminMainScreen,
+        icon: '../../assets/pgAdmin4.png',
+        webPreferences: {
+          preload: path.join(__dirname, 'other_preload.js'),
+        },
+      });
+      viewLogWindow.loadFile('./src/html/view_log.html');
+      viewLogWindow.once('ready-to-show', ()=>{
+        viewLogWindow.show();
+      });
+    } else {
+      viewLogWindow.hide();
+      viewLogWindow.show();
+    }
+  },
+  'configure': openConfigure,
+  'reloadApp': reloadApp,
+};
 
 // Do not allow a second instance of pgAdmin to run.
 const gotTheLock = app.requestSingleInstanceLock();
@@ -153,26 +192,26 @@ function reloadApp() {
   currWin.webContents.reload();
 }
 
-async function desktopFileDownload(payload) {
-  const currWin = BrowserWindow.getFocusedWindow();
-  try {
-    await download(currWin, payload.downloadUrl, {
-      filename: payload.fileName,
-      saveAs: payload.prompt_for_download_location,
-      onProgress: (progress) => {
-        currWin.webContents.send('download-progress', progress);
-      },
-      onCompleted: (item) => {
-        currWin.webContents.send('download-complete', item);
-        if (payload.automatically_open_downloaded_file)
-          shell.openPath(item.path);
-      },
-    });
-  } catch (error) {
-    if (!(error instanceof CancelError)) {
-      misc.writeServerLog(error);
-    }
+
+// Remove auto_update_enabled from configStore on app close or quit
+function cleanupAutoUpdateFlag() {
+  if (configStore.has('auto_update_enabled')) {
+    configStore.delete('auto_update_enabled');
   }
+}
+
+// This function will force quit and install update and restart the app
+function forceQuitAndInstallUpdate() {
+  // Disable beforeunload handlers
+  const preventUnload = (event) => {
+    event.preventDefault();
+    pgAdminMainScreen.webContents.off('will-prevent-unload', preventUnload);
+  };
+  pgAdminMainScreen.webContents.on('will-prevent-unload', preventUnload);
+  // Set flag to show notification after restart
+  configStore.set('update_installed', true);
+  cleanupAutoUpdateFlag();
+  autoUpdater.quitAndInstall();
 }
 
 // This functions is used to start the pgAdmin4 server by spawning a
@@ -184,7 +223,6 @@ function startDesktopMode() {
     return;
 
   let pingIntervalID;
-  let UUID = crypto.randomUUID();
   // Set the environment variables so that pgAdmin 4 server
   // starts listening on the appropriate port.
   process.env.PGADMIN_INT_PORT = serverPort;
@@ -192,8 +230,9 @@ function startDesktopMode() {
   process.env.PGADMIN_SERVER_MODE = 'OFF';
 
   // Start Page URL
-  startPageUrl = 'http://127.0.0.1:' + serverPort + '/?key=' + UUID;
-  serverCheckUrl = 'http://127.0.0.1:' + serverPort + '/misc/ping?key=' + UUID;
+  baseUrl = `http://127.0.0.1:${serverPort}`;
+  startPageUrl = `${baseUrl}/?key=${UUID}`;
+  serverCheckUrl = `${baseUrl}/misc/ping?key=${UUID}`;
 
   // Write Python Path, pgAdmin file path and command in log file.
   misc.writeServerLog('pgAdmin Runtime Environment');
@@ -328,34 +367,10 @@ function launchPgAdminWindow() {
   splashWindow.close();
   pgAdminMainScreen.webContents.session.clearCache();
 
-  setupMenu(pgAdminMainScreen, {
-    'view_logs': ()=>{
-      if(viewLogWindow === null || viewLogWindow?.isDestroyed()) {
-        viewLogWindow = new BrowserWindow({
-          show: false,
-          width: 800,
-          height: 460,
-          position: 'center',
-          resizable: false,
-          parent: pgAdminMainScreen,
-          icon: '../../assets/pgAdmin4.png',
-          webPreferences: {
-            preload: path.join(__dirname, 'other_preload.js'),
-          },
-        });
-        viewLogWindow.loadFile('./src/html/view_log.html');
-        viewLogWindow.once('ready-to-show', ()=>{
-          viewLogWindow.show();
-        });
-      } else {
-        viewLogWindow.hide();
-        viewLogWindow.show();
-      }
-    },
-    'configure': openConfigure,
-    'reloadApp': reloadApp,
-  });
-
+  setupMenu(pgAdminMainScreen, configStore, menuCallbacks);
+  
+  setupDownloader()
+  
   pgAdminMainScreen.loadURL(startPageUrl);
 
   const bounds = configStore.get('bounds');
@@ -364,6 +379,15 @@ function launchPgAdminWindow() {
     pgAdminMainScreen.setBounds({x: 0, y: 0, width: 1024, height: 768});
 
   pgAdminMainScreen.show();
+
+  setupAutoUpdater({
+    pgAdminMainScreen,
+    configStore,
+    menuCallbacks,
+    baseUrl,
+    UUID,
+    forceQuitAndInstallUpdate,
+  });
 
   pgAdminMainScreen.webContents.setWindowOpenHandler(({url})=>{
     let openDocsInBrowser = configStore.get('openDocsInBrowser', true);
@@ -396,17 +420,49 @@ function launchPgAdminWindow() {
   });
 
   pgAdminMainScreen.on('closed', ()=>{
+    cleanupAutoUpdateFlag();
     misc.cleanupAndQuitApp();
   });
 
   pgAdminMainScreen.on('close', () => {
     configStore.set('bounds', pgAdminMainScreen.getBounds());
+    updateConfigAndMenus('error-close', configStore, pgAdminMainScreen, menuCallbacks);
     pgAdminMainScreen.removeAllListeners('close');
     pgAdminMainScreen.close();
   });
+
+  // Notify if update was installed (fix: always check after main window is ready)
+  notifyUpdateInstalled();
 }
 
 let splashWindow;
+
+// Helper to notify update installed after restart
+function notifyUpdateInstalled() {
+  if (configStore.get('update_installed')) {
+    try {
+      // Notify renderer
+      if (pgAdminMainScreen) {
+        misc.writeServerLog('[Auto-Updater]: Update installed successfully.');
+        setTimeout(() => {
+          pgAdminMainScreen.webContents.send('notifyAppAutoUpdate', {update_installed: true});
+        }, 10000);
+      } else {
+        // If main screen not ready, wait and send after it's created
+        app.once('browser-window-created', (event, window) => {
+          misc.writeServerLog('[Auto-Updater]: Update installed successfully.');
+          setTimeout(() => {
+            pgAdminMainScreen.webContents.send('notifyAppAutoUpdate', {update_installed: true});
+          }, 10000);
+        });
+      }
+      // Reset the flag
+      configStore.set('update_installed', false);
+    } catch (err) {
+      misc.writeServerLog(`[Auto-Updater]: ${err}`);
+    }
+  }
+}
 
 // setup preload events.
 ipcMain.handle('showOpenDialog', (e, options) => dialog.showOpenDialog(BrowserWindow.fromWebContents(e.sender), options));
@@ -425,11 +481,18 @@ ipcMain.on('restartApp', ()=>{
   app.relaunch();
   app.exit(0);
 });
-ipcMain.on('log', (text) => ()=>{
+ipcMain.on('log', (_e, text) => {
   misc.writeServerLog(text);
 });
+ipcMain.on('focus', (e) => {
+  app.focus({steal: true});
+  const callerWindow = BrowserWindow.fromWebContents(e.sender);
+  if (callerWindow) {
+    if (callerWindow.isMinimized()) callerWindow.restore();
+    callerWindow.focus();
+  }
+});
 ipcMain.on('reloadApp', reloadApp);
-ipcMain.on('onFileDownload', (_, payload) => desktopFileDownload(payload));
 ipcMain.handle('checkPortAvailable', async (_e, fixedPort)=>{
   try {
     await misc.getAvailablePort(fixedPort);
@@ -439,6 +502,7 @@ ipcMain.handle('checkPortAvailable', async (_e, fixedPort)=>{
   }
 });
 ipcMain.handle('openConfigure', openConfigure);
+
 
 app.whenReady().then(() => {
   splashWindow = new BrowserWindow({

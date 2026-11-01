@@ -7,7 +7,7 @@
 //
 //////////////////////////////////////////////////////////////
 
-import React, { forwardRef, useContext } from 'react';
+import { useContext } from 'react';
 import {
   RightAngleLinkModel,
   RightAngleLinkWidget,
@@ -168,8 +168,8 @@ function NotationForType({itype, width, rotation}) {
   if(itype == 'many') {
     return (
       <>
-        <circle className={['OneToMany-svgLink','OneToMany-svgLinkCircle'].join(' ')} cx="0" cy="16" r={width*2.5} strokeWidth={width} />
-        <polyline className='OneToMany-svgLink' points="-8,0 0,15 0,0 0,30 0,15 8,0" fill="none" strokeWidth={width} />
+        <circle className={['OneToMany-svgLink','OneToMany-svgLinkCircle'].join(' ')} cx="0" cy="16" r={width*2.5} />
+        <polyline className='OneToMany-svgLink' points="-8,0 0,15 0,0 0,30 0,15 8,0" fill="none" />
       </>
     );
   } else if (itype == 'one') {
@@ -354,21 +354,18 @@ export class OneToManyLinkWidget extends RightAngleLinkWidget {
   }
 }
 
-const LinkSegment = forwardRef(({model, selected, path, ...props}, ref)=>{
-
+function LinkSegment({ref, selected, path, ...props}) {
   return (
     <path
       ref={ref}
       className={['OneToMany-svgLink','OneToMany-svgLinkPath', (selected ? 'OneToMany-svgLinkSelected' : '')].join(' ')}
-      stroke={model.getOptions().color}
-      strokeWidth={model.getOptions().width}
       selected={selected}
       d={path}
       {...props}
     >
     </path>
   );
-});
+};
 LinkSegment.displayName = 'LinkSegment';
 LinkSegment.propTypes = {
   model: PropTypes.object,

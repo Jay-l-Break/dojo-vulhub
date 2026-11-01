@@ -7,7 +7,7 @@
 //
 //////////////////////////////////////////////////////////////
 
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import gettext from 'sources/gettext';
 import url_for from 'sources/url_for';
 import _ from 'lodash';
@@ -33,7 +33,7 @@ import { getRandomInt } from '../../../../static/js/utils';
 import { useWorkspace } from './WorkspaceProvider';
 
 class AdHocConnectionSchema extends BaseUISchema {
-  constructor(connectExistingServer, initValues={}) {
+  constructor(connectExistingServer, pgAdmin, initValues={}) {
     super({
       sid: null,
       did: null,
@@ -58,6 +58,7 @@ class AdHocConnectionSchema extends BaseUISchema {
     this.dbs = [];
     this.api = getApiInstance();
     this.connectExistingServer = connectExistingServer;
+    this.pgAdmin = pgAdmin;
     this.paramSchema = new VariableSchema(getConnectionParameters, null, null, ['name', 'keyword', 'value']);
   }
 
@@ -84,12 +85,17 @@ class AdHocConnectionSchema extends BaseUISchema {
   }
 
   getServerList() {
+    let obj = this;
     if(this.groupedServers?.length != 0) {
       return Promise.resolve(this.groupedServers);
     }
     return new Promise((resolve, reject)=>{
       this.api.get(url_for('sqleditor.get_new_connection_servers'))
         .then(({data: respData})=>{
+          // Sort the server list
+          respData.data.result.server_list.Servers?.sort(function (a, b) {
+            return obj.pgAdmin.natural_sort(a.label, b.label);
+          });
           let groupedOptions = [];
           _.forIn(respData.data.result.server_list, (v, k)=>{
             if(v.length == 0) {
@@ -209,11 +215,11 @@ class AdHocConnectionSchema extends BaseUISchema {
         disabled: (state) => state.sid,
       },{
         id: 'did', label: gettext('Database'), deps: ['sid', 'connected'],
-        controlProps: {creatable: true},
         type: (state) => {
           if (state?.sid) {
             return {
               type: 'select',
+              controlProps: {creatable: true},
               options: () => this.getOtherOptions(
                 state.sid, 'get_new_connection_database'
               ),
@@ -223,7 +229,6 @@ class AdHocConnectionSchema extends BaseUISchema {
             return {type: 'text'};
           }
         },
-        optionsLoaded: (res) => this.dbs = res,
         depChange: (state) => {
           /* Once the option is selected get the name */
           return {
@@ -232,11 +237,11 @@ class AdHocConnectionSchema extends BaseUISchema {
         }
       }, {
         id: 'user', label: gettext('User'), deps: ['sid', 'connected'],
-        controlProps: {creatable: true},
         type: (state) => {
           if (state?.sid) {
             return {
               type: 'select',
+              controlProps: {creatable: true},
               options: () => this.getOtherOptions(
                 state.sid, 'get_new_connection_user'
               ),
@@ -260,9 +265,9 @@ class AdHocConnectionSchema extends BaseUISchema {
         }
       },{
         id: 'role', label: gettext('Role'), deps: ['sid', 'connected'],
-        controlProps: {creatable: true},
         type: (state)=>({
           type: 'select',
+          controlProps: {creatable: true},
           options: () => this.getOtherOptions(
             state.sid, 'get_new_connection_role'
           ),
@@ -449,7 +454,7 @@ export default function AdHocConnection({mode}) {
       'pgadmin:tool:show',
       `${BROWSER_PANELS.PSQL_TOOL}_${transId}`,
       openUrl,
-      {title: escapedTitle, db: db_name},
+      {title: escapedTitle, db: db_name, server_name: formData.server_name, 'user': user_name},
       {title: panelTitle, icon: 'pg-font-icon icon-terminal', manualClose: false, renamable: true},
       Boolean(open_new_tab?.includes('psql_tool'))
     );
@@ -499,7 +504,7 @@ export default function AdHocConnection({mode}) {
     saveBtnName = gettext('Connect & Open PSQL');
   }
 
-  let adHocConObj = useMemo(() => new AdHocConnectionSchema(connectExistingServer), []);
+  let adHocConObj = useMemo(() => new AdHocConnectionSchema(connectExistingServer, pgAdmin), []);
 
   useEffect(()=>{
     if(currentWorkspace == mode) adHocConObj.refreshServerList();

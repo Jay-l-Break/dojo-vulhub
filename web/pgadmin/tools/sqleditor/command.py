@@ -365,11 +365,13 @@ class GridCommand(BaseCommand, SQLFilter, FetchedRowTracker):
             self.limit = 100
 
         self.thread_native_id = None
+        self.server_cursor = kwargs['server_cursor'] if\
+            'server_cursor' in kwargs else None
 
     def get_primary_keys(self, *args, **kwargs):
         return None, None
 
-    def get_all_columns_with_order(self, default_conn):
+    def get_all_columns_with_order(self):
         """
         Responsible for fetching columns from given object
 
@@ -382,38 +384,14 @@ class GridCommand(BaseCommand, SQLFilter, FetchedRowTracker):
             all_columns: List of all the column for given object which will
                          be used to fill columns options
         """
-        driver = get_driver(PG_DEFAULT_DRIVER)
-        if default_conn is None:
-            manager = driver.connection_manager(self.sid)
-            conn = manager.connection(did=self.did, conn_id=self.conn_id)
-        else:
-            conn = default_conn
-
         all_sorted_columns = []
         data_sorting = self.get_data_sorting()
-        all_columns = []
-        if conn.connected():
-            # Fetch the rest of the column names
-            query = render_template(
-                "/".join([self.sql_path, 'get_columns.sql']),
-                table_name=self.object_name,
-                table_nspname=self.nsp_name,
-                conn=conn,
-            )
-            status, result = conn.execute_dict(query)
-            if not status:
-                raise ExecuteError(result)
 
-            for row in result['rows']:
-                all_columns.append(row['attname'])
-        else:
-            raise InternalServerError(SERVER_CONNECTION_CLOSED)
-
-        # If user has custom data sorting then pass as it as it is
+        # If user has custom data sorting then pass as it is.
         if data_sorting and len(data_sorting) > 0:
             all_sorted_columns = data_sorting
 
-        return all_sorted_columns, all_columns
+        return all_sorted_columns
 
     def save(self, changed_data, default_conn=None):
         return forbidden(
@@ -448,6 +426,9 @@ class GridCommand(BaseCommand, SQLFilter, FetchedRowTracker):
 
     def set_thread_native_id(self, thread_native_id):
         self.thread_native_id = thread_native_id
+
+    def set_server_cursor(self, server_cursor):
+        self.server_cursor = server_cursor
 
 
 class TableCommand(GridCommand):
@@ -562,27 +543,6 @@ class TableCommand(GridCommand):
             raise InternalServerError(SERVER_CONNECTION_CLOSED)
 
         return pk_names, primary_keys
-
-    def get_all_columns_with_order(self, default_conn=None):
-        """
-        It is overridden method specially for Table because we all have to
-        fetch primary keys.
-
-        Args:
-            default_conn: Connection object
-
-        Returns:
-            all_sorted_columns: Sorted columns for the Grid
-        """
-
-        all_sorted_columns = []
-        data_sorting = self.get_data_sorting()
-
-        # If user has custom data sorting then pass as it is
-        if data_sorting and len(data_sorting) > 0:
-            all_sorted_columns = data_sorting
-
-        return all_sorted_columns
 
     def can_edit(self):
         return True
@@ -861,11 +821,12 @@ class QueryToolCommand(BaseCommand, FetchedRowTracker):
         self.table_has_oids = False
         self.columns_types = None
         self.thread_native_id = None
+        self.server_cursor = False
 
     def get_sql(self, default_conn=None):
         return None
 
-    def get_all_columns_with_order(self, default_conn=None):
+    def get_all_columns_with_order(self):
         return None
 
     def get_primary_keys(self):
@@ -961,6 +922,9 @@ class QueryToolCommand(BaseCommand, FetchedRowTracker):
 
     def set_auto_commit(self, auto_commit):
         self.auto_commit = auto_commit
+
+    def set_server_cursor(self, server_cursor):
+        self.server_cursor = server_cursor
 
     def __set_updatable_results_attrs(self, sql_path,
                                       table_oid, conn):

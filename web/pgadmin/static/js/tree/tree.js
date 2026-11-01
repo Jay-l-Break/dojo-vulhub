@@ -84,6 +84,9 @@ export class Tree {
     this.rootNode = manageTree.tempTree;
     this.Nodes = pgBrowser ? pgBrowser.Nodes : pgAdmin.Browser.Nodes;
 
+    // Flag to suppress added and opened tree event being called during object search operations,
+    // tree.select of search object clashes with other tree.select.
+    this.suppressEventsForPath = null;
     this.draggableTypes = {};
   }
 
@@ -476,7 +479,13 @@ export class Tree {
     let node_cnt = 0;
     let result = {};
     if (!identifier) return;
-    let item = TreeNode.prototype.isPrototypeOf(identifier) ? identifier : this.findNode(identifier.path);
+    let item;
+    try {
+      item = TreeNode.prototype.isPrototypeOf(identifier) ? identifier : this.findNode(identifier.path);
+    } catch {
+      // It is possible that the requested path is not present in the tree anymore
+      item = null;
+    }
     if (!item) return;
     do {
       const currentNodeData = item.getData();
@@ -579,6 +588,10 @@ export class Tree {
 
   onNodeCopy(copyCallback) {
     this.copyHandler = copyCallback;
+  }
+
+  toggleItemLoader(item, show) {
+    this.tree.toggleItemLoader(item, show);
   }
 }
 

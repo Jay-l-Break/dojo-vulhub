@@ -14,7 +14,6 @@ import {getOneToOneDialogSchema} from './OneToOneDialog';
 
 import pgAdmin from 'sources/pgadmin';
 import SchemaView from '../../../../../../static/js/SchemaView';
-import React from 'react';
 export default class ERDDialogs {
   constructor(modalProvider) {
     this.modal = modalProvider;
@@ -35,7 +34,7 @@ export default class ERDDialogs {
   showTableDialog(params) {
     let schema = getTableDialogSchema(
       params.attributes, params.isNew, params.tableNodes,
-      params.colTypes, params.schemas);
+      params.colTypes, params.schemas, params.geometryTypes);
     this.modal.showModal(params.title, (closeModal)=>{
       return (
         <SchemaView

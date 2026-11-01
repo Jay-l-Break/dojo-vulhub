@@ -44,7 +44,7 @@ import config
 from pgadmin import current_blueprint
 from pgadmin.authenticate import get_logout_url
 from pgadmin.authenticate.mfa.utils import is_mfa_enabled
-from pgadmin.settings import get_setting
+from pgadmin.settings import get_setting, get_layout
 from pgadmin.utils import PgAdminModule
 from pgadmin.utils.ajax import make_json_response, internal_server_error, \
     bad_request
@@ -52,6 +52,8 @@ from pgadmin.utils.csrf import pgCSRFProtect
 from pgadmin.utils.preferences import Preferences
 from pgadmin.browser.register_browser_preferences import \
     register_browser_preferences
+from pgadmin.browser.register_editor_preferences import \
+    register_editor_preferences
 from pgadmin.utils.master_password import validate_master_password, \
     set_masterpass_check_text, cleanup_master_password, get_crypt_key, \
     set_crypt_key, process_masterpass_disabled, \
@@ -61,7 +63,7 @@ from pgadmin.utils.master_password import validate_master_password, \
 from pgadmin.model import User, db
 from pgadmin.utils.constants import MIMETYPE_APP_JS, PGADMIN_NODE, \
     INTERNAL, KERBEROS, LDAP, QT_DEFAULT_PLACEHOLDER, OAUTH2, WEBSERVER, \
-    VW_EDT_DEFAULT_PLACEHOLDER
+    VW_EDT_DEFAULT_PLACEHOLDER, NO_CACHE_CONTROL
 from pgadmin.authenticate import AuthSourceManager
 from pgadmin.utils.exception import CryptKeyMissing
 
@@ -87,6 +89,7 @@ class BrowserModule(PgAdminModule):
 
     def register_preferences(self):
         register_browser_preferences(self)
+        register_editor_preferences(self)
 
     def get_exposed_url_endpoints(self):
         """
@@ -400,12 +403,6 @@ def index():
             'pass_enc_key' in session:
         session['allow_save_password'] = False
 
-    response = Response(render_template(
-        MODULE_NAME + "/index.html",
-        username=current_user.username,
-        _=gettext
-    ))
-
     # Set the language cookie after login, so next time the user will have that
     # same option at the login time.
     misc_preference = Preferences.module('misc')
@@ -416,10 +413,21 @@ def index():
     if user_languages:
         language = user_languages.get() or 'en'
 
+    # Get the theme preference
+    user_theme = misc_preference.preference('theme')
+    theme = user_theme.get() or 'light' if user_theme else 'light'
+
     domain = dict()
     if config.COOKIE_DEFAULT_DOMAIN and\
             config.COOKIE_DEFAULT_DOMAIN != 'localhost':
         domain['domain'] = config.COOKIE_DEFAULT_DOMAIN
+
+    response = Response(render_template(
+        MODULE_NAME + "/index.html",
+        username=current_user.username,
+        theme=theme,
+        _=gettext
+    ))
 
     response.set_cookie("PGADMIN_LANGUAGE", value=language,
                         path=config.SESSION_COOKIE_PATH,
@@ -469,38 +477,13 @@ def get_shared_storage_list():
 @pgCSRFProtect.exempt
 @pga_login_required
 def utils():
-    layout = get_setting('Browser/Layout', default='')
+    layout = get_layout()
+
     snippets = []
 
     prefs = Preferences.module('paths')
     pg_help_path_pref = prefs.preference('pg_help_path')
     pg_help_path = pg_help_path_pref.get()
-
-    # Get sqleditor options
-    prefs = Preferences.module('sqleditor')
-
-    editor_tab_size_pref = prefs.preference('tab_size')
-    editor_tab_size = editor_tab_size_pref.get()
-
-    editor_use_spaces_pref = prefs.preference('use_spaces')
-    editor_use_spaces = editor_use_spaces_pref.get()
-
-    editor_wrap_code_pref = prefs.preference('wrap_code')
-    editor_wrap_code = editor_wrap_code_pref.get()
-
-    brace_matching_pref = prefs.preference('brace_matching')
-    brace_matching = brace_matching_pref.get()
-
-    highlight_selection_matches_pref = prefs.preference(
-        'highlight_selection_matches'
-    )
-    highlight_selection_matches = highlight_selection_matches_pref.get()
-
-    insert_pair_brackets_perf = prefs.preference('insert_pair_brackets')
-    insert_pair_brackets = insert_pair_brackets_perf.get()
-
-    # This will be opposite of use_space option
-    editor_indent_with_tabs = False if editor_use_spaces else True
 
     # Try to fetch current libpq version from the driver
     try:
@@ -510,17 +493,6 @@ def utils():
         pg_libpq_version = driver.libpq_version()
     except Exception:
         pg_libpq_version = 0
-
-    # Get the pgadmin server's locale
-    default_locale = ''
-    if current_app.PGADMIN_RUNTIME:
-        import locale
-        try:
-            locale_info = locale.getlocale()
-            if len(locale_info) > 0 and locale_info[0] != 'C':
-                default_locale = locale_info[0].replace('_', '-')
-        except Exception:
-            current_app.logger.debug('Failed to get the default locale.')
 
     for submodule in current_blueprint.submodules:
         snippets.extend(submodule.jssnippets)
@@ -537,19 +509,12 @@ def utils():
     shared_storage_list, \
         restricted_shared_storage_list = get_shared_storage_list()
 
-    return make_response(
+    response = make_response(
         render_template(
             'browser/js/utils.js',
             layout=layout,
             jssnippets=snippets,
             pg_help_path=pg_help_path,
-            editor_tab_size=editor_tab_size,
-            editor_use_spaces=editor_use_spaces,
-            editor_wrap_code=editor_wrap_code,
-            editor_brace_matching=brace_matching,
-            editor_highlight_selection_matches=highlight_selection_matches,
-            editor_insert_pair_brackets=insert_pair_brackets,
-            editor_indent_with_tabs=editor_indent_with_tabs,
             app_name=config.APP_NAME,
             app_version_int=config.APP_VERSION_INT,
             pg_libpq_version=pg_libpq_version,
@@ -559,7 +524,6 @@ def utils():
             qt_default_placeholder=QT_DEFAULT_PLACEHOLDER,
             vw_edt_default_placeholder=VW_EDT_DEFAULT_PLACEHOLDER,
             enable_psql=config.ENABLE_PSQL,
-            pgadmin_server_locale=default_locale,
             _=gettext,
             auth_only_internal=auth_only_internal,
             mfa_enabled=is_mfa_enabled(),
@@ -574,8 +538,10 @@ def utils():
                 "Administrator") else restricted_shared_storage_list,
             enable_server_passexec_cmd=config.ENABLE_SERVER_PASS_EXEC_CMD,
             max_server_tags_allowed=config.MAX_SERVER_TAGS_ALLOWED,
-        ),
-        200, {'Content-Type': MIMETYPE_APP_JS})
+        ), 200)
+    response.headers['Content-Type'] = MIMETYPE_APP_JS
+    response.headers['Cache-Control'] = NO_CACHE_CONTROL
+    return response
 
 
 @blueprint.route("/js/endpoints.js")
@@ -775,17 +741,17 @@ def set_master_password():
                     if not isinstance(e, NoKeyringError):
                         delete_local_storage_master_key()
 
-                    # Delete saved password encrypted with kecyhain master key
-                    from pgadmin.browser.server_groups.servers.utils \
-                        import remove_saved_passwords, update_session_manager
-                    remove_saved_passwords(current_user.id)
-                    update_session_manager(current_user.id)
-
-                return form_master_password_response(
-                    existing=False,
-                    present=True,
-                    errmsg=errmsg,
-                    keyring_name=keyring_name)
+                    # Delete saved password encrypted with keychain master key
+                #     from pgadmin.browser.server_groups.servers.utils \
+                #         import remove_saved_passwords, update_session_manager
+                #     remove_saved_passwords(current_user.id)
+                #     update_session_manager(current_user.id)
+                #
+                # return form_master_password_response(
+                #     existing=False,
+                #     present=True,
+                #     errmsg=errmsg,
+                #     keyring_name=keyring_name)
     else:
         # If the master password is required and the master password hook
         # is specified then try to retrieve the encryption key and update data.

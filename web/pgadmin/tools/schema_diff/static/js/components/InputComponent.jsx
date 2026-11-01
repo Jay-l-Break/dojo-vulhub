@@ -7,15 +7,11 @@
 //
 //////////////////////////////////////////////////////////////
 import PropTypes from 'prop-types';
-
-import React, { useContext, useState, useEffect } from 'react';
-
+import { useContext, useState, useEffect } from 'react';
 import { Box, Grid, Typography } from '@mui/material';
-
 import { InputSelect } from '../../../../../static/js/components/FormComponents';
 import { SchemaDiffEventsContext } from './SchemaDiffComponent';
 import { SCHEMA_DIFF_EVENT } from '../SchemaDiffConstants';
-
 
 export function InputComponent({ label, serverList, databaseList, schemaList, diff_type, selectedSid = null, selectedDid=null, selectedScid=null, onServerSchemaChange }) {
   const [selectedServer, setSelectedServer] = useState(selectedSid);
@@ -25,10 +21,18 @@ export function InputComponent({ label, serverList, databaseList, schemaList, di
   const [disableDBSelection, setDisableDBSelection] = useState(selectedSid == null);
   const [disableSchemaSelection, setDisableSchemaSelection] = useState(selectedDid == null);
 
-  useEffect(() => {
-    setSelectedDatabase(selectedDid);
-    if (selectedDid) setDisableSchemaSelection(false);
-  }, [selectedSid, selectedDid, selectedScid]);
+
+  useEffect(()=>{
+    changeServer(selectedSid);
+  },[selectedSid]);
+
+  useEffect(()=>{
+    changeDatabase(selectedDid);
+  },[selectedDid]);
+
+  useEffect(()=>{
+    changeSchema(selectedScid);
+  },[selectedScid]);
 
   const changeServer = (selectedOption) => {
     setDisableDBSelection(false);
@@ -42,6 +46,7 @@ export function InputComponent({ label, serverList, databaseList, schemaList, di
     }
     eventBus.fireEvent(SCHEMA_DIFF_EVENT.TRIGGER_SELECT_SERVER, { selectedOption, diff_type, serverList });
   };
+
 
   const changeDatabase = (selectedDB) => {
     setSelectedDatabase(selectedDB);
@@ -68,10 +73,10 @@ export function InputComponent({ label, serverList, databaseList, schemaList, di
         direction="row"
         alignItems="center"
       >
-        <Grid item lg={2} md={2} sm={2} xs={2} sx={{padding: '0.3rem'}}>
+        <Grid sx={{padding: '0.3rem'}} size={{ lg: 2, md: 2, sm: 2, xs: 2 }}>
           <Typography id={label}>{label}</Typography>
         </Grid>
-        <Grid item lg={4} md={4} sm={4} xs={4} sx={{padding: '0.3rem'}}>
+        <Grid sx={{padding: '0.3rem'}} size={{ lg: 4, md: 4, sm: 4, xs: 4 }}>
           <InputSelect
             options={serverList}
             optionsReloadBasis={serverList?.length}
@@ -86,7 +91,7 @@ export function InputComponent({ label, serverList, databaseList, schemaList, di
           ></InputSelect>
         </Grid>
 
-        <Grid item lg={3} md={3} sm={3} xs={3} sx={{padding: '0.3rem'}}>
+        <Grid sx={{padding: '0.3rem'}} size={{ lg: 3, md: 3, sm: 3, xs: 3 }}>
           <InputSelect
             options={databaseList}
             optionsReloadBasis={databaseList?.map ? _.join(databaseList.map((c)=>c.value), ',') : null}
@@ -102,7 +107,7 @@ export function InputComponent({ label, serverList, databaseList, schemaList, di
           ></InputSelect>
         </Grid>
 
-        <Grid item lg={3} md={3} sm={3} xs={3} sx={{padding: '0.3rem'}}>
+        <Grid sx={{padding: '0.3rem'}} size={{ lg: 3, md: 3, sm: 3, xs: 3 }}>
           <InputSelect
             options={schemaList}
             optionsReloadBasis={schemaList?.map ? _.join(schemaList.map((c)=>c.value), ',') : null}

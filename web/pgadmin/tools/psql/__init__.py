@@ -10,6 +10,7 @@ import json
 import os
 import select
 import struct
+
 import config
 import re
 import subprocess
@@ -23,12 +24,11 @@ from flask_security import current_user
 from pgadmin.user_login_check import pga_login_required
 from pgadmin.browser.utils import underscore_unescape, underscore_escape
 from pgadmin.utils import PgAdminModule
-from pgadmin.utils.constants import MIMETYPE_APP_JS
 from pgadmin.utils.driver import get_driver
 from ... import socketio as sio
 from pgadmin.utils import get_complete_file_path
 from pgadmin.authenticate import socket_login_required
-
+from pgadmin.model import Server
 
 if _platform == 'win32':
     # Check Windows platform support for WinPty api, Disable psql
@@ -72,17 +72,6 @@ class PSQLModule(PgAdminModule):
 blueprint = PSQLModule('psql', __name__, static_url_path='/static')
 
 
-@blueprint.route("/psql.js")
-@pga_login_required
-def script():
-    """render the required javascript"""
-    return Response(
-        response=render_template("psql/js/psql.js", _=gettext),
-        status=200,
-        mimetype=MIMETYPE_APP_JS
-    )
-
-
 @blueprint.route('/panel/<int:trans_id>',
                  methods=["POST"],
                  endpoint="panel")
@@ -92,32 +81,38 @@ def panel(trans_id):
     Return panel template for PSQL tools.
     :param trans_id:
     """
-    params = {
-        'trans_id': trans_id,
-        'title': request.form['title']
-    }
-    if 'sid_soid_mapping' not in app.config:
-        app.config['sid_soid_mapping'] = dict()
+    params = {'trans_id': trans_id,
+              'is_enable':config.ENABLE_PSQL,
+              'platform': _platform
+              }
     if request.args:
         params.update({k: v for k, v in request.args.items()})
+    if request.form:
+        for key, val in request.form.items():
+            params[key] = val
 
-    data = _get_database_role(params['sid'], params['did'])
+    params['title'] = underscore_escape(params['title'])
+    if 'user' in params:
+        params['user'] = underscore_escape(params['user'])
 
-    params = {
-        'sid': params['sid'],
-        'db': underscore_escape(data['db_name']),
-        'server_type': params['server_type'],
-        'is_enable': config.ENABLE_PSQL,
-        'title': underscore_escape(params['title']),
-        'theme': params['theme'],
-        'o_db_name': underscore_escape(data['db_name']),
-        'role': underscore_escape(data['role']),
-        'platform': _platform
-    }
+    if 'sid_soid_mapping' not in app.config:
+        app.config['sid_soid_mapping'] = dict()
 
-    set_env_variables(is_win=_platform == 'win32')
-    return render_template("psql/index.html",
-                           params=json.dumps(params))
+    s = Server.query.filter_by(id=int(params['sid'])).first()
+    if s:
+        data = _get_database_role(params['sid'], params['did'])
+        if data:
+            params['db'] = underscore_escape(data['db_name']) \
+                if 'db_name' in data else 'postgres'
+            params['role'] = underscore_escape(data['role'])
+        set_env_variables(is_win=_platform == 'win32')
+        return render_template("psql/index.html",
+                               params=json.dumps(params))
+    else:
+        params['error'] = 'The server was not found.'
+        return render_template(
+            "psql/index.html",
+            params=json.dumps(params))
 
 
 def set_env_variables(is_win=False):
@@ -216,9 +211,16 @@ def read_terminal_data(parent, data_ready, max_read_bytes, sid):
     if parent in data_ready:
         # Read the output from parent fd (terminal).
         output = os.read(parent, max_read_bytes)
+        try:
+            decode_data = output.decode()
+        except Exception:
+            try:
+                decode_data = output.decode('UTF-8')
+            except Exception:
+                decode_data = output.decode('UTF-8', errors='replace')
 
         sio.emit('pty-output',
-                 {'result': output.decode(),
+                 {'result': decode_data,
                   'error': False},
                  namespace='/pty', room=sid)
 
@@ -233,7 +235,7 @@ def read_stdout(process, sid, max_read_bytes, win_emit_output=True):
                       'error': False},
                      namespace='/pty', room=sid)
 
-    sio.sleep(0)
+    sio.sleep(0.01)
 
 
 def windows_platform(connection_data, sid, max_read_bytes, server_id):
@@ -244,10 +246,11 @@ def windows_platform(connection_data, sid, max_read_bytes, server_id):
     process.write("\r\n")
     app.config['sessions'][request.sid] = process
     pdata[request.sid] = process
+    cdata[request.sid] = process.fd
     open_psql_connections[request.sid] = server_id
     set_term_size(process, 50, 50)
 
-    while True:
+    while process.isalive():
         read_stdout(process, sid, max_read_bytes,
                     win_emit_output=True)
 
@@ -302,6 +305,7 @@ def start_process(data):
     # Check user is authenticated and PSQL is enabled in config.
     if current_user.is_authenticated and config.ENABLE_PSQL:
         connection_data = []
+        connection_successful = False
         try:
             db = ''
             if data['db']:
@@ -325,33 +329,39 @@ def start_process(data):
                 return
             connection_data = get_connection_str(psql_utility, db,
                                                  manager)
+            connection_successful = True
         except Exception as e:
             # If any error raised during the start the PSQL emit error to UI.
             # request.sid: This sid is socket id.
-            sio.emit(
-                'conn_error',
-                {
-                    'error': 'Error while running psql command: {0}'.format(e),
-                }, namespace='/pty', room=request.sid)
+            error_msg = 'Error while running psql command: {0}'.format(e)
+            if str(e) == 'Server is not connected.':
+                error_msg = 'Error while opening psql tool: {0}'.format(e)
 
-        try:
-            if str(data['sid']) not in app.config['sid_soid_mapping']:
-                # request.sid: refer request.sid as socket id.
-                app.config['sid_soid_mapping'][str(data['sid'])] = list()
-                app.config['sid_soid_mapping'][str(data['sid'])].append(
-                    request.sid)
-            else:
-                app.config['sid_soid_mapping'][str(data['sid'])].append(
-                    request.sid)
+            sio.emit('conn_error',
+                     {'error': error_msg},
+                     namespace='/pty',
+                     room=request.sid)
 
-            sio.start_background_task(read_and_forward_pty_output,
-                                      request.sid, data)
-        except Exception as e:
-            sio.emit(
-                'conn_error',
-                {
-                    'error': 'Error while running psql command: {0}'.format(e),
-                }, namespace='/pty', room=request.sid)
+        if connection_successful:
+            try:
+                if str(data['sid']) not in app.config['sid_soid_mapping']:
+                    # request.sid: refer request.sid as socket id.
+                    app.config['sid_soid_mapping'][str(data['sid'])] = list()
+                    app.config['sid_soid_mapping'][str(data['sid'])].append(
+                        request.sid)
+                else:
+                    app.config['sid_soid_mapping'][str(data['sid'])].append(
+                        request.sid)
+
+                sio.start_background_task(read_and_forward_pty_output,
+                                          request.sid, data)
+            except Exception as e:
+                sio.emit(
+                    'conn_error',
+                    {'error':'Error while running psql command: {0}'.
+                        format(e)},
+                    namespace='/pty',
+                    room=request.sid)
     else:
         # Show error if user is not authenticated.
         sio.emit('conn_not_allow', {'sid': request.sid}, namespace='/pty',
@@ -367,6 +377,10 @@ def _get_connection(sid, data):
     :return:
     """
     manager = get_driver(PG_DEFAULT_DRIVER).connection_manager(sid)
+    if not manager:
+        msg = 'Server is not connected.'
+        app.logger.error(msg)
+        raise RuntimeError(msg)
     try:
         conn = manager.connection()
         # This is added for unit test only, no use in normal execution.
@@ -377,12 +391,6 @@ def _get_connection(sid, data):
             status, msg = conn.connect()
         if not status:
             app.logger.error(msg)
-            sio.emit(sio.emit(
-                'conn_error',
-                {
-                    'error': 'Error while running psql command: {0}'
-                             ''.format('Server connection not present.'),
-                }, namespace='/pty', room=request.sid))
             raise RuntimeError('Server is not connected.')
 
         return conn, manager
@@ -622,7 +630,8 @@ def _get_database_role(sid, did):
         db_name = conn.db
         role = manager.role if manager.role else None
         return {'db_name': db_name, 'role': role}
-    except Exception:
+    except Exception as e:
+        print(str(e))
         return None
 
 

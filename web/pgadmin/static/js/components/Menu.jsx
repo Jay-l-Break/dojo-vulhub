@@ -20,6 +20,7 @@ import {
 export {MenuDivider as PgMenuDivider} from '@szhsin/react-menu';
 import { shortcutToString } from './ShortcutTitle';
 import CustomPropTypes from '../custom_prop_types';
+import { Box } from '@mui/material';
 
 export function PgMenu({open, className='', label, menuButton=null, ...props}) {
   const state = open ? 'open' : 'closed';
@@ -56,14 +57,18 @@ PgMenu.propTypes = {
   menuButton: PropTypes.element,
 };
 
-export const PgSubMenu = (({label, ...props})=>{
+export const PgSubMenu = (({label, alignCheck, ...props})=>{
+  if(alignCheck) {
+    label = <><CheckIcon style={{visibility: 'hidden', width: '1.3rem'}} data-label="CheckIcon"/>{label}</>;
+  }
   return (
     <SubMenu label={label}  itemProps={{'data-label': label}} {...props} />
   );
 });
 
 PgSubMenu.propTypes = {
-  label: PropTypes.string
+  label: PropTypes.string,
+  alignCheck: PropTypes.bool
 };
 
 export const PgMenuItem = (({hasCheck=false, checked=false, accesskey, shortcut, children, closeOnCheck=false, ...props})=>{
@@ -81,9 +86,25 @@ export const PgMenuItem = (({hasCheck=false, checked=false, accesskey, shortcut,
   return <MenuItem {...props} onClick={onClick} data-label={dataLabel} data-checked={checked}>
     {hasCheck && <CheckIcon  style={checked ? {} : {visibility: 'hidden', width: '1.3rem'}} data-label="CheckIcon"/>}
     {children}
-    <div style={{ marginLeft:'auto', fontSize:'0.8em', paddingLeft:'12px'}}>
-      {keyVal ? `(${keyVal})` : ''}
-    </div>
+    <Box
+      sx={{
+        marginLeft: 'auto',
+        paddingLeft: '12px',
+        display: 'flex',
+        gap: '1px',
+        color: 'text.muted',
+        '.szh-menu__item--hover &': {
+          color: 'primary.contrastText',
+        },
+      }}
+    >
+      {Array.isArray(keyVal)
+        ? keyVal.map((key, idx) => (
+          <Box key={idx} component="div">{key}</Box>
+        ))
+        : <Box component="div"> {keyVal ? `${keyVal}` : ''}</Box>
+      }
+    </Box>
   </MenuItem>;
 });
 
@@ -103,7 +124,7 @@ export function usePgMenuGroup() {
   const prevMenuOpenIdRef = useRef(null);
 
   const toggleMenu = React.useCallback((e)=>{
-    const name = e.currentTarget?.getAttribute('name') || e.currentTarget?.name;
+    const name = e.currentTarget?.getAttribute?.('name') || e.currentTarget?.name;
     setOpenMenuName(()=>{
       return prevMenuOpenIdRef.current == name ? null : name;
     });

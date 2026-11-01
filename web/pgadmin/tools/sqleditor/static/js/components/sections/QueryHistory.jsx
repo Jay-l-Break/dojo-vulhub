@@ -1,3 +1,11 @@
+/////////////////////////////////////////////////////////////
+//
+// pgAdmin 4 - PostgreSQL Tools
+//
+// Copyright (C) 2013 - 2025, The pgAdmin Development Team
+// This software is released under the PostgreSQL Licence
+//
+//////////////////////////////////////////////////////////////
 import { styled } from '@mui/material/styles';
 import React, { useContext } from 'react';
 import { PANELS, QUERY_TOOL_EVENTS, MAX_QUERY_LENGTH } from '../QueryToolConstants';
@@ -117,14 +125,10 @@ export const QuerySources = {
 };
 
 function getDateFormatted(date) {
-  if (pgAdmin['pgadmin_server_locale'] !== '')
-    return date.toLocaleDateString(pgAdmin['pgadmin_server_locale']);
   return date.toLocaleDateString();
 }
 
 function getTimeFormatted(time) {
-  if (pgAdmin['pgadmin_server_locale'] !== '')
-    return time.toLocaleTimeString(pgAdmin['pgadmin_server_locale']);
   return time.toLocaleTimeString();
 }
 
@@ -332,14 +336,14 @@ function QueryHistoryDetails({entry}) {
       {entry.info && <Box className='QuerySources-infoHeader'>{entry.info}</Box>}
       <Box padding="0.5rem" data-label="history-detail">
         <Grid container>
-          <Grid item sm={4}>{getDateFormatted(entry.start_time) + ' ' + getTimeFormatted(entry.start_time)}</Grid>
-          <Grid item sm={4}>{entry?.row_affected > 0 && entry.row_affected}</Grid>
-          <Grid item sm={4}>{entry.total_time}</Grid>
+          <Grid size={{ sm: 4 }}>{getDateFormatted(entry.start_time) + ' ' + getTimeFormatted(entry.start_time)}</Grid>
+          <Grid size={{ sm: 4 }}>{entry?.row_affected > 0 && entry.row_affected}</Grid>
+          <Grid size={{ sm: 4 }}>{entry.total_time}</Grid>
         </Grid>
         <Grid container>
-          <Grid item sm={4}>{gettext('Date')}</Grid>
-          <Grid item sm={4}>{gettext('Rows affected')}</Grid>
-          <Grid item sm={4}>{gettext('Duration')}</Grid>
+          <Grid size={{ sm: 4 }}>{gettext('Date')}</Grid>
+          <Grid size={{ sm: 4 }}>{gettext('Rows affected')}</Grid>
+          <Grid size={{ sm: 4 }}>{gettext('Duration')}</Grid>
         </Grid>
         <Box className='QuerySources-detailsQuery'>
           <DefaultButton size="xs" className='QuerySources-copyBtn' onClick={onCopyClick}>{copyText}</DefaultButton>
@@ -374,19 +378,34 @@ export function QueryHistory() {
   const queryToolConnCtx = React.useContext(QueryToolConnectionContext);
 
   const eventBus = React.useContext(QueryToolEventsContext);
-  const [selectedItemKey, setSelectedItemKey] = React.useState(1);
+  const [activeOnce, setActiveOnce] = React.useState(false);
+  const [selectedItemKey, setSelectedItemKey] = React.useState(null);
   const [showInternal, setShowInternal] = React.useState(true);
   const forceUpdate = useForceUpdate();
   const [loaderText, setLoaderText] = React.useState('');
   const selectedEntry = qhu.current.getEntry(selectedItemKey);
   const layoutDocker = useContext(LayoutDockerContext);
   const listRef = React.useRef();
+  const isVisible = queryToolCtx.docker?.isTabVisible(PANELS.HISTORY);
 
   React.useEffect(()=>{
-    layoutDocker.eventBus.registerListener(LAYOUT_EVENTS.ACTIVE, (currentTabId)=>{
-      currentTabId == PANELS.HISTORY && listRef.current?.focus();
+    const unregister = layoutDocker.eventBus.registerListener(LAYOUT_EVENTS.ACTIVE, (currentTabId)=>{
+      if(currentTabId == PANELS.HISTORY) {
+        listRef.current?.focus();
+
+        if(!activeOnce) {
+          setActiveOnce(true);
+          setSelectedItemKey((prev)=>prev || 1);
+        }
+      }
     });
-  }, []);
+
+    if(isVisible && !activeOnce) {
+      setActiveOnce(true);
+    }
+
+    return () => unregister();
+  }, [isVisible]);
 
   const fetchQueryHistory = async() =>{
     if(!queryToolConnCtx.connected) {
@@ -432,11 +451,11 @@ export function QueryHistory() {
     return ()=>eventBus.deregisterListener(QUERY_TOOL_EVENTS.PUSH_HISTORY, pushHistory);
   };
 
-  React.useEffect(() =>{
-    fetchQueryHistory();
-  },[queryToolConnCtx.connected]);
+  React.useEffect(() => {
+    activeOnce && fetchQueryHistory();
+  }, [queryToolConnCtx.connected, activeOnce]);
 
-  const onRemove = async ()=>{
+  const onRemove = async () => {
     setLoaderText(gettext('Removing history entry...'));
     try {
       await queryToolCtx.api.delete(url_for('sqleditor.clear_query_history', {
@@ -490,52 +509,52 @@ export function QueryHistory() {
     }
   };
 
+  if(!activeOnce) {
+    return <></>;
+  }
+
   return (
     <Root>
       <Loader message={loaderText} />
-      {React.useMemo(()=>(
+      {qhu.current.size() == 0 ?
+        <EmptyPanelMessage text={gettext('No history found')} />:
         <>
-          {qhu.current.size() == 0 ?
-            <EmptyPanelMessage text={gettext('No history found')} />:
-            <>
-              <Box className='QuerySources-leftRoot'>
-                <Box className='QuerySources-header'>
-                  <Box marginRight="auto">
-                    {gettext('Show queries generated internally by pgAdmin?')}
-                    <InputSwitch value={showInternal} onChange={(e)=>{
-                      setShowInternal(e.target.checked);
-                      qhu.current.showInternal = e.target.checked;
-                      setSelectedItemKey(qhu.current.getNextItemKey());
-                    }} />
-                  </Box>
-                  <Box>
-                    <DefaultButton size="small" disabled={!selectedItemKey} onClick={onRemove}>{gettext('Remove')}</DefaultButton>
-                    <DefaultButton size="small" disabled={!qhu.current?.getGroups()?.length}
-                      className='QuerySources-removeBtnMargin' onClick={onRemoveAll}>{gettext('Remove All')}</DefaultButton>
-                  </Box>
-                </Box>
-                <Box flexGrow="1" overflow="auto" className='QuerySources-listRoot'>
-                  <List ref={listRef} subheader={<li />} tabIndex="0" onKeyDown={onKeyPressed}>
-                    {qhu.current.getGroups().map(([groupKey, groupHeader]) => (
-                      <ListItem key={`section-${groupKey}`} className='QuerySources-removePadding'>
-                        <List className='QuerySources-removePadding'>
-                          <ListSubheader className='QuerySources-listSubheader'>{groupHeader}</ListSubheader>
-                          {qhu.current.getGroupEntries(groupKey).map((entry) => (
-                            <HistoryEntry key={entry.itemKey} entry={entry} formatEntryDate={qhu.current.formatEntryDate}
-                              itemKey={entry.itemKey} selectedItemKey={selectedItemKey} onClick={()=>{setSelectedItemKey(entry.itemKey);}}/>
-                          ))}
-                        </List>
-                      </ListItem>
-                    ))}
-                  </List>
-                </Box>
+          <Box className='QuerySources-leftRoot'>
+            <Box className='QuerySources-header'>
+              <Box marginRight="auto">
+                {gettext('Show queries generated internally by pgAdmin?')}
+                <InputSwitch value={showInternal} onChange={(e)=>{
+                  setShowInternal(e.target.checked);
+                  qhu.current.showInternal = e.target.checked;
+                  setSelectedItemKey(qhu.current.getNextItemKey());
+                }} />
               </Box>
-              <Box flexBasis="50%" maxWidth="50%" overflow="auto">
-                <QueryHistoryDetails entry={selectedEntry}/>
+              <Box>
+                <DefaultButton size="small" disabled={!selectedItemKey} onClick={onRemove}>{gettext('Remove')}</DefaultButton>
+                <DefaultButton size="small" disabled={!qhu.current?.getGroups()?.length}
+                  className='QuerySources-removeBtnMargin' onClick={onRemoveAll}>{gettext('Remove All')}</DefaultButton>
               </Box>
-            </>}
-        </>
-      ), [selectedItemKey, showInternal, qhu.current.size()])}
+            </Box>
+            <Box flexGrow="1" overflow="auto" className='QuerySources-listRoot'>
+              <List ref={listRef} subheader={<li />} tabIndex="0" onKeyDown={onKeyPressed}>
+                {qhu.current.getGroups().map(([groupKey, groupHeader]) => (
+                  <ListItem key={`section-${groupKey}`} className='QuerySources-removePadding'>
+                    <List className='QuerySources-removePadding'>
+                      <ListSubheader className='QuerySources-listSubheader'>{groupHeader}</ListSubheader>
+                      {qhu.current.getGroupEntries(groupKey).map((entry) => (
+                        <HistoryEntry key={entry.itemKey} entry={entry} formatEntryDate={qhu.current.formatEntryDate}
+                          itemKey={entry.itemKey} selectedItemKey={selectedItemKey} onClick={()=>{setSelectedItemKey(entry.itemKey);}}/>
+                      ))}
+                    </List>
+                  </ListItem>
+                ))}
+              </List>
+            </Box>
+          </Box>
+          <Box flexBasis="50%" maxWidth="50%" overflow="auto">
+            <QueryHistoryDetails entry={selectedEntry}/>
+          </Box>
+        </>}
     </Root>
   );
 }

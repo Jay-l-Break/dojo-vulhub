@@ -177,6 +177,9 @@ not be able to connect directly.
   *Identity file* field to specify the location of the key file.
 * If the SSH host is expecting a password of the user name or an identity file
   if being used, use the *Password* field to specify the password.
+* Check the box next to *Prompt for password?* to to have pgAdmin prompt for
+  a password if the identity file includes one. This setting applies only when
+  using an identity file, which may or may not require a password.
 * Check the box next to *Save password?* to instruct pgAdmin to save the
   password for future use. Use
   :ref:`Clear SSH Tunnel Password <clear_saved_passwords>` to remove the saved
@@ -195,11 +198,19 @@ Click the *Advanced* tab to continue.
 
 Use the fields in the *Advanced* tab to configure a connection:
 
-* Use the *DB restriction* field to provide a SQL restriction that will be used
-  against the pg_database table to limit the databases that you see. For
-  example, you might enter: *live_db test_db* so that only live_db and test_db
-  are shown in the pgAdmin browser. Separate entries with a comma or tab as you
-  type.
+* Specify the type of the database restriction that will be used to filter
+  out the databases for restriction in the *DB restriction type* field:
+
+    * Select the *Databases* option to specify the name of the databases
+      that will be used against the pg_database table to limit the databases
+      that you see. This is the default.
+    * Select the *SQL* option to provide a SQL restriction that will be used
+      against the pg_database table to limit the databases that you see.
+
+* Use the *DB restriction* field to provide a SQL restriction OR Database names
+  that will be used against the pg_database table to limit the databases that you see.
+  For example, you might enter: *live_db test_db* so that only live_db and test_db
+  are shown in the pgAdmin object explorer.
 * Use the *Password exec command* field to specify a shell command to be executed
   to retrieve a password to be used for SQL authentication. The ``stdout`` of the
   command will be used as the SQL password. This may be useful when the password

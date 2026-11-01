@@ -23,7 +23,7 @@ class EmptySchema extends BaseUISchema {
   }
 }
 
-export function getTableDialogSchema(attributes, isNew, tableNodesDict, colTypes, schemas) {
+export function getTableDialogSchema(attributes, isNew, tableNodesDict, colTypes, schemas, geometryTypes) {
   let treeNodeInfo;
 
   let columnSchema = new ColumnSchema(
@@ -31,7 +31,7 @@ export function getTableDialogSchema(attributes, isNew, tableNodesDict, colTypes
     treeNodeInfo,
     ()=>colTypes,
     ()=>[],
-    ()=>[],
+    ()=>geometryTypes,
     true,
   );
 
@@ -61,8 +61,7 @@ export function getTableDialogSchema(attributes, isNew, tableNodesDict, colTypes
           references: ()=>{
             let retOpts = [];
             _.forEach(tableNodesDict, (node, uid)=>{
-              let [schema, name] = node.getSchemaTableName();
-              retOpts.push({value: uid, label: `(${schema}) ${name}`});
+              retOpts.push({value: uid, label: node.getDisplayName()});
             });
             return retOpts;
           }

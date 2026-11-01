@@ -77,7 +77,8 @@ export function showViewData(
   connectionData,
   treeIdentifier,
   transId,
-  filter=false
+  filter=false,
+  server_cursor=false
 ) {
   const node = pgBrowser.tree.findNodeByDomElement(treeIdentifier);
   if (node === undefined || !node.getData()) {
@@ -100,7 +101,7 @@ export function showViewData(
     return;
   }
 
-  const gridUrl = generateUrl(transId, connectionData, node.getData(), parentData);
+  const gridUrl = generateUrl(transId, connectionData, node.getData(), parentData, server_cursor);
   const queryToolTitle = generateViewDataTitle(pgBrowser, treeIdentifier);
 
   if(filter) {
@@ -109,7 +110,7 @@ export function showViewData(
     showFilterDialog(pgBrowser, treeIdentifier, queryToolMod, transId, gridUrl,
       queryToolTitle, validateUrl);
   } else {
-    queryToolMod.launch(transId, gridUrl, false, queryToolTitle);
+    queryToolMod.launch(transId, gridUrl, false, queryToolTitle, {server_cursor: server_cursor});
   }
 }
 
@@ -145,7 +146,7 @@ export function retrieveNodeName(parentData) {
   return '';
 }
 
-function generateUrl(trans_id, connectionData, nodeData, parentData) {
+function generateUrl(trans_id, connectionData, nodeData, parentData, server_cursor=false) {
   let url_endpoint = url_for('sqleditor.panel', {
     'trans_id': trans_id,
   });
@@ -157,7 +158,8 @@ function generateUrl(trans_id, connectionData, nodeData, parentData) {
     +`&sgid=${parentData.server_group._id}`
     +`&sid=${parentData.server._id}`
     +`&did=${parentData.database._id}`
-    +`&server_type=${parentData.server.server_type}`;
+    +`&server_type=${parentData.server.server_type}`
+    +`&server_cursor=${server_cursor}`;
 
   if(!parentData.server.username && parentData.server.user?.name) {
     url_endpoint += `&user=${parentData.server.user?.name}`;
@@ -188,7 +190,7 @@ function showFilterDialog(pgBrowser, item, queryToolMod, transId,
   let helpUrl = url_for('help.static', {'filename': 'viewdata_filter.html'});
 
   let okCallback = function() {
-    queryToolMod.launch(transId, gridUrl, false, queryToolTitle, {sql_filter: JSON.stringify(schema.sessData.filter_sql)});
+    queryToolMod.launch(transId, gridUrl, false, queryToolTitle, {sql_filter: schema.sessData.filter_sql});
   };
 
   pgBrowser.Events.trigger('pgadmin:utility:show', item,

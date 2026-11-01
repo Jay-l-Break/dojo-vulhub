@@ -7,7 +7,7 @@
 //
 //////////////////////////////////////////////////////////////
 
-import React, {useEffect, useMemo, useState } from 'react';
+import {useEffect, useMemo, useState } from 'react';
 import AppMenuBar from './AppMenuBar';
 import ObjectBreadcrumbs from './components/ObjectBreadcrumbs';
 import Layout, { LAYOUT_EVENTS, LayoutDocker, getDefaultGroup } from './helpers/Layout';
@@ -21,7 +21,7 @@ import Dependencies from '../../misc/dependencies/static/js/Dependencies';
 import Dependents from '../../misc/dependents/static/js/Dependents';
 import ModalProvider from './helpers/ModalProvider';
 import { NotifierProvider } from './helpers/Notifier';
-import ObjectExplorerToolbar from './helpers/ObjectExplorerToolbar';
+import ObjectExplorerToolbar from './tree/ObjectExplorer/ObjectExplorerToolbar';
 import MainMoreToolbar from './helpers/MainMoreToolbar';
 import Dashboard from '../../dashboard/static/js/Dashboard';
 import usePreferences from '../../preferences/static/js/store';
@@ -33,7 +33,9 @@ import pgWindow from 'sources/window';
 import WorkspaceToolbar from '../../misc/workspaces/static/js/WorkspaceToolbar';
 import { useWorkspace, WorkspaceProvider } from '../../misc/workspaces/static/js/WorkspaceProvider';
 import { PgAdminProvider, usePgAdmin } from './PgAdminProvider';
-
+import PreferencesComponent from '../../preferences/static/js/components/PreferencesComponent';
+import { ApplicationStateProvider } from '../../settings/static/ApplicationStateProvider';
+import { appAutoUpdateNotifier } from './helpers/appAutoUpdateNotifier';
 
 const objectExplorerGroup  = {
   tabLocked: true,
@@ -43,6 +45,10 @@ const objectExplorerGroup  = {
 
 export const processesPanelData = {
   id: BROWSER_PANELS.PROCESSES, title: gettext('Processes'), content: <Processes />, closable: true, group: 'playground'
+};
+
+export const preferencesPanelData = {
+  id: BROWSER_PANELS.PREFERENCES, title: gettext('Preferences'), content: <PreferencesComponent panelId={BROWSER_PANELS.PREFERENCES} />, closable: true, manualClose: true, group: 'playground'
 };
 
 export const defaultTabsData = [
@@ -67,9 +73,11 @@ export const defaultTabsData = [
   processesPanelData,
 ];
 
-const mainPanelGroup  = {
-  ...getDefaultGroup(),
-  panelExtra: () => <MainMoreToolbar tabsData={defaultTabsData}/>
+const getMorePanelGroup = (tabsData) => {
+  return {
+    ...getDefaultGroup(),
+    panelExtra: () => <MainMoreToolbar tabsData={tabsData}/>
+  };
 };
 
 let defaultLayout = {
@@ -83,8 +91,10 @@ let defaultLayout = {
             size: 20,
             tabs: [
               LayoutDocker.getPanel({
-                id: BROWSER_PANELS.OBJECT_EXPLORER, title: gettext('Object Explorer'),
-                content: <ObjectExplorer />, group: 'object-explorer'
+                id: BROWSER_PANELS.OBJECT_EXPLORER,
+                title: gettext('Object Explorer'),
+                content: <ObjectExplorer />,
+                group: 'object-explorer'
               }),
             ],
           },
@@ -105,40 +115,44 @@ function Layouts({browser}) {
   const pgAdmin = usePgAdmin();
   const {config, enabled, currentWorkspace} = useWorkspace();
   return (
-    <div style={{display: 'flex', height: (browser != 'Electron' ? 'calc(100% - 30px)' : '100%')}}>
-      {enabled && <WorkspaceToolbar/> }
-      <Layout
-        getLayoutInstance={(obj)=>{
-          pgAdmin.Browser.docker.default_workspace = obj;
-        }}
-        defaultLayout={defaultLayout}
-        layoutId='Browser/Layout'
-        savedLayout={pgAdmin.Browser.utils.layout}
-        groups={{
-          'object-explorer': objectExplorerGroup,
-          'playground': mainPanelGroup,
-        }}
-        noContextGroups={['object-explorer']}
-        resetToTabPanel={BROWSER_PANELS.MAIN}
-        enableToolEvents
-        isLayoutVisible={!enabled || currentWorkspace == WORKSPACES.DEFAULT}
-      />
-      {enabled && config.map((item)=>(
+    <ApplicationStateProvider>
+      <div style={{display: 'flex', height: (browser != 'Electron' ? 'calc(100% - 30px)' : '100%')}}>
+        {enabled && <WorkspaceToolbar/> }
         <Layout
-          key={item.docker}
           getLayoutInstance={(obj)=>{
-            pgAdmin.Browser.docker[item.docker] = obj;
-            obj.eventBus.fireEvent(LAYOUT_EVENTS.INIT);
+            pgAdmin.Browser.docker.default_workspace = obj;
           }}
-          defaultLayout={item.layout}
+          defaultLayout={defaultLayout}
+          layoutId='Browser/Layout'
+          savedLayout={pgAdmin.Browser.utils.layout['Browser/Layout']}
           groups={{
-            'playground': item?.tabsData ? {...getDefaultGroup(), panelExtra: () => <MainMoreToolbar tabsData={item.tabsData}/>} : {...getDefaultGroup()},
+            'object-explorer': objectExplorerGroup,
+            'playground': getMorePanelGroup(defaultTabsData),
           }}
+          noContextGroups={['object-explorer']}
           resetToTabPanel={BROWSER_PANELS.MAIN}
-          isLayoutVisible={currentWorkspace == item.workspace}
+          enableToolEvents
+          isLayoutVisible={!enabled || currentWorkspace == WORKSPACES.DEFAULT}
         />
-      ))}
-    </div>
+        {enabled && config.map((item)=>(
+          <Layout
+            key={item.docker}
+            getLayoutInstance={(obj)=>{
+              pgAdmin.Browser.docker[item.docker] = obj;
+              obj.eventBus.fireEvent(LAYOUT_EVENTS.INIT);
+            }}
+            defaultLayout={item.layout}
+            layoutId={`Workspace/Layout-${item.workspace}`}
+            savedLayout={pgAdmin.Browser.utils.layout[`Workspace/Layout-${item.workspace}`]}
+            groups={{
+              'playground': item?.tabsData ? getMorePanelGroup(item?.tabsData) : {...getDefaultGroup()},
+            }}
+            resetToTabPanel={BROWSER_PANELS.MAIN}
+            isLayoutVisible={currentWorkspace == item.workspace}
+          />
+        ))}
+      </div>
+    </ApplicationStateProvider>
   );
 }
 Layouts.propTypes = {
@@ -154,6 +168,7 @@ export default function BrowserComponent({pgAdmin}) {
   useBeforeUnload({
     enabled: confirmOnClose,
     beforeClose: (forceClose)=>{
+      window.electronUI?.focus();
       pgAdmin.Browser.notifier.confirm(
         gettext('Quit pgAdmin 4'),
         gettext('Are you sure you want to quit the application?'),
@@ -167,6 +182,36 @@ export default function BrowserComponent({pgAdmin}) {
     },
     isNewTab: true,
   });
+
+  // Called when Install and Restart btn called for auto-update install
+  function installUpdate() {
+    if (window.electronUI) {
+      window.electronUI.sendDataForAppUpdate({
+        'install_update_now': true
+      });
+    }}
+  
+  // Listen for auto-update events from the Electron main process and display notifications
+  // to the user based on the update status (e.g., update available, downloading, downloaded, installed, or error).
+  if (window.electronUI && typeof window.electronUI.notifyAppAutoUpdate === 'function') {
+    window.electronUI.notifyAppAutoUpdate((data)=>{
+      if (data?.check_version_update) {
+        pgAdmin.Browser.check_version_update(true);
+      } else if (data.update_downloading) {
+        appAutoUpdateNotifier('Update downloading.', 'info', null, 10000);
+      } else if (data.no_update_available) {
+        appAutoUpdateNotifier('No update available.', 'info', null, 10000);
+      } else if (data.update_downloaded) {
+        const UPDATE_DOWNLOADED_MESSAGE = gettext('An update is ready. Restart the app now to install it, or later to keep using the current version.');
+        appAutoUpdateNotifier(UPDATE_DOWNLOADED_MESSAGE, 'warning', installUpdate, null, 'Update downloaded', 'update_downloaded');
+      } else if (data.error) {
+        appAutoUpdateNotifier(`${data.errMsg}`, 'error');
+      } else if (data.update_installed) {
+        const UPDATE_INSTALLED_MESSAGE = gettext('Update installed successfully!');
+        appAutoUpdateNotifier(UPDATE_INSTALLED_MESSAGE, 'success');
+      }
+    });
+  }
 
   useEffect(()=>{
     if(uiReady) {

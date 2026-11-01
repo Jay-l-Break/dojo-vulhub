@@ -32,7 +32,7 @@ import Uploader from './Uploader';
 import GridView from './GridView';
 import convert from 'convert-units';
 import PropTypes from 'prop-types';
-import { downloadBlob } from '../../../../../static/js/utils';
+import DownloadUtils from '../../../../../static/js/DownloadUtils';
 import ErrorBoundary from '../../../../../static/js/helpers/ErrorBoundary';
 import { MY_STORAGE } from './FileManagerConstants';
 import _ from 'lodash';
@@ -160,6 +160,10 @@ export class FileManagerUtils {
     this.currPath = '';
     this.separator = '/';
     this.storage_folder = '';
+  }
+
+  setModalObj(obj){
+    this.params.modal = obj;
   }
 
   get transId() {
@@ -311,7 +315,7 @@ export class FileManagerUtils {
         'storage_folder': ss,
       },
     });
-    downloadBlob(res.data, res.headers.filename);
+    DownloadUtils.downloadBlob(res.data, res.headers.filename);
   }
 
   setDialogView(view) {
@@ -386,6 +390,61 @@ export class FileManagerUtils {
       ret = ret.slice(0, ret.lastIndexOf(this.separator)+1);
     }
     return ret;
+  }
+
+  warnFileReload (fileName, toolContent) {
+    return new Promise((resolve) => {
+      this.params.modal.confirm(
+        gettext('Reload file?'),
+        gettext('The file has been modified by another program. Do you want to reload it and lose changes made in pgAdmin?'),
+        function () {
+          resolve({
+            loadFile: true,
+            data: null,
+            fileName: fileName,
+          });
+        },
+        function () {
+          resolve({
+            loadFile: false,
+            data: toolContent,
+            fileName: fileName
+          });
+        }
+      );
+    });
+  };
+
+  async loadFile(fileName){
+    try{
+      const res =  await this.api.post(url_for('file_manager.load_file'), {
+        'file_name': decodeURI(fileName)
+      }, {transformResponse: [(data, headers) => {
+        if(headers['content-type'].includes('application/json')) {
+          return JSON.parse(data);
+        }
+        return data;
+      }]});
+      if (res && res.status === 200) {
+        return {
+          success: true,
+          data: res.data,
+          error: null,
+        };
+      } else {
+        return {
+          success: false,
+          data: null,
+          error: res.data || 'Unknown error while loading file.',
+        };
+      }
+    } catch (err) {
+      return {
+        success: false,
+        data: null,
+        error: err.message || err,
+      };
+    }
   }
 
 }
@@ -733,7 +792,7 @@ export default function FileManager({params, closeModal, onOK, onCancel, sharedS
                 onKeyDown={async (e)=>{
                   if(e.code === 'Enter') {
                     e.preventDefault();
-                    await openDir(path);
+                    await openDir(path, selectedSS);
                   }
                 }} value={path} onChange={setPath} readonly={showUploader} />
 

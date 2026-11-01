@@ -9,6 +9,7 @@
 import { getNodeTableSchema } from './table.ui';
 import _ from 'lodash';
 import getApiInstance from '../../../../../../../../static/js/api_instance';
+import { AllPermissionTypes } from '../../../../../../../static/js/constants';
 
 define('pgadmin.node.table', [
   'pgadmin.tables.js/enable_disable_triggers',
@@ -67,12 +68,14 @@ define('pgadmin.node.table', [
           category: 'create', priority: 1, label: gettext('Table...'),
           data: {action: 'create', check: true},
           enable: 'canCreate',
+          shortcut_preference: ['browser', 'sub_menu_create'],
         },{
           name: 'create_table', node: 'table', module: this,
           applies: ['object', 'context'], callback: 'show_obj_properties',
           category: 'create', priority: 1, label: gettext('Table...'),
           data: {action: 'create', check: true},
           enable: 'canCreate',
+          shortcut_preference: ['browser', 'sub_menu_create'],
         },{
           name: 'create_table__on_schema', node: 'schema', module: this,
           applies: ['object', 'context'], callback: 'show_obj_properties',
@@ -127,7 +130,8 @@ define('pgadmin.node.table', [
           priority: 5, label: gettext('ERD For Table'),
           enable: (_, item) => {
             return !('catalog' in pgAdmin.Browser.tree.getTreeNodeHierarchy(item));
-          }
+          },
+          permission: AllPermissionTypes.TOOLS_ERD_TOOL,
         }
         ]);
         pgBrowser.Events.on(

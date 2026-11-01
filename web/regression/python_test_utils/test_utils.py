@@ -955,6 +955,25 @@ def configure_preferences(default_binary_path=None):
             ('False', pref_breadcrumbs_enable.pid)
         )
 
+    # Disable workspace save feature
+    misc_pref = Preferences.module('misc')
+    save_app_state = misc_pref.preference('save_app_state')
+
+    user_pref = cur.execute(
+        select_preference_query, (save_app_state.pid,)
+    )
+
+    if len(user_pref.fetchall()) == 0:
+        cur.execute(
+            insert_preferences_query,
+            (save_app_state.pid, 1, 'False')
+        )
+    else:
+        cur.execute(
+            update_preference_query,
+            ('False', save_app_state.pid)
+        )
+
     conn.commit()
     conn.close()
 
@@ -1885,3 +1904,10 @@ def module_patch(*args):
 
     # did not find a module, just return the default mock
     return mock.patch(*args)
+
+
+def check_extension_exists(cursor, extension_name):
+    cursor.execute(f"""SELECT COUNT(*) FROM pg_extension
+                   WHERE extname='{extension_name}'""")
+    res = cursor.fetchone()
+    return res

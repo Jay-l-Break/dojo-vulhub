@@ -42,6 +42,9 @@ define('pgadmin.node.type', [
       hasSQL: true,
       hasDepends: true,
       width: pgBrowser.stdW.md + 'px',
+      refreshParent: function(node) {
+        return node?._metadata?.data?.has_dependent;
+      },
       Init: function() {
         /* Avoid multiple registration of menus */
         if (this.initialized)
@@ -55,12 +58,14 @@ define('pgadmin.node.type', [
           category: 'create', priority: 4, label: gettext('Type...'),
           data: {action: 'create', check: true},
           enable: 'canCreate',
+          shortcut_preference: ['browser', 'sub_menu_create'],
         },{
           name: 'create_type', node: 'type', module: this,
           applies: ['object', 'context'], callback: 'show_obj_properties',
           category: 'create', priority: 4, label: gettext('Type...'),
           data: {action: 'create', check: true},
           enable: 'canCreate',
+          shortcut_preference: ['browser', 'sub_menu_create'],
         },{
           name: 'create_type', node: 'schema', module: this,
           applies: ['object', 'context'], callback: 'show_obj_properties',

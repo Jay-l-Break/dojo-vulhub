@@ -8,7 +8,6 @@
 //////////////////////////////////////////////////////////////
 
 
-import React from 'react';
 
 import { act, render } from '@testing-library/react';
 import MockAdapter from 'axios-mock-adapter';
@@ -44,8 +43,11 @@ describe('Users', ()=>{
 
     it('init', async ()=>{
       let ctrl;
-      await act(async ()=>{
-        ctrl = await render(<UsersWithBrowser />);
+      await act(()=>{
+        ctrl = render(<UsersWithBrowser roles={[
+          { id: 1, name: 'Administrator' },
+          { id: 2, name: 'User' },
+        ]}/>);
       });
       expect(ctrl.container.querySelectorAll('[data-test="users"]').length).toBe(1);
     });

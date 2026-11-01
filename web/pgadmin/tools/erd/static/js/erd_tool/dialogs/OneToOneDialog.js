@@ -2,7 +2,7 @@
 //
 // pgAdmin 4 - PostgreSQL Tools
 //
-// Copyright (C) 2013 - 2024, The pgAdmin Development Team
+// Copyright (C) 2013 - 2025, The pgAdmin Development Team
 // This software is released under the PostgreSQL Licence
 //
 //////////////////////////////////////////////////////////////
@@ -83,8 +83,7 @@ class OneToOneSchema extends BaseUISchema {
 export function getOneToOneDialogSchema(attributes, tableNodesDict) {
   let tablesData = [];
   _.forEach(tableNodesDict, (node, uid)=>{
-    let [schema, name] = node.getSchemaTableName();
-    tablesData.push({value: uid, label: `(${schema}) ${name}`, image: 'icon-table'});
+    tablesData.push({value: uid, label: node.getDisplayName(), image: 'icon-table'});
   });
 
   return new OneToOneSchema({

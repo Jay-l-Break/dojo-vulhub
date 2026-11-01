@@ -59,6 +59,7 @@ LANGUAGES = {
     'pt_BR': 'Portuguese (Brazilian)',
     'ru': 'Russian',
     'es': 'Spanish',
+    'sv': 'Swedish'
 }
 
 # DO NOT CHANGE UNLESS YOU KNOW WHAT YOU ARE DOING!
@@ -127,6 +128,17 @@ WEB_SERVER = 'Python'
 # Note that "DENY" is NOT supported (and will be silently ignored).
 # See https://tools.ietf.org/html/rfc7034 for more info.
 X_FRAME_OPTIONS = "SAMEORIGIN"
+
+
+# The Cross-Origin-Opener-Policy allows a website to control whether
+# a new top-level document, opened using Window.open() or by navigating
+# to a new page, is opened in the same browsing context group (BCG)
+# or in a new browsing context group.
+# Set to 'unsafe-none', 'same-origin-allow-popups', 'same-origin',
+# or 'noopener-allow-popups'
+
+CROSS_ORIGIN_OPENER_POLICY = "same-origin"
+
 
 # The Content-Security-Policy header allows you to restrict how resources
 # such as JavaScript, CSS, or pretty much anything that the browser loads.
@@ -364,6 +376,9 @@ SESSION_DB_PATH = os.path.join(DATA_DIR, 'sessions')
 
 SESSION_COOKIE_NAME = 'pga4_session'
 
+# Session digest method
+SESSION_DIGEST_METHOD = 'hashlib.sha1'
+
 ##########################################################################
 # Mail server settings
 ##########################################################################
@@ -464,12 +479,14 @@ DEFAULT_BINARY_PATHS = {
     "pg-15": "",
     "pg-16": "",
     "pg-17": "",
+    "pg-18": "",
     "ppas": "",
     "ppas-13": "",
     "ppas-14": "",
     "ppas-15": "",
     "ppas-16": "",
-    "ppas-17": ""
+    "ppas-17": "",
+    "ppas-18": ""
 }
 
 ##########################################################################
@@ -484,12 +501,14 @@ FIXED_BINARY_PATHS = {
     "pg-15": "",
     "pg-16": "",
     "pg-17": "",
+    "pg-18": "",
     "ppas": "",
     "ppas-13": "",
     "ppas-14": "",
     "ppas-15": "",
     "ppas-16": "",
-    "ppas-17": ""
+    "ppas-17": "",
+    "ppas-18": ""
 }
 
 ##########################################################################
@@ -735,6 +754,9 @@ LDAP_CA_CERT_FILE = ''
 LDAP_CERT_FILE = ''
 LDAP_KEY_FILE = ''
 
+# TLS/SSL certificate Validation (True/False),
+# Make it false if certificate validation is not required.
+LDAP_CERT_VALIDATE = True
 ##########################################################################
 
 # Some flaky LDAP servers returns malformed schema. If True, no exception

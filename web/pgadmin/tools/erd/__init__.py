@@ -10,17 +10,17 @@
 """A blueprint module implementing the erd tool."""
 import json
 
-from flask import url_for, request, Response
+from flask import request, Response, session
 from flask import render_template, current_app as app
+from flask_security import permissions_required
 from pgadmin.user_login_check import pga_login_required
 from flask_babel import gettext
 from werkzeug.user_agent import UserAgent
 from pgadmin.utils import PgAdminModule, \
     SHORTCUT_FIELDS as shortcut_fields
-from pgadmin.utils.ajax import make_json_response, bad_request, \
-    internal_server_error
+from pgadmin.utils.ajax import make_json_response, internal_server_error
 from pgadmin.model import Server
-from config import PG_DEFAULT_DRIVER
+from config import PG_DEFAULT_DRIVER, ALLOW_SAVE_PASSWORD
 from pgadmin.utils.driver import get_driver
 from pgadmin.browser.utils import underscore_unescape
 from pgadmin.browser.server_groups.servers.databases.schemas.utils \
@@ -28,11 +28,13 @@ from pgadmin.browser.server_groups.servers.databases.schemas.utils \
 from pgadmin.browser.server_groups.servers.databases.schemas.tables. \
     constraints.foreign_key import utils as fkey_utils
 from pgadmin.utils.constants import PREF_LABEL_KEYBOARD_SHORTCUTS, \
-    PREF_LABEL_DISPLAY, PREF_LABEL_OPTIONS
+    PREF_LABEL_OPTIONS
 from .utils import ERDHelper
 from pgadmin.utils.exception import ConnectionLost
 from pgadmin.authenticate import socket_login_required
+from pgadmin.tools.user_management.PgAdminPermissions import AllPermissionTypes
 from ... import socketio
+
 
 MODULE_NAME = 'erd'
 SOCKETIO_NAMESPACE = '/{0}'.format(MODULE_NAME)
@@ -150,6 +152,24 @@ class ERDModule(PgAdminModule):
                 'key': {
                     'key_code': 73,
                     'char': 'i'
+                }
+            },
+            category_label=PREF_LABEL_KEYBOARD_SHORTCUTS,
+            fields=shortcut_fields
+        )
+
+        self.preference.register(
+            'keyboard_shortcuts',
+            'search_table',
+            gettext('Search table'),
+            'keyboardshortcut',
+            {
+                'alt': True,
+                'shift': False,
+                'control': True,
+                'key': {
+                    'key_code': 70,
+                    'char': 'f'
                 }
             },
             category_label=PREF_LABEL_KEYBOARD_SHORTCUTS,
@@ -430,6 +450,19 @@ class ERDModule(PgAdminModule):
         )
 
         self.preference.register(
+            'options', 'image_pixel_ratio',
+            gettext('Image Download Resolution'), 'radioModern', '1',
+            category_label=PREF_LABEL_OPTIONS, options=[
+                {'label': gettext('Good'), 'value': '1'},
+                {'label': gettext('High'), 'value': '3'},
+                {'label': gettext('Very High'), 'value': '5'},
+            ],
+            help_str=gettext(
+                'Higher values will use higher memory and slower rendering.'
+            ),
+        )
+
+        self.preference.register(
             'options',
             'sql_with_drop',
             gettext('SQL With DROP Table'),
@@ -442,6 +475,19 @@ class ERDModule(PgAdminModule):
             )
         )
 
+        self.preference.register(
+            'options',
+            'format_pgerd',
+            gettext('Format ERD Project File?'),
+            'boolean',
+            False,
+            category_label=PREF_LABEL_OPTIONS,
+            help_str=gettext(
+                'If enabled, the .pgerd project file of the ERD tool will '
+                'be formatted before saving.'
+            )
+        )
+
 
 blueprint = ERDModule(MODULE_NAME, __name__, static_url_path='/static')
 
@@ -451,6 +497,7 @@ blueprint = ERDModule(MODULE_NAME, __name__, static_url_path='/static')
     methods=["POST"],
     endpoint='panel'
 )
+@permissions_required(AllPermissionTypes.tools_erd_tool)
 @pga_login_required
 def panel(trans_id):
     """
@@ -459,11 +506,11 @@ def panel(trans_id):
     Args:
         panel_title: Title of the panel
     """
+    params = {'trans_id': trans_id, }
+    if request.form:
+        for key, val in request.form.items():
+            params[key] = val
 
-    params = {
-        'trans_id': trans_id,
-        'title': request.form['title']
-    }
     if request.args:
         params.update({k: v for k, v in request.args.items()})
 
@@ -497,19 +544,26 @@ def panel(trans_id):
 
     s = Server.query.filter_by(id=int(params['sid'])).first()
 
-    params.update({
-        'bgcolor': s.bgcolor,
-        'fgcolor': s.fgcolor,
-        'client_platform': user_agent.platform,
-        'is_desktop_mode': app.PGADMIN_RUNTIME,
-        'is_linux': is_linux_platform
-    })
+    if s:
+        params.update({
+            'bgcolor': s.bgcolor,
+            'fgcolor': s.fgcolor,
+            'client_platform': user_agent.platform,
+            'is_desktop_mode': app.PGADMIN_RUNTIME,
+            'is_linux': is_linux_platform
+        })
 
-    return render_template(
-        "erd/index.html",
-        title=underscore_unescape(params['title']),
-        params=json.dumps(params),
-    )
+        return render_template(
+            "erd/index.html",
+            connectionTitle=underscore_unescape(params['connectionTitle']),
+            params=json.dumps(params),
+        )
+    else:
+        params['error'] = 'Server did not find.'
+        return render_template(
+            "erd/index.html",
+            title=None,
+            params=json.dumps(params))
 
 
 @blueprint.route(
@@ -530,11 +584,26 @@ def initialize_erd(trans_id, sgid, sid, did):
     """
     # Read the data if present. Skipping read may cause connection
     # reset error if data is sent from the client
+    data = {}
     if request.data:
-        _ = request.data
+        data = json.loads(request.data)
 
-    conn = _get_connection(sid, did, trans_id)
-
+    try:
+        conn = _get_connection(sid, did, trans_id, data.get('db_name', None))
+    except ConnectionLost as e:
+        return make_json_response(
+            success=0,
+            status=428,
+            result={"server_label": data.get('server_name', None),
+                    "username": data.get('user', None),
+                    "server_type":data.get('server_type', None),
+                    "errmsg": str(e),
+                    "prompt_password": True,
+                    "allow_save_password": True
+                    if ALLOW_SAVE_PASSWORD and
+                    session.get('allow_save_password', None) else False,
+                    }
+        )
     return make_json_response(
         data={
             'connId': str(trans_id),
@@ -544,7 +613,7 @@ def initialize_erd(trans_id, sgid, sid, did):
     )
 
 
-def _get_connection(sid, did, trans_id):
+def _get_connection(sid, did, trans_id, db_name=None):
     """
     Get the connection object of ERD.
     :param sid:
@@ -554,9 +623,13 @@ def _get_connection(sid, did, trans_id):
     """
     manager = get_driver(PG_DEFAULT_DRIVER).connection_manager(sid)
     try:
-        conn = manager.connection(did=did, conn_id=trans_id,
+        conn = manager.connection(conn_id=trans_id,
                                   auto_reconnect=True,
-                                  use_binary_placeholder=True)
+                                  use_binary_placeholder=True,
+                                  **({"database": db_name}
+                                     if db_name is not None
+                                     else {"did": did})
+                                  )
         status, msg = conn.connect()
         if not status:
             app.logger.error(msg)
@@ -585,10 +658,16 @@ def prequisite(trans_id, sgid, sid, did):
     if not status:
         return internal_server_error(errormsg=schemas)
 
+    status, types = helper.get_geometry_types()
+
+    if not status:
+        return internal_server_error(errormsg=types)
+
     return make_json_response(
         data={
             'col_types': col_types,
-            'schemas': schemas['rows']
+            'schemas': schemas['rows'],
+            'geometry_types': types
         },
         status=200
     )

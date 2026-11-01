@@ -7,7 +7,6 @@
 //
 //////////////////////////////////////////////////////////////
 
-import React from 'react';
 
 import FloatingNote from 'pgadmin.tools.erd/erd_tool/components/FloatingNote';
 import Theme from '../../../../pgadmin/static/js/Theme';
@@ -27,6 +26,9 @@ describe('ERD FloatingNote', ()=>{
       getSchemaTableName: function() {
         return ['schema1', 'table1'];
       },
+      getDisplayName: function() {
+        return '(schema1) table1';
+      }
     };
     const user = userEvent.setup();
 

@@ -89,19 +89,12 @@ const StyledEditorDiv = styled(Box)(({ theme }) => ({
     padding: '0.25rem',
     '& .jsoneditor-div': {
       fontSize: '12px',
-      minWidth: '525px',
-      minHeight: '300px',
+      minWidth: '200px',
+      minHeight: '200px',
       ...theme.mixins.panelBorder.all,
       outline: 0,
       resize: 'both',
       overflow: 'hidden',
-    },
-    '& .jsoneditor': {
-      height: 'abc',
-      border: 'none',
-      '& .ace-jsoneditor .ace_marker-layer .ace_active-line': {
-        background: theme.palette.primary.light,
-      },
     },
   },
   '& .Editors-buttonMargin': {
@@ -109,7 +102,7 @@ const StyledEditorDiv = styled(Box)(({ theme }) => ({
   },
 }));
 
-const ResizableDiv = ({columnIndex, children, ...otherProps}) => {
+const ResizableDiv = ({columnIndex, children, resizeKey, defaultSize, ...otherProps}) => {
 
   const editorRef = React.useRef(null);
   const {getCellElement} = useContext(RowInfoContext);
@@ -131,11 +124,24 @@ const ResizableDiv = ({columnIndex, children, ...otherProps}) => {
       if (box.right > innerWidth) {
         editorRef.current.firstChild.style.width = `${currentWidth - widthDiff - 20}px`;
       }
+      // logic to save the height and width of the editor
+      if (currentHeight || currentWidth) {
+        window.resizeKeys = window.resizeKeys || {};
+        window.resizeKeys[resizeKey] = {height: editorRef.current.firstChild.style.height, width: editorRef.current.firstChild.style.width};
+      }
+
     };
 
     editorRef.current.addEventListener('mousedown', () => {
       document.addEventListener('mouseup', resizeEditor, {once: true});
     });
+    // Fetch the saved height and width from window object
+    editorRef.current.firstChild.style.height = window.resizeKeys?.[resizeKey]?.height || defaultSize.height;
+    editorRef.current.firstChild.style.width = window.resizeKeys?.[resizeKey]?.width || defaultSize.width;
+
+    // set initial position of editor and resize if it goes beyond visible area.
+    setEditorPosition(getCellElement(columnIndex), editorRef.current, '.rdg', 12);
+    resizeEditor();
 
     return () => document.removeEventListener('mouseup', resizeEditor);
 
@@ -144,7 +150,6 @@ const ResizableDiv = ({columnIndex, children, ...otherProps}) => {
   return (
     <StyledEditorDiv ref={(ele)=>{
       editorRef.current = ele;
-      setEditorPosition(getCellElement(columnIndex), ele, '.rdg', 12);
     }} {...otherProps}>
       {children}
     </StyledEditorDiv>
@@ -153,7 +158,9 @@ const ResizableDiv = ({columnIndex, children, ...otherProps}) => {
 ResizableDiv.displayName = 'ResizableDiv';
 ResizableDiv.propTypes = {
   children: CustomPropTypes.children,
-  columnIndex: PropTypes.number
+  columnIndex: PropTypes.number,
+  resizeKey: PropTypes.string,
+  defaultSize: PropTypes.object,
 };
 
 function autoFocusAndSelect(input) {
@@ -256,7 +263,7 @@ export function TextEditor({row, column, onRowChange, onClose}) {
   return (
     <Portal container={document.body}>
       <ResizableDiv columnIndex={column.idx}
-        className='Editors-textEditor' data-label="pg-editor" onKeyDown={suppressEnterKey} >
+        className='Editors-textEditor' data-label="pg-editor" resizeKey={'text'} defaultSize={{height:'80px', width:'250px'}} onKeyDown={suppressEnterKey} >
         <textarea ref={autoFocusAndSelect} className='Editors-textarea' value={localVal} onChange={onChange} onKeyDown={onkeydown} />
         <Box display="flex" justifyContent="flex-end">
           <DefaultButton startIcon={<CloseIcon />} onClick={()=>onClose(false)} size="small">
@@ -409,6 +416,7 @@ export function JsonTextEditor({row, column, onRowChange, onClose}) {
   const [hasError, setHasError] = React.useState(false);
 
   const onChange = React.useCallback((newVal)=>{
+    newVal = newVal == '' ? null : newVal;
     setLocalVal(newVal);
   }, []);
   const onOK = ()=>{
@@ -423,15 +431,33 @@ export function JsonTextEditor({row, column, onRowChange, onClose}) {
     onRowChange({ ...row, [column.key]: localVal}, true);
     onClose();
   };
+
+  const setJsonEditorSize = (eleRef) => {
+    // Logic to set the size of the editor
+    const { innerHeight, innerWidth } = window;
+    const box = eleRef.getBoundingClientRect();
+    let currentHeight = parseInt(eleRef.offsetHeight);
+    let heightDiff = parseInt(box.bottom) - innerHeight;
+    let currentWidth = parseInt(eleRef.offsetWidth);
+    let widthDiff = parseInt(box.right) - innerWidth;
+
+    if (box.bottom > innerHeight) {
+      eleRef.style.height = `${currentHeight - heightDiff - 50}px`;
+    }
+    if (box.right > innerWidth) {
+      eleRef.style.width = `${currentWidth - widthDiff - 50}px`;
+    }
+  };
   return (
     <Portal container={document.body}>
       <ResizableDiv columnIndex={column.idx}
-        className='Editors-jsonEditor' data-label="pg-editor" onKeyDown={suppressEnterKey} >
+        className='Editors-jsonEditor' data-label="pg-editor" resizeKey={'json'} defaultSize={{height:'500px', width:'600px'}} onKeyDown={suppressEnterKey} >
         <JsonEditor
-          value={localVal}
+          setJsonEditorSize={setJsonEditorSize}
+          value={localVal??''}
           options={{
             onChange: onChange,
-            onValidationError: (errors)=>{setHasError(Boolean(errors.length));}
+            onValidationError: (errors)=>{setHasError(Boolean(errors));}
           }}
           className={'jsoneditor-div'}
         />

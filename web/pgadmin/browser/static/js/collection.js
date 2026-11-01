@@ -7,6 +7,7 @@
 //
 //////////////////////////////////////////////////////////////
 import _ from 'lodash';
+import { AllPermissionTypes } from './constants';
 
 define([
   'sources/gettext', 'sources/pgadmin',
@@ -44,6 +45,7 @@ define([
           name: 'refresh', node: this.type, module: this,
           applies: ['object', 'context'], callback: 'refresh',
           priority: 2, label: gettext('Refresh'),
+          shortcut_preference: ['browser', 'sub_menu_refresh'],
         }]);
 
         // show query tool only in context menu of supported nodes.
@@ -53,6 +55,8 @@ define([
               name: 'show_query_tool', node: this.type, module: this,
               applies: ['context'], callback: 'show_query_tool',
               priority: 998, label: gettext('Query Tool'),
+              permission: AllPermissionTypes.TOOLS_QUERY_TOOL,
+              shortcut_preference: ['browser', 'sub_menu_query_tool'],
             }]);
 
             // show search objects same as query tool
@@ -60,6 +64,8 @@ define([
               name: 'search_objects', node: this.type, module: this,
               applies: ['context'], callback: 'show_search_objects',
               priority: 997, label: gettext('Search Objects...'),
+              permission: AllPermissionTypes.TOOLS_SEARCH_OBJECTS,
+              shortcut_preference: ['browser', 'sub_menu_search_objects'],
             }]);
 
             // show psql tool same as query tool.
@@ -68,6 +74,7 @@ define([
                 name: 'show_psql_tool', node: this.type, module: this,
                 applies: ['context'], callback: 'show_psql_tool',
                 priority: 998, label: gettext('PSQL Tool'),
+                permission: AllPermissionTypes.TOOLS_PSQL_TOOL,
               }]);
             }
           }

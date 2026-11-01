@@ -49,6 +49,8 @@ export default function(basicSettings) {
         main: '#eea236',
         light: '#fce5c5',
         contrastText: '#000',
+        hoverMain: darken('#eea236', 0.1),
+        hoverBorderColor: darken('#eea236', 0.1),
       },
       info: {
         main: '#fde74c',
@@ -58,13 +60,11 @@ export default function(basicSettings) {
         '400': '#ebeef3',
         '600': '#bac1cd',
         '800': '#848ea0',
+        '900': '#646B82',
       },
       text: {
         primary: '#222',
         muted: '#646B82',
-      },
-      checkbox: {
-        disabled: '#ebeef3'
       },
       background: {
         paper: '#fff',
@@ -72,6 +72,10 @@ export default function(basicSettings) {
       },
     },
     custom: {
+      checkbox: {
+        borderColor: '#646B82',
+        disabled: '#ebeef3'
+      },
       icon: {
         main: '#fff',
         contrastText: '#222',
@@ -152,7 +156,7 @@ export default function(basicSettings) {
         number: '#964',
         string: '#a11',
         variable: '#222',
-        type: '#05a',
+        type: '#7e0000',
         comment: '#a50',
         punctuation: '#737373',
         operator: '#222',

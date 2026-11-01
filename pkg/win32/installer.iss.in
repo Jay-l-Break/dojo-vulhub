@@ -36,6 +36,9 @@ ArchitecturesInstallIn64BitMode={#MyAppArchitecturesMode}
 AllowNoIcons=yes
 WizardImageFile=sidebar.bmp
 MinVersion={#MinimumWindowsVer}
+SignTool=pgAdminSigntool
+SignedUninstaller=yes
+CloseApplications=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
