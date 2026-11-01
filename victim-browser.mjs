@@ -19,7 +19,7 @@ async function prepareVictim() {
   await page.goto(GATEWAY_ORIGIN, {waitUntil: 'domcontentloaded'});
   await page.evaluate(
       ([key, token]) => localStorage.setItem(key, JSON.stringify({token})),
-      [SETTINGS_KEY, process.env.OPENCLAW_GATEWAY_TOKEN]);
+      [SETTINGS_KEY, process.env.CLAWDBOT_GATEWAY_TOKEN]);
   await page.reload({waitUntil: 'domcontentloaded'});
   await page.waitForFunction(
       () => document.querySelector('clawdbot-app')?.connected === true,

@@ -1,24 +1,24 @@
 #!/bin/bash
 set -euo pipefail
 
-if [[ -z "${OPENCLAW_GATEWAY_TOKEN:-}" ]]; then
-    OPENCLAW_GATEWAY_TOKEN="$(node -e 'process.stdout.write(require("crypto").randomBytes(24).toString("hex"))')"
-    export OPENCLAW_GATEWAY_TOKEN
+if [[ -z "${CLAWDBOT_GATEWAY_TOKEN:-}" ]]; then
+    CLAWDBOT_GATEWAY_TOKEN="$(node -e 'process.stdout.write(require("crypto").randomBytes(24).toString("hex"))')"
+    export CLAWDBOT_GATEWAY_TOKEN
 fi
 
-mkdir -p /root/.config/openclaw
-cat > /root/.config/openclaw/openclaw.json5 <<EOF
+mkdir -p /root/.clawdbot
+cat > /root/.clawdbot/clawdbot.json <<EOF
 {
-  gateway: {
-    mode: "local",
-    bind: "lan",
-    port: 18790,
-    auth: {
-      mode: "token",
-      token: "$OPENCLAW_GATEWAY_TOKEN"
+  "gateway": {
+    "mode": "local",
+    "bind": "lan",
+    "port": 18790,
+    "auth": {
+      "mode": "token",
+      "token": "$CLAWDBOT_GATEWAY_TOKEN"
     },
-    controlUi: {
-      allowInsecureAuth: true
+    "controlUi": {
+      "allowInsecureAuth": true
     }
   }
 }
