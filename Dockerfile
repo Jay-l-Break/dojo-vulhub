@@ -4,7 +4,7 @@ RUN python -m pip install --no-cache-dir 'salt==2018.3.0rc1' --no-deps \
     && python -m pip install --no-cache-dir \
        'Jinja2==2.11.3' 'MarkupSafe==2.0.1' 'msgpack-python==0.5.6' \
        'PyYAML==6.0.1' 'requests==2.27.1' 'tornado==4.5.3' \
-       'pyzmq==25.1.2' 'pycryptodome==3.18.0'
+       'pyzmq==22.3.0' 'pycryptodome==3.18.0'
 COPY salt /usr/local/lib/python3.6/site-packages/salt
 COPY gateway.py /usr/local/bin/gateway.py
 COPY start.sh /usr/local/bin/start-saltstack.sh
