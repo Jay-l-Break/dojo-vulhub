@@ -7,7 +7,7 @@ RUN sed -i 's|deb.debian.org/debian|archive.debian.org/debian|g;s|security.debia
     && python -m pip install --no-cache-dir \
        'Jinja2==2.11.3' 'MarkupSafe==2.0.1' 'msgpack-python==0.5.6' \
        'PyYAML==6.0.1' 'requests==2.27.1' 'tornado==4.5.3' \
-       'pyzmq==25.1.2' 'pycryptodome==3.18.0' 'CherryPy==18.6.0'
+       'pyzmq==22.3.0' 'pycryptodome==3.18.0' 'CherryPy==18.6.0' 'pytz==2026.5'
 COPY salt /usr/local/lib/python3.6/site-packages/salt
 COPY api.conf /etc/salt/master.d/api.conf
 COPY start.sh /usr/local/bin/start-saltstack.sh
